@@ -4,8 +4,11 @@ import org.dom4j.DocumentException;
 import org.neuclear.commons.NeuClearException;
 import org.neuclear.commons.configuration.ConfigurationException;
 import org.neuclear.id.SignedNamedObject;
+import org.neuclear.ledger.BookExistsException;
 import org.neuclear.ledger.LedgerCreationException;
 import org.neuclear.ledger.LowlevelLedgerException;
+import org.neuclear.ledger.UnknownBookException;
+import org.neuclear.pay.Account;
 import org.neuclear.pay.PaymentProcessor;
 import org.neuclear.pay.contracts.TransferContract;
 import org.neuclear.receiver.AbstractReceiverTest;
@@ -30,8 +33,12 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: PaymentReceiverTest.java,v 1.1 2003/10/25 00:46:29 pelle Exp $
+$Id: PaymentReceiverTest.java,v 1.2 2003/10/28 23:42:47 pelle Exp $
 $Log: PaymentReceiverTest.java,v $
+Revision 1.2  2003/10/28 23:42:47  pelle
+The PassPhraseDialogue now works. It simply presents itself as a simple modal dialog box asking for a passphrase.
+The two SignerStore implementations both use it for the passphrase.
+
 Revision 1.1  2003/10/25 00:46:29  pelle
 Added tests to test the PaymentReceiver.
 CreateTestPayments is a command line utility to create signed payment requests
@@ -46,7 +53,7 @@ CreateTestPayments is a command line utility to create signed payment requests
 public class PaymentReceiverTest extends AbstractReceiverTest {
     public PaymentReceiverTest(String string) throws LowlevelLedgerException, LedgerCreationException, ConfigurationException {
         super(string);
-        //proc=PaymentProcessor.getInstance();
+        proc = PaymentProcessor.getInstance();
         receiver = new PaymentReceiver(proc, "neu://test/pay");
     }
 
@@ -62,12 +69,24 @@ public class PaymentReceiverTest extends AbstractReceiverTest {
         return ".xml";
     }
 
+    private Account createNewAccount(String name) throws BookExistsException, LowlevelLedgerException {
+        try {
+            return proc.getAccount(name);
+        } catch (UnknownBookException e) {
+            return proc.createAccount(name, name);
+        }
+
+    }
+
     public Object getPreTransactionState(SignedNamedObject obj) throws Exception {
 
         if (obj instanceof TransferContract) {
             TransferContract transfer = (TransferContract) obj;
-            double fromBalance = proc.getAccount(transfer.getSignatory().getName()).getBalance(transfer.getTimeStamp());
-            double toBalance = proc.getAccount(transfer.getRecipient()).getBalance(transfer.getTimeStamp());
+            Account fromAccount = createNewAccount(transfer.getSignatory().getName());
+            double fromBalance = (fromAccount != null) ? fromAccount.getBalance(transfer.getTimeStamp()) : 0;
+            Account toAccount = createNewAccount(transfer.getRecipient());
+            double toBalance = (toAccount != null) ? toAccount.getBalance(transfer.getTimeStamp()) : 0;
+            ;
             return new double[]{fromBalance, toBalance};
 
         }
@@ -78,8 +97,11 @@ public class PaymentReceiverTest extends AbstractReceiverTest {
         if (obj instanceof TransferContract && state != null) {
             TransferContract transfer = (TransferContract) obj;
             final double prebalances[] = (double[]) state;
-            double fromBalance = proc.getAccount(transfer.getSignatory().getName()).getBalance(transfer.getTimeStamp());
-            double toBalance = proc.getAccount(transfer.getRecipient()).getBalance(transfer.getTimeStamp());
+            Account fromAccount = createNewAccount(transfer.getSignatory().getName());
+            Account toAccount = createNewAccount(transfer.getRecipient());
+            double fromBalance = (fromAccount != null) ? fromAccount.getBalance(transfer.getTimeStamp()) : 0;
+            double toBalance = (toAccount != null) ? toAccount.getBalance(transfer.getTimeStamp()) : 0;
+            ;
 
             return (fromBalance == prebalances[0] - transfer.getAmount()) &&
                     (toBalance == prebalances[1] + transfer.getAmount());

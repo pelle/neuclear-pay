@@ -3,7 +3,6 @@ package org.neuclear.pay;
 import org.neuclear.commons.configuration.Configuration;
 import org.neuclear.commons.configuration.ConfigurationException;
 import org.neuclear.ledger.*;
-import org.picocontainer.PicoContainer;
 
 import java.util.Date;
 
@@ -102,8 +101,7 @@ public class PaymentProcessor {
     }
 
     public static PaymentProcessor getInstance() throws LowlevelLedgerException, LedgerCreationException, ConfigurationException {
-        PicoContainer pico = Configuration.getContainer(PaymentProcessor.class);
-        return (PaymentProcessor) pico.getComponentInstance(PaymentProcessor.class);
+        return (PaymentProcessor) Configuration.getComponent(PaymentProcessor.class, "neuclear-pay");
     }
 
 /*    public static PicoContainer getContainer() throws LedgerCreationException, LowlevelLedgerException {
