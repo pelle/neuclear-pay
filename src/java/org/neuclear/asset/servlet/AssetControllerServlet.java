@@ -1,16 +1,21 @@
 package org.neuclear.asset.servlet;
 
 import org.neuclear.asset.AssetController;
+import org.neuclear.asset.contracts.Asset;
 import org.neuclear.asset.contracts.AssetGlobals;
 import org.neuclear.asset.controllers.currency.CurrencyController;
 import org.neuclear.asset.orders.TransferGlobals;
+import org.neuclear.commons.servlets.ServletTools;
 import org.neuclear.id.Service;
 import org.neuclear.id.receiver.ReceiverServlet;
-import org.neuclear.id.resolver.Resolver;
-import org.neuclear.ledger.simple.SimpleLedger;
+import org.neuclear.id.verifier.VerifyingReader;
+import org.neuclear.ledger.Ledger;
+import org.neuclear.ledger.hibernate.HibernateLedger;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
+import java.io.InputStream;
+import java.net.URL;
 
 /*
 NeuClear Distributed Transaction Clearing Platform
@@ -30,8 +35,11 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: AssetControllerServlet.java,v 1.7 2004/04/15 20:03:18 pelle Exp $
+$Id: AssetControllerServlet.java,v 1.8 2004/04/20 23:30:43 pelle Exp $
 $Log: AssetControllerServlet.java,v $
+Revision 1.8  2004/04/20 23:30:43  pelle
+All unit tests (junit and cactus) work. The AssetControllerServlet is operational.
+
 Revision 1.7  2004/04/15 20:03:18  pelle
 Added license screen to Personal Signer.
 Added Sign document menu to  Personal Signer.
@@ -124,10 +132,18 @@ public final class AssetControllerServlet extends ReceiverServlet {
         AssetGlobals.registerReaders();
         TransferGlobals.registerReaders();
         try {
-            asset = (Service) Resolver.resolveIdentity(getServiceid());
-            final AssetController receiver = new CurrencyController(new SimpleLedger(getServiceid()), null,
+            String asseturl = ServletTools.getInitParam("asset", config);
+            InputStream is;
+            if (asseturl.startsWith("/"))
+                is = ctx.getResourceAsStream(asseturl);
+            else {
+                is = new URL(asseturl).openStream();
+            }
+            asset = (Asset) VerifyingReader.getInstance().read(is);
+            ledger = new HibernateLedger(getAlias());
+            final AssetController receiver = new CurrencyController(ledger, asset,
                     getSigner(),
-                    getServiceid());
+                    getAlias());
             setReceiver(receiver);
 
         } catch (Exception e) {
@@ -140,6 +156,14 @@ public final class AssetControllerServlet extends ReceiverServlet {
         return asset;
     }
 
+    void setAsset(Asset asset) {
+        this.asset = asset;
+    }
 
-    private Service asset;
+    Ledger getLedger() {
+        return ledger;
+    }
+
+    private Asset asset;
+    private Ledger ledger;
 }

@@ -3,6 +3,7 @@ package org.neuclear.asset.controllers.currency;
 import org.neuclear.asset.Auditor;
 import org.neuclear.asset.InvalidTransferException;
 import org.neuclear.asset.contracts.Asset;
+import org.neuclear.asset.contracts.AssetGlobals;
 import org.neuclear.asset.contracts.builders.AssetBuilder;
 import org.neuclear.asset.orders.Amount;
 import org.neuclear.asset.orders.IssueReceipt;
@@ -26,6 +27,8 @@ import java.security.GeneralSecurityException;
 public final class IssuanceTests extends AbstractSigningTest {
     public IssuanceTests(final String s) throws LowlevelLedgerException, GeneralSecurityException, NeuClearException {
         super(s);
+        AssetGlobals.registerReaders();
+
         asset = createTestAsset();
         ledger = new SimpleLedger("test");
         proc = new CurrencyController(ledger, asset, getSigner(), "neu://test/bux");

@@ -4,26 +4,30 @@
   "http://java.sun.com/dtd/web-app_2_3.dtd">
 <web-app>
     <context-param>
-            <param-name>serviceid</param-name>
-            <param-value>neu://test/bux</param-value>
-            <description>NeuClear id of Service</description>
+        <param-name>serviceid</param-name>
+        <param-value>bux</param-value>
+        <description>NeuClear id of Service</description>
     </context-param>
     <context-param>
-             <param-name>title</param-name>
-             <param-value>NeuClear Sample E-Currency Application</param-value>
+        <param-name>title</param-name>
+        <param-value>NeuClear Sample E-Currency Application</param-value>
     </context-param>
     <context-param>
-             <param-name>keystore</param-name>
-             <param-value>test</param-value>
+        <param-name>keystore</param-name>
+        <param-value>test</param-value>
     </context-param>
     <context-param>
-             <param-name>passphraseagent</param-name>
-             <param-value>test</param-value>
+        <param-name>asset</param-name>
+        <param-value>/bux.html</param-value>
     </context-param>
-     <context-param>
-         <param-name>datasource</param-name>
-         <param-value>jdbc/AssetDS</param-value>
-     </context-param>
+    <context-param>
+        <param-name>passphraseagent</param-name>
+        <param-value>test</param-value>
+    </context-param>
+    <context-param>
+        <param-name>datasource</param-name>
+        <param-value>jdbc/AssetDS</param-value>
+    </context-param>
     <filter>
         <filter-name>authfilter</filter-name>
         <filter-class>org.neuclear.id.auth.AuthenticationFilter</filter-class>
@@ -41,11 +45,11 @@
         </init-param>
         <load-on-startup>1</load-on-startup>
     </servlet>
-     <servlet>
-         <servlet-name>authenticator</servlet-name>
-         <servlet-class>org.neuclear.id.auth.AuthenticationServlet</servlet-class>
-         <load-on-startup>1</load-on-startup>
-     </servlet>
+    <servlet>
+        <servlet-name>authenticator</servlet-name>
+        <servlet-class>org.neuclear.id.auth.AuthenticationServlet</servlet-class>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
     <servlet-mapping>
         <servlet-name>assetcontroller</servlet-name>
         <url-pattern>/Asset</url-pattern>

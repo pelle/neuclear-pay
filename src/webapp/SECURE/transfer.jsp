@@ -6,7 +6,6 @@
                  org.neuclear.commons.time.TimeTools,
                  org.neuclear.id.builders.SignatureRequestBuilder,
                  org.neuclear.asset.contracts.AssetGlobals,
-
                  org.neuclear.asset.servlet.AssetControllerServlet,
                  org.neuclear.id.SignedNamedObject,
                  org.neuclear.commons.crypto.Base64,
@@ -14,13 +13,18 @@
                  org.neuclear.id.Service,
                  org.neuclear.asset.orders.TransferGlobals,
                  org.neuclear.id.Signatory,
-                 org.neuclear.asset.orders.Amount"%>
+                 org.neuclear.asset.orders.Amount,
+                 org.neuclear.commons.crypto.signers.TestCaseSigner,
+                 org.neuclear.commons.crypto.signers.ServletSignerFactory,
+                 org.neuclear.commons.crypto.signers.Signer"%>
 <%
     AssetGlobals.registerReaders();
     TransferGlobals.registerReaders();
+    final Signer signer = ServletSignerFactory.getInstance().createSigner(config);
     Signatory userns=(Signatory) request.getUserPrincipal();
-    String service=ServletTools.getInitParam("service",config);
-//    Service asset=(Service)Resolver.resolveIdentity(service);
+    String service=ServletTools.getInitParam("serviceid",config);
+//    String asseturl=ServletTools.getInitParam("asset",config);
+    Asset asset=(Asset)Resolver.resolveIdentity(ServletTools.getAbsoluteURL(request,"/bux.html"));
     String recipient=Utility.denullString(request.getParameter("recipient"));
     double amount=Double.parseDouble(Utility.denullString(request.getParameter("amount"),"0"));
     boolean submit=!Utility.isEmpty(request.getParameter("submit"));
@@ -51,13 +55,13 @@ if (!submit){
 </p>
 <% } else {
     TransferOrderBuilder transfer=new TransferOrderBuilder(
-            service,
-            recipient,
+            asset.getName(),
+            "test",//new Signatory(signer.getPublicKey(recipient)),
             new Amount(amount),
             comment
     ) ;
     SignatureRequestBuilder sigreq=new SignatureRequestBuilder(transfer,comment);
-//    SignedNamedObject sig=sigreq.sign();
+    SignedNamedObject sig=sigreq.convert(service,signer);
 
 %>
 <form action="http://localhost:11870/Signer" method="POST">

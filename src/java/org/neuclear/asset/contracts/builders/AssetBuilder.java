@@ -33,8 +33,11 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: AssetBuilder.java,v 1.13 2004/04/18 01:06:05 pelle Exp $
+$Id: AssetBuilder.java,v 1.14 2004/04/20 23:30:42 pelle Exp $
 $Log: AssetBuilder.java,v $
+Revision 1.14  2004/04/20 23:30:42  pelle
+All unit tests (junit and cactus) work. The AssetControllerServlet is operational.
+
 Revision 1.13  2004/04/18 01:06:05  pelle
 Asset now parses the xhtml file for its details.
 
@@ -155,8 +158,8 @@ public final class AssetBuilder extends ServiceBuilder {
 
             final AssetBuilder assetraw = new AssetBuilder("Bux",
                     "http://bux.neuclear.org",
-                    signer.getPublicKey("neu://test/bux"),
-                    signer.getPublicKey("neu://alice@test"),
+                    signer.getPublicKey("bux"),
+                    signer.getPublicKey("carol"),
                     2,
                     0.01);
             assetraw.getDescription().setText("NeuClear Test Currency");
