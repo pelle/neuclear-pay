@@ -20,8 +20,8 @@ import java.util.Random;
  * Date: Jul 21, 2003
  * Time: 6:05:04 PM
  */
-public class CurrencyTests extends TestCase {
-    public CurrencyTests(String s) throws SQLException, IOException, LowlevelLedgerException, BookExistsException, LedgerCreationException, ConfigurationException {
+public final class CurrencyTests extends TestCase {
+    public CurrencyTests(final String s) throws SQLException, IOException, LowlevelLedgerException, BookExistsException, LedgerCreationException, ConfigurationException {
         super(s);
 //        proc = CurrencyController.getInstance();
     }

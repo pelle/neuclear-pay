@@ -6,20 +6,20 @@ package org.neuclear.asset;
  * Date: Jul 23, 2003
  * Time: 11:38:10 AM
  */
-public class NegativeTransferException extends InvalidTransferException {
-    public NegativeTransferException(double amount) {
+public final class NegativeTransferException extends InvalidTransferException {
+    public NegativeTransferException(final double amount) {
         super("negative amount");
         this.amount = amount;
     }
 
-    private double amount;
+    private final double amount;
 
 
-    public double getAmount() {
+    public final double getAmount() {
         return amount;
     }
 
-    public String getSubMessage() {
+    public final String getSubMessage() {
         return "Not possible to perform payment of negative amount: " + amount;
     }
 }

@@ -6,6 +6,7 @@ import org.neuclear.asset.NegativeTransferException;
 import org.neuclear.asset.contracts.HeldTransferRequest;
 import org.neuclear.asset.contracts.TransferGlobals;
 import org.neuclear.commons.time.TimeTools;
+import org.neuclear.commons.NeuClearException;
 
 /*
 NeuClear Distributed Transaction Clearing Platform
@@ -25,8 +26,14 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: HeldTransferReceiptBuilder.java,v 1.2 2003/11/11 21:17:19 pelle Exp $
+$Id: HeldTransferReceiptBuilder.java,v 1.3 2003/11/21 04:43:03 pelle Exp $
 $Log: HeldTransferReceiptBuilder.java,v $
+Revision 1.3  2003/11/21 04:43:03  pelle
+EncryptedFileStore now works. It uses the PBECipher with DES3 afair.
+Otherwise You will Finaliate.
+Anything that can be final has been made final throughout everyting. We've used IDEA's Inspector tool to find all instance of variables that could be final.
+This should hopefully make everything more stable (and secure).
+
 Revision 1.2  2003/11/11 21:17:19  pelle
 Further vital reshuffling.
 org.neudist.crypto.* and org.neudist.utils.* have been moved to respective areas under org.neuclear.commons
@@ -52,10 +59,10 @@ which will handle all neuclear-ledger based AssetControllers.
  * Date: Nov 7, 2003
  * Time: 8:05:15 PM
  */
-public class HeldTransferReceiptBuilder extends TransferReceiptBuilder {
-    public HeldTransferReceiptBuilder(HeldTransferRequest req, String id) throws InvalidTransferException, NegativeTransferException {
+public final class HeldTransferReceiptBuilder extends TransferReceiptBuilder {
+    public HeldTransferReceiptBuilder(final HeldTransferRequest req, final String id) throws InvalidTransferException, NegativeTransferException, NeuClearException {
         super(TransferGlobals.HELD_XFER_RCPT_TAGNAME, req, id);
-        Element element = getElement();
+        final Element element = getElement();
         element.add(TransferGlobals.createAttribute(element, "helduntil", TimeTools.formatTimeStamp(req.getHeldUntil())));
 
     }

@@ -4,6 +4,7 @@ import org.dom4j.Element;
 import org.neuclear.asset.contracts.*;
 import org.neuclear.asset.InvalidTransferException;
 import org.neuclear.asset.NegativeTransferException;
+import org.neuclear.commons.NeuClearException;
 
 import java.util.Date;
 
@@ -25,8 +26,14 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: TransferReceiptBuilder.java,v 1.3 2003/11/10 17:42:07 pelle Exp $
+$Id: TransferReceiptBuilder.java,v 1.4 2003/11/21 04:43:03 pelle Exp $
 $Log: TransferReceiptBuilder.java,v $
+Revision 1.4  2003/11/21 04:43:03  pelle
+EncryptedFileStore now works. It uses the PBECipher with DES3 afair.
+Otherwise You will Finaliate.
+Anything that can be final has been made final throughout everyting. We've used IDEA's Inspector tool to find all instance of variables that could be final.
+This should hopefully make everything more stable (and secure).
+
 Revision 1.3  2003/11/10 17:42:07  pelle
 The AssetController interface has been more or less finalized.
 CurrencyController fully implemented
@@ -62,10 +69,10 @@ TransferReceiptBuilder has been created for use by Transfer processors. It is us
  * Time: 6:28:26 PM
  */
 public class TransferReceiptBuilder extends TransferBuilder {
-    public TransferReceiptBuilder(TransferRequest req,String id) throws InvalidTransferException, NegativeTransferException {
+    public TransferReceiptBuilder(final TransferRequest req,final String id) throws InvalidTransferException, NegativeTransferException, NeuClearException {
         this(TransferGlobals.XFER_RCPT_TAGNAME,req,id);
     }
-    public TransferReceiptBuilder(CompleteHeldTransferRequest req,String id) throws InvalidTransferException, NegativeTransferException {
+    public TransferReceiptBuilder(final CompleteHeldTransferRequest req,final String id) throws InvalidTransferException, NegativeTransferException, NeuClearException {
         super(TransferGlobals.XFER_RCPT_TAGNAME,
                 req.getAsset(),
                 req.getAsset(),
@@ -73,12 +80,12 @@ public class TransferReceiptBuilder extends TransferBuilder {
                 req.getAmount(),
                 req.getValueTime(),
                 req.getComment());
-        Element element = getElement();
+        final Element element = getElement();
         element.add(TransferGlobals.createAttribute(element, "sender", req.getFrom().getName()));
         element.add(TransferGlobals.createAttribute(element, "holdid", req.getHoldId()));
     }
 
-    TransferReceiptBuilder(String tagname,TransferRequest req,String id) throws InvalidTransferException, NegativeTransferException {
+    TransferReceiptBuilder(final String tagname,final TransferRequest req,final String id) throws InvalidTransferException, NegativeTransferException, NeuClearException {
         super(tagname,
                 req.getAsset(),
                 req.getAsset(),
@@ -86,7 +93,7 @@ public class TransferReceiptBuilder extends TransferBuilder {
                 req.getAmount(),
                 req.getValueTime(),
                 req.getComment());
-        Element element = getElement();
+        final Element element = getElement();
         element.add(TransferGlobals.createAttribute(element, "sender", req.getFrom().getName()));
         element.add(TransferGlobals.createAttribute(element, "reqid", req.getName()));
     }

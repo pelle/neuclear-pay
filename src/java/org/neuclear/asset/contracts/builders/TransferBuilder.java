@@ -6,6 +6,7 @@ import org.neuclear.asset.NegativeTransferException;
 import org.neuclear.asset.contracts.Asset;
 import org.neuclear.asset.contracts.TransferGlobals;
 import org.neuclear.commons.Utility;
+import org.neuclear.commons.NeuClearException;
 import org.neuclear.commons.time.TimeTools;
 import org.neuclear.id.Identity;
 import org.neuclear.id.NSTools;
@@ -31,8 +32,14 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: TransferBuilder.java,v 1.5 2003/11/12 23:47:04 pelle Exp $
+$Id: TransferBuilder.java,v 1.6 2003/11/21 04:43:03 pelle Exp $
 $Log: TransferBuilder.java,v $
+Revision 1.6  2003/11/21 04:43:03  pelle
+EncryptedFileStore now works. It uses the PBECipher with DES3 afair.
+Otherwise You will Finaliate.
+Anything that can be final has been made final throughout everyting. We've used IDEA's Inspector tool to find all instance of variables that could be final.
+This should hopefully make everything more stable (and secure).
+
 Revision 1.5  2003/11/12 23:47:04  pelle
 Much work done in creating good test environment.
 PaymentReceiverTest works, but needs a abit more work in its environment to succeed testing.
@@ -78,7 +85,7 @@ TransferReceiptBuilder has been created for use by Transfer processors. It is us
  * Time: 3:13:27 PM
  */
 public abstract class TransferBuilder extends NamedObjectBuilder {
-    protected TransferBuilder(String tagname, Asset asset, Identity signer, Identity to, double amount, Date valuetime, String comment) throws InvalidTransferException, NegativeTransferException {
+    protected TransferBuilder(final String tagname, final Asset asset, final Identity signer, final Identity to, final double amount, final Date valuetime, final String comment) throws InvalidTransferException, NegativeTransferException, NeuClearException {
         super(NSTools.createUniqueNamedID(signer.getName(), to.getName()), TransferGlobals.createQName(tagname));
         if (amount < 0)
             throw new NegativeTransferException(amount);
@@ -90,7 +97,7 @@ public abstract class TransferBuilder extends NamedObjectBuilder {
             throw new InvalidTransferException("valuetime");
 
         this.asset = asset;
-        Element element = getElement();
+        final Element element = getElement();
         element.add(TransferGlobals.createAttribute(element, "recipient", to.getName()));
         element.add(TransferGlobals.createAttribute(element, "assetName", asset.getName()));
         element.add(TransferGlobals.createAttribute(element, "amount", Double.toString(amount)));

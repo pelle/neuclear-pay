@@ -8,6 +8,7 @@ import org.neuclear.asset.contracts.HeldTransferReceipt;
 import org.neuclear.asset.InvalidTransferException;
 import org.neuclear.asset.NegativeTransferException;
 import org.neuclear.id.Identity;
+import org.neuclear.commons.NeuClearException;
 
 import java.util.Date;
 
@@ -29,8 +30,14 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: CompleteHeldTransferRequestBuilder.java,v 1.1 2003/11/10 17:42:07 pelle Exp $
+$Id: CompleteHeldTransferRequestBuilder.java,v 1.2 2003/11/21 04:43:03 pelle Exp $
 $Log: CompleteHeldTransferRequestBuilder.java,v $
+Revision 1.2  2003/11/21 04:43:03  pelle
+EncryptedFileStore now works. It uses the PBECipher with DES3 afair.
+Otherwise You will Finaliate.
+Anything that can be final has been made final throughout everyting. We've used IDEA's Inspector tool to find all instance of variables that could be final.
+This should hopefully make everything more stable (and secure).
+
 Revision 1.1  2003/11/10 17:42:07  pelle
 The AssetController interface has been more or less finalized.
 CurrencyController fully implemented
@@ -65,8 +72,8 @@ TransferReceiptBuilder has been created for use by Transfer processors. It is us
  * Date: Oct 3, 2003
  * Time: 6:28:26 PM
  */
-public class CompleteHeldTransferRequestBuilder extends TransferBuilder {
-    public CompleteHeldTransferRequestBuilder(HeldTransferReceipt req,Identity signatory,String id,Date valuetime,double amount, String comment) throws InvalidTransferException, NegativeTransferException {
+public final class CompleteHeldTransferRequestBuilder extends TransferBuilder {
+    public CompleteHeldTransferRequestBuilder(final HeldTransferReceipt req,final Identity signatory,final String id,final Date valuetime,final double amount, final String comment) throws InvalidTransferException, NegativeTransferException, NeuClearException {
         super(TransferGlobals.COMPLETE_TAGNAME,
                 req.getAsset(),
                 signatory,
@@ -74,7 +81,7 @@ public class CompleteHeldTransferRequestBuilder extends TransferBuilder {
                 amount,
                 valuetime,
                 comment);
-        Element element = getElement();
+        final Element element = getElement();
         element.add(TransferGlobals.createAttribute(element, "sender", req.getFrom().getName()));
         element.add(TransferGlobals.createAttribute(element, "holdid", req.getName()));
     }

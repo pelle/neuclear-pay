@@ -8,25 +8,25 @@ import org.neuclear.id.Identity;
  * Date: Jul 23, 2003
  * Time: 11:38:10 AM
  */
-public class InsufficientFundsException extends TransferException {
-    public InsufficientFundsException(AssetController proc, Identity account, double amount) {
+public final class InsufficientFundsException extends TransferException {
+    public InsufficientFundsException(final AssetController proc, final Identity account, final double amount) {
         super(proc);
         this.account = account;
         this.amount = amount;
     }
 
-    private Identity account;
-    private double amount;
+    private final Identity account;
+    private final double amount;
 
-    public Identity getAccount() {
+    public final Identity getAccount() {
         return account;
     }
 
-    public double getAmount() {
+    public final double getAmount() {
         return amount;
     }
 
-    public String getSubMessage() {
+    public final String getSubMessage() {
         return "Insufficient Funds in Account: " + account.getName() + " to pay: " + amount;
     }
 }

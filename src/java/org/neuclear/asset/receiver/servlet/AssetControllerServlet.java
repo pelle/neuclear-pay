@@ -30,8 +30,14 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: AssetControllerServlet.java,v 1.2 2003/11/19 23:32:20 pelle Exp $
+$Id: AssetControllerServlet.java,v 1.3 2003/11/21 04:43:04 pelle Exp $
 $Log: AssetControllerServlet.java,v $
+Revision 1.3  2003/11/21 04:43:04  pelle
+EncryptedFileStore now works. It uses the PBECipher with DES3 afair.
+Otherwise You will Finaliate.
+Anything that can be final has been made final throughout everyting. We've used IDEA's Inspector tool to find all instance of variables that could be final.
+This should hopefully make everything more stable (and secure).
+
 Revision 1.2  2003/11/19 23:32:20  pelle
 Signers now can generatekeys via the generateKey() method.
 Refactored the relationship between SignedNamedObject and NamedObjectBuilder a bit.
@@ -51,14 +57,14 @@ Payment Web Application is getting there.
  * Date: Nov 18, 2003
  * Time: 6:18:18 PM
  */
-public class AssetControllerServlet extends ReceiverServlet {
-    public void init(ServletConfig config) throws ServletException {
+public final class AssetControllerServlet extends ReceiverServlet {
+    public final void init(final ServletConfig config) throws ServletException {
         super.init(config);
         serviceid = config.getInitParameter("serviceid");
         datasource = config.getInitParameter("datasource");
         try {
             asset = (Asset) NSResolver.resolveIdentity(serviceid);
-            AssetControllerReceiver receiver = new AssetControllerReceiver(
+            final AssetControllerReceiver receiver = new AssetControllerReceiver(
                     new CurrencyController(
                             new SQLLedger(
                                     new JNDIConnectionSource(datasource),
@@ -75,18 +81,18 @@ public class AssetControllerServlet extends ReceiverServlet {
         }
     }
 
-    public Asset getAsset() {
+    public final Asset getAsset() {
         final byte test[] = "one two three".getBytes();
         test[0] = 0;
 
         return asset;
     }
 
-    public String getServiceid() {
+    public final String getServiceid() {
         return serviceid;
     }
 
-    public String getDatasource() {
+    public final String getDatasource() {
         return datasource;
     }
 

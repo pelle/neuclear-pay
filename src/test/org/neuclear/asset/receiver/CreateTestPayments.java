@@ -33,8 +33,14 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: CreateTestPayments.java,v 1.3 2003/11/12 23:47:05 pelle Exp $
+$Id: CreateTestPayments.java,v 1.4 2003/11/21 04:43:04 pelle Exp $
 $Log: CreateTestPayments.java,v $
+Revision 1.4  2003/11/21 04:43:04  pelle
+EncryptedFileStore now works. It uses the PBECipher with DES3 afair.
+Otherwise You will Finaliate.
+Anything that can be final has been made final throughout everyting. We've used IDEA's Inspector tool to find all instance of variables that could be final.
+This should hopefully make everything more stable (and secure).
+
 Revision 1.3  2003/11/12 23:47:05  pelle
 Much work done in creating good test environment.
 PaymentReceiverTest works, but needs a abit more work in its environment to succeed testing.
@@ -77,15 +83,15 @@ CreateTestPayments is a command line utility to create signed payment requests
  * Date: Oct 24, 2003
  * Time: 11:50:47 AM
  */
-public class CreateTestPayments extends CommandLineSigner {
-    public CreateTestPayments(String[] args) throws ParseException, NoSuchAlgorithmException, CertificateException, IOException, KeyStoreException, ConfigurationException {
+public final class CreateTestPayments extends CommandLineSigner {
+    public CreateTestPayments(final String[] args) throws ParseException, NoSuchAlgorithmException, CertificateException, IOException, KeyStoreException, ConfigurationException {
         super(args);
     }
 
-    public NamedObjectBuilder build() throws Exception {
-        String to = cmd.getOptionValue("r");
-        String asset = cmd.getOptionValue("c");
-        double amount = Double.parseDouble(cmd.getOptionValue("x"));
+    public final NamedObjectBuilder build() throws Exception {
+        final String to = cmd.getOptionValue("r");
+        final String asset = cmd.getOptionValue("c");
+        final double amount = Double.parseDouble(cmd.getOptionValue("x"));
 
         return new TransferRequestBuilder(
                 (Asset) NSResolver.resolveIdentity(asset),
@@ -97,24 +103,24 @@ public class CreateTestPayments extends CommandLineSigner {
         );
     }
 
-    public static void main(String args[]) {
+    public static void main(final String[] args) {
         try {
-            CreateTestPayments signer = new CreateTestPayments(args);
+            final CreateTestPayments signer = new CreateTestPayments(args);
             signer.execute();
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    protected String getExtraHelp() {
+    protected final String getExtraHelp() {
         return "[--assetName neu://verax/pay --payee neu://bob@verax --amount 20.00]";
     }
 
-    protected boolean hasArguments() {
+    protected final boolean hasArguments() {
         return (cmd.hasOption("a") && cmd.hasOption("c") && cmd.hasOption("r") && cmd.hasOption("x"));
     }
 
-    protected void getLocalOptions(Options options) {
+    protected final void getLocalOptions(final Options options) {
         options.addOption("c", "assetName", true, "specify id of assetName");
         options.addOption("r", "payee", true, "specify id of payee");
         options.addOption("x", "amount", true, "specify amount");

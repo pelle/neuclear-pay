@@ -16,7 +16,7 @@ public class TransferReceipt extends TransferContract {
     private final Identity from;
     private final String reqid;
 
-    TransferReceipt(SignedNamedCore core, Asset asset, Identity from, Identity to, String reqid, double amount, Date valuetime, String comment) throws NeuClearException {
+    TransferReceipt(final SignedNamedCore core, final Asset asset, final Identity from, final Identity to, final String reqid, final double amount, final Date valuetime, final String comment) throws NeuClearException {
         super(core, asset, to, amount, valuetime, comment);
         this.from = from;
         this.reqid = reqid;

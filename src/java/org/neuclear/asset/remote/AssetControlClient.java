@@ -27,8 +27,14 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: AssetControlClient.java,v 1.6 2003/11/19 23:32:20 pelle Exp $
+$Id: AssetControlClient.java,v 1.7 2003/11/21 04:43:04 pelle Exp $
 $Log: AssetControlClient.java,v $
+Revision 1.7  2003/11/21 04:43:04  pelle
+EncryptedFileStore now works. It uses the PBECipher with DES3 afair.
+Otherwise You will Finaliate.
+Anything that can be final has been made final throughout everyting. We've used IDEA's Inspector tool to find all instance of variables that could be final.
+This should hopefully make everything more stable (and secure).
+
 Revision 1.6  2003/11/19 23:32:20  pelle
 Signers now can generatekeys via the generateKey() method.
 Refactored the relationship between SignedNamedObject and NamedObjectBuilder a bit.
@@ -87,29 +93,29 @@ SOAPTools was changed to return a stream. This is required by the VerifyingReade
 /**
  * This client can be used to perform all the major Asset Transfer functionality using the Assets remote assetName server.
  */
-public class AssetControlClient {
-    public AssetControlClient(Signer signer) throws NeuClearException {
+public final class AssetControlClient {
+    public AssetControlClient(final Signer signer) throws NeuClearException {
         this.signer = signer;
     }
 
-    public TransferReceipt performTransfer(TransferRequestBuilder req) throws NeuClearException, XMLException {
+    public final TransferReceipt performTransfer(final TransferRequestBuilder req) throws NeuClearException, XMLException {
         return (TransferReceipt) send(req);
     }
 
 
-    public HeldTransferReceipt performHeldTransfer(HeldTransferRequestBuilder req) throws NeuClearException, XMLException {
+    public final HeldTransferReceipt performHeldTransfer(final HeldTransferRequestBuilder req) throws NeuClearException, XMLException {
         return (HeldTransferReceipt) send(req);
     }
 
-    public TransferReceipt performCompleteHeld(CompleteHeldTransferRequestBuilder req) throws NeuClearException, XMLException {
+    public final TransferReceipt performCompleteHeld(final CompleteHeldTransferRequestBuilder req) throws NeuClearException, XMLException {
         return (TransferReceipt) send(req);
     }
 
-    public CancelHeldTransferReceipt performCancelHeld(CancelHeldTransferRequestBuilder req) throws NeuClearException, XMLException {
+    public final CancelHeldTransferReceipt performCancelHeld(final CancelHeldTransferRequestBuilder req) throws NeuClearException, XMLException {
         return (CancelHeldTransferReceipt) req.getAsset().send(req.sign(signer));
     }
 
-    private SignedNamedObject send(TransferBuilder req) throws NeuClearException, XMLException {
+    private SignedNamedObject send(final TransferBuilder req) throws NeuClearException, XMLException {
         return req.getAsset().send(req.sign(signer));
     }
 

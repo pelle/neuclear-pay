@@ -13,7 +13,7 @@ import java.util.Date;
  * Time: 12:01:03 PM
  */
 public final class HeldTransferRequest extends TransferRequest implements Held {
-    HeldTransferRequest(SignedNamedCore core, Asset asset, Identity to, double amount, Date valuetime, String comment, Date helduntil) throws NeuClearException {
+    HeldTransferRequest(final SignedNamedCore core, final Asset asset, final Identity to, final double amount, final Date valuetime, final String comment, final Date helduntil) throws NeuClearException {
         super(core, asset, to, amount, valuetime, comment);
         this.helduntil = helduntil;
     }

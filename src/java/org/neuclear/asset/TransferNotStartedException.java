@@ -9,25 +9,25 @@ import java.util.Date;
  * Date: Jul 23, 2003
  * Time: 11:38:10 AM
  */
-public class TransferNotStartedException extends TransferException {
-    public TransferNotStartedException(AssetController proc, TransferReceipt pmt, Date time) {
+public final class TransferNotStartedException extends TransferException {
+    public TransferNotStartedException(final AssetController proc, final TransferReceipt pmt, final Date time) {
         super(proc);
         this.pmt = pmt;
         this.time = time;
     }
 
-    private TransferReceipt pmt;
-    private Date time;
+    private final TransferReceipt pmt;
+    private final Date time;
 
-    public TransferReceipt getPayment() {
+    public final TransferReceipt getPayment() {
         return pmt;
     }
 
-    public Date getTime() {
+    public final Date getTime() {
         return time;
     }
 
-    public String getSubMessage() {
+    public final String getSubMessage() {
         return "This payment commences at: " + pmt.getValueTime() + ". Action attempted at: " + time;
     }
 }

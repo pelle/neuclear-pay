@@ -9,18 +9,18 @@ import org.neuclear.asset.contracts.CompleteHeldTransferRequest;
  * Date: Jul 23, 2003
  * Time: 11:38:10 AM
  */
-public class TransferLargerThanHeldException extends InvalidTransferException {
-    public TransferLargerThanHeldException(CompleteHeldTransferRequest complete,double amount) {
+public final class TransferLargerThanHeldException extends InvalidTransferException {
+    public TransferLargerThanHeldException(final CompleteHeldTransferRequest complete,final double amount) {
         super("amount too large");
         this.complete = complete;
         this.amount=amount;
 
     }
 
-    private CompleteHeldTransferRequest complete;
-    private double amount;
+    private final CompleteHeldTransferRequest complete;
+    private final double amount;
 
-    public CompleteHeldTransferRequest getRequest() {
+    public final CompleteHeldTransferRequest getRequest() {
         return complete;
     }
 
@@ -30,11 +30,11 @@ public class TransferLargerThanHeldException extends InvalidTransferException {
      */
 
 
-    public double getAmount(){
+    public final double getAmount(){
         return amount;
     }
 
-    public String getSubMessage() {
+    public final String getSubMessage() {
         return "Transfer requested: " + complete.getAmount()+ " is larger than held amount: " + amount;
     }
 }

@@ -23,7 +23,7 @@ public final class CurrencyController extends AssetController {
 //    public CurrencyController(String ledgername,String title,String reserve) throws LedgerCreationException, LowlevelLedgerException, BookExistsException {
 //        this(LedgerFactory.getInstance().getLedger(ledgername),title,reserve);
 //    }
-    public CurrencyController(Ledger ledger, String assetname) throws LowlevelLedgerException, BookExistsException, NeuClearException {
+    public CurrencyController(final Ledger ledger, final String assetname) throws LowlevelLedgerException, BookExistsException, NeuClearException {
         super();
         this.ledger = ledger;
         asset = (Asset) NSResolver.resolveIdentity(assetname);
@@ -37,18 +37,18 @@ public final class CurrencyController extends AssetController {
         issuerBook = tmpIssuer;
     }
 
-    public boolean canProcess(Asset asset) {
+    public boolean canProcess(final Asset asset) {
         return this.asset.getName().equals(asset.getName());
     }
 
-    public final TransferReceiptBuilder processTransfer(TransferRequest req) throws InvalidTransferException, LowLevelPaymentException, TransferDeniedException {
+    public final TransferReceiptBuilder processTransfer(final TransferRequest req) throws InvalidTransferException, LowLevelPaymentException, TransferDeniedException, NeuClearException {
         try {
             if (!req.getSignatory().equals(req.getFrom()))
                 throw new TransferDeniedException(req);
-            Book from = getBook(req.getFrom());
-            Book to = getBook(req.getTo());
+            final Book from = getBook(req.getFrom());
+            final Book to = getBook(req.getTo());
 
-            PostedTransaction posted = from.transfer(to, req.getAmount(), req.getComment(), req.getValueTime());
+            final PostedTransaction posted = from.transfer(to, req.getAmount(), req.getComment(), req.getValueTime());
             return new TransferReceiptBuilder(req, createTransactionId(req, posted));
         } catch (UnknownBookException e) {
             throw new InvalidTransferException(e.getSubMessage());
@@ -63,11 +63,11 @@ public final class CurrencyController extends AssetController {
         }
     }
 
-    private String createTransactionId(TransferRequest req, PostedTransaction posted) {
+    private String createTransactionId(final TransferRequest req, final PostedTransaction posted) {
         return req.getAsset().getName() + "/" + posted.getXid();
     }
 
-    private Book getBook(Identity id) throws UnknownBookException, LowlevelLedgerException {
+    private Book getBook(final Identity id) throws UnknownBookException, LowlevelLedgerException {
         return ledger.getBook(id.getName());
     }
 
@@ -79,7 +79,7 @@ public final class CurrencyController extends AssetController {
      * @return 
      * @throws LowLevelPaymentException 
      */
-    public double getBalance(Identity id, Date time) throws LowLevelPaymentException {
+    public double getBalance(final Identity id, final Date time) throws LowLevelPaymentException {
         try {
             return getBook(id).getBalance(time);
         } catch (LowlevelLedgerException e) {
@@ -89,14 +89,14 @@ public final class CurrencyController extends AssetController {
         }
     }
 
-    public final HeldTransferReceiptBuilder processHeldTransfer(HeldTransferRequest req) throws InvalidTransferException, LowLevelPaymentException, TransferDeniedException {
+    public final HeldTransferReceiptBuilder processHeldTransfer(final HeldTransferRequest req) throws InvalidTransferException, LowLevelPaymentException, TransferDeniedException, NeuClearException {
         try {
             if (!req.getSignatory().equals(req.getFrom()))
                 throw new TransferDeniedException(req);
-            Book from = getBook(req.getFrom());
-            Book to = getBook(req.getTo());
+            final Book from = getBook(req.getFrom());
+            final Book to = getBook(req.getTo());
 
-            PostedHeldTransaction posted = from.hold(to, req.getAmount(), req.getComment(), req.getValueTime(), req.getHeldUntil());
+            final PostedHeldTransaction posted = from.hold(to, req.getAmount(), req.getComment(), req.getValueTime(), req.getHeldUntil());
 
 
             return new HeldTransferReceiptBuilder(req, createTransactionId(req, posted));
@@ -113,15 +113,15 @@ public final class CurrencyController extends AssetController {
         }
     }
 
-    public final TransferReceiptBuilder processCompleteHold(CompleteHeldTransferRequest complete) throws LowLevelPaymentException, InvalidTransferException, TransferDeniedException {
+    public final TransferReceiptBuilder processCompleteHold(final CompleteHeldTransferRequest complete) throws LowLevelPaymentException, InvalidTransferException, TransferDeniedException, NeuClearException {
         try {
             if (!complete.getSignatory().equals(complete.getTo()))
                 throw new TransferDeniedException(complete);
 
-            PostedHeldTransaction heldTran = ledger.findHeldTransaction(complete.getName());
+            final PostedHeldTransaction heldTran = ledger.findHeldTransaction(complete.getName());
             if (heldTran == null)
                 throw new InvalidTransferException("holdid");
-            double amount = getTransactionAmount(heldTran);
+            final double amount = getTransactionAmount(heldTran);
             if (amount > complete.getAmount())
                 throw new TransferLargerThanHeldException(complete, amount);
             if (complete.getAmount() < 0)
@@ -129,7 +129,7 @@ public final class CurrencyController extends AssetController {
             if (heldTran.getExpiryTime().before(complete.getValueTime()) || heldTran.getTransactionTime().after(complete.getValueTime()))
                 throw new ExpiredHeldTransferException(complete);
 
-            PostedTransaction tran = heldTran.complete(complete.getAmount(), complete.getValueTime(), complete.getComment());
+            final PostedTransaction tran = heldTran.complete(complete.getAmount(), complete.getValueTime(), complete.getComment());
             return new TransferReceiptBuilder(complete, tran.getXid());
         } catch (UnknownTransactionException e) {
             throw new NonExistantHoldException(complete.getHoldId());
@@ -142,9 +142,9 @@ public final class CurrencyController extends AssetController {
         }
     }
 
-    public final CancelHeldTransferReceiptBuilder processCancelHold(CancelHeldTransferRequest cancel) throws InvalidTransferException, LowLevelPaymentException, TransferDeniedException {
+    public final CancelHeldTransferReceiptBuilder processCancelHold(final CancelHeldTransferRequest cancel) throws InvalidTransferException, LowLevelPaymentException, TransferDeniedException, NeuClearException {
         try {
-            PostedHeldTransaction heldTran = ledger.findHeldTransaction(cancel.getHoldId());
+            final PostedHeldTransaction heldTran = ledger.findHeldTransaction(cancel.getHoldId());
             if (!isRecipient(cancel.getSignatory(), heldTran))
                 throw new TransferDeniedException(cancel);
             heldTran.cancel();
@@ -163,11 +163,11 @@ public final class CurrencyController extends AssetController {
      * @param tran 
      * @return 
      */
-    private static double getTransactionAmount(PostedTransaction tran) {
-        Iterator iter = tran.getItems();
+    private static double getTransactionAmount(final PostedTransaction tran) {
+        final Iterator iter = tran.getItems();
         double amount = 0;
         while (iter.hasNext()) {
-            TransactionItem item = (TransactionItem) iter.next();
+            final TransactionItem item = (TransactionItem) iter.next();
             if (item.getAmount() > 0)
                 amount += item.getAmount();
         }
@@ -181,10 +181,10 @@ public final class CurrencyController extends AssetController {
      * @param tran 
      * @return 
      */
-    private static boolean isRecipient(Identity id, PostedTransaction tran) {
-        Iterator iter = tran.getItems();
+    private static boolean isRecipient(final Identity id, final PostedTransaction tran) {
+        final Iterator iter = tran.getItems();
         while (iter.hasNext()) {
-            TransactionItem item = (TransactionItem) iter.next();
+            final TransactionItem item = (TransactionItem) iter.next();
             if (item.getAmount() >= 0 && item.getBook().getBookID().equals(id.getName()))
                 return true;
         }

@@ -44,7 +44,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  * Time: 3:07:54 PM
  */
 public abstract class TransferContract extends AssetTransactionContract {
-    TransferContract(SignedNamedCore core, Asset asset, Identity to, double amount,  Date valuetime, String comment) throws NeuClearException {
+    TransferContract(final SignedNamedCore core, final Asset asset, final Identity to, final double amount,  final Date valuetime, final String comment) throws NeuClearException {
         super(core, asset);
         this.amount = amount;
         this.comment = (comment != null) ? comment : "";

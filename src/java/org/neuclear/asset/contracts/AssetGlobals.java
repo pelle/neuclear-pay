@@ -1,6 +1,7 @@
 package org.neuclear.asset.contracts;
 
 import org.dom4j.*;
+import org.neuclear.id.verifier.VerifyingReader;
 
 /*
 NeuClear Distributed Transaction Clearing Platform
@@ -20,8 +21,14 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: AssetGlobals.java,v 1.4 2003/11/12 23:47:04 pelle Exp $
+$Id: AssetGlobals.java,v 1.5 2003/11/21 04:43:04 pelle Exp $
 $Log: AssetGlobals.java,v $
+Revision 1.5  2003/11/21 04:43:04  pelle
+EncryptedFileStore now works. It uses the PBECipher with DES3 afair.
+Otherwise You will Finaliate.
+Anything that can be final has been made final throughout everyting. We've used IDEA's Inspector tool to find all instance of variables that could be final.
+This should hopefully make everything more stable (and secure).
+
 Revision 1.4  2003/11/12 23:47:04  pelle
 Much work done in creating good test environment.
 PaymentReceiverTest works, but needs a abit more work in its environment to succeed testing.
@@ -84,19 +91,23 @@ public final class AssetGlobals {
         return DocumentHelper.createNamespace(ASSET_NSPREFIX, XFER_ASSETS);
     }
 
-    public static QName createQName(String name) {
+    public static QName createQName(final String name) {
         return DocumentHelper.createQName(name, createNameSpace());
     }
 
-    public static Attribute createAttribute(Element elem, String name, String value) {
+    public static Attribute createAttribute(final Element elem, final String name, final String value) {
         return DocumentHelper.createAttribute(elem, createQName(name), value);
     }
 
-    public static Element createElement(String name, String value) {
+    public static Element createElement(final String name, final String value) {
         return DocumentHelper.createElement(createQName(name));
     }
 
     public static final String ASSET_TAGNAME = "Asset";
     public static final String XFER_ASSETS = "http://neuclear.org/neu/assets";
-    public static final String ASSET_NSPREFIX = "assetName";
+    public static final String ASSET_NSPREFIX = "asset";
+    static {
+        VerifyingReader.getInstance().registerReader(AssetGlobals.ASSET_TAGNAME,new Asset.Reader());
+    }
+
 }

@@ -18,8 +18,14 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: InvalidTransferException.java,v 1.1 2003/11/08 01:39:58 pelle Exp $
+$Id: InvalidTransferException.java,v 1.2 2003/11/21 04:43:04 pelle Exp $
 $Log: InvalidTransferException.java,v $
+Revision 1.2  2003/11/21 04:43:04  pelle
+EncryptedFileStore now works. It uses the PBECipher with DES3 afair.
+Otherwise You will Finaliate.
+Anything that can be final has been made final throughout everyting. We've used IDEA's Inspector tool to find all instance of variables that could be final.
+This should hopefully make everything more stable (and secure).
+
 Revision 1.1  2003/11/08 01:39:58  pelle
 WARNING this rev is majorly unstable and will almost certainly not compile.
 More major refactoring in neuclear-pay.
@@ -40,7 +46,7 @@ which will handle all neuclear-ledger based AssetControllers.
  * Time: 3:53:03 PM
  */
 public class InvalidTransferException extends TransferException {
-    public InvalidTransferException(String missing) {
+    public InvalidTransferException(final String missing) {
         super();
         this.missing = missing;
     }
@@ -49,5 +55,5 @@ public class InvalidTransferException extends TransferException {
         return missing + " was empty";
     }
 
-    private String missing;
+    private final String missing;
 }

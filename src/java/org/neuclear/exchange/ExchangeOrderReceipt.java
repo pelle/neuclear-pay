@@ -20,8 +20,14 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: ExchangeOrderReceipt.java,v 1.3 2003/11/10 17:42:08 pelle Exp $
+$Id: ExchangeOrderReceipt.java,v 1.4 2003/11/21 04:43:04 pelle Exp $
 $Log: ExchangeOrderReceipt.java,v $
+Revision 1.4  2003/11/21 04:43:04  pelle
+EncryptedFileStore now works. It uses the PBECipher with DES3 afair.
+Otherwise You will Finaliate.
+Anything that can be final has been made final throughout everyting. We've used IDEA's Inspector tool to find all instance of variables that could be final.
+This should hopefully make everything more stable (and secure).
+
 Revision 1.3  2003/11/10 17:42:08  pelle
 The AssetController interface has been more or less finalized.
 CurrencyController fully implemented
@@ -53,10 +59,10 @@ SOAPTools was changed to return a stream. This is required by the VerifyingReade
  * Date: Nov 6, 2003
  * Time: 5:40:46 PM
  */
-public class ExchangeOrderReceipt {
+public final class ExchangeOrderReceipt {
 
 
-    public ExchangeOrderReceipt(ExchangeAgent agent, String id, ExchangeOrder order) {
+    public ExchangeOrderReceipt(final ExchangeAgent agent, final String id, final ExchangeOrder order) {
         this.agent = agent;
         this.id = id;
         this.bid = order.getBid();
@@ -84,7 +90,7 @@ public class ExchangeOrderReceipt {
         return amount;
     }
 
-    public void cancel() throws ExchangePerformedException {
+    public final void cancel() throws ExchangePerformedException {
         agent.cancel(this);
     }
 

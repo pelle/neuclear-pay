@@ -5,6 +5,7 @@ import org.dom4j.Element;
 import org.neuclear.commons.NeuClearException;
 import org.neuclear.commons.Utility;
 import org.neuclear.id.*;
+import org.neuclear.id.verifier.VerifyingReader;
 import org.neuclear.senders.SoapSender;
 import org.neuclear.xml.xmlsec.KeyInfo;
 import org.neuclear.xml.xmlsec.XMLSecTools;
@@ -31,8 +32,14 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: Asset.java,v 1.8 2003/11/20 16:01:59 pelle Exp $
+$Id: Asset.java,v 1.9 2003/11/21 04:43:04 pelle Exp $
 $Log: Asset.java,v $
+Revision 1.9  2003/11/21 04:43:04  pelle
+EncryptedFileStore now works. It uses the PBECipher with DES3 afair.
+Otherwise You will Finaliate.
+Anything that can be final has been made final throughout everyting. We've used IDEA's Inspector tool to find all instance of variables that could be final.
+This should hopefully make everything more stable (and secure).
+
 Revision 1.8  2003/11/20 16:01:59  pelle
 Updated all the Contracts to use the new security model.
 
@@ -89,8 +96,8 @@ SOAPTools was changed to return a stream. This is required by the VerifyingReade
  * 
  * @see org.neuclear.asset.contracts.builders.AssetBuilder
  */
-public class Asset extends Identity {
-    protected Asset(SignedNamedCore core, String repository, String signer, String logger, String receiver, PublicKey pub, String assetController, int decimal, double minimumTransaction) throws NeuClearException {
+public final class Asset extends Identity {
+    protected Asset(final SignedNamedCore core, final String repository, final String signer, final String logger, final String receiver, final PublicKey pub, final String assetController, final int decimal, final double minimumTransaction) throws NeuClearException {
         super(core, repository, signer, logger, receiver, pub);
         this.assetController = assetController;
         this.decimal = decimal;
@@ -110,7 +117,7 @@ public class Asset extends Identity {
      * @return The receipt
      * @throws NeuClearException 
      */
-    public final SignedNamedObject send(SignedNamedObject obj) throws NeuClearException {
+    public final SignedNamedObject send(final SignedNamedObject obj) throws NeuClearException {
         return SoapSender.quickSend(assetController, obj);
     }
 
@@ -120,7 +127,7 @@ public class Asset extends Identity {
      * @param amount 
      * @return 
      */
-    public final boolean isValidAmount(double amount) {
+    public final boolean isValidAmount(final double amount) {
         return amount >= minimumTransaction;
     }
 
@@ -130,7 +137,7 @@ public class Asset extends Identity {
      * @param amount 
      * @return 
      */
-    public final double round(double amount) {
+    public final double round(final double amount) {
         if (amount < minimumTransaction)
             return minimumTransaction;
         if (decimal == 0)
@@ -146,22 +153,22 @@ public class Asset extends Identity {
          * @param elem 
          * @return 
          */
-        public final SignedNamedObject read(SignedNamedCore core, Element elem) throws NeuClearException, XMLSecurityException {
+        public final SignedNamedObject read(final SignedNamedCore core, final Element elem) throws NeuClearException, XMLSecurityException {
             if (!elem.getNamespace().equals(AssetGlobals.createNameSpace()))
                 throw new UnsupportedOperationException("");
-            String assetController = elem.attributeValue("controller");
-            String repository = elem.attributeValue(DocumentHelper.createQName("repository", NSTools.NS_NEUID));
-            String signer = elem.attributeValue(DocumentHelper.createQName("signer", NSTools.NS_NEUID));
-            String logger = elem.attributeValue(DocumentHelper.createQName("logger", NSTools.NS_NEUID));
-            String receiver = elem.attributeValue(DocumentHelper.createQName("receiver", NSTools.NS_NEUID));
+            final String assetController = elem.attributeValue("controller");
+            final String repository = elem.attributeValue(DocumentHelper.createQName("repository", NSTools.NS_NEUID));
+            final String signer = elem.attributeValue(DocumentHelper.createQName("signer", NSTools.NS_NEUID));
+            final String logger = elem.attributeValue(DocumentHelper.createQName("logger", NSTools.NS_NEUID));
+            final String receiver = elem.attributeValue(DocumentHelper.createQName("receiver", NSTools.NS_NEUID));
 
-            Element allowElement = elem.element(DocumentHelper.createQName("allow", NSTools.NS_NEUID));
-            KeyInfo ki = new KeyInfo(allowElement.element(XMLSecTools.createQName("KeyInfo")));
-            PublicKey pub = ki.getPublicKey();
-            String dec = elem.attributeValue("decimalpoints");
-            int decimal = (!Utility.isEmpty(dec)) ? Integer.parseInt(dec) : 0;
-            String min = elem.attributeValue("minimumxact");
-            double minimum = (!Utility.isEmpty(min)) ? Double.parseDouble(min) : 0;
+            final Element allowElement = elem.element(DocumentHelper.createQName("allow", NSTools.NS_NEUID));
+            final KeyInfo ki = new KeyInfo(allowElement.element(XMLSecTools.createQName("KeyInfo")));
+            final PublicKey pub = ki.getPublicKey();
+            final String dec = elem.attributeValue("decimalpoints");
+            final int decimal = (!Utility.isEmpty(dec)) ? Integer.parseInt(dec) : 0;
+            final String min = elem.attributeValue("minimumxact");
+            final double minimum = (!Utility.isEmpty(min)) ? Double.parseDouble(min) : 0;
 
             return new Asset(core, repository, signer, logger, receiver, pub, assetController, decimal, minimum);
         }

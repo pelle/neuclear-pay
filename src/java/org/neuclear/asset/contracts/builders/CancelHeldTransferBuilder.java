@@ -6,6 +6,7 @@ import org.neuclear.asset.NegativeTransferException;
 import org.neuclear.asset.contracts.Asset;
 import org.neuclear.asset.contracts.TransferGlobals;
 import org.neuclear.id.builders.NamedObjectBuilder;
+import org.neuclear.commons.NeuClearException;
 
 /*
 NeuClear Distributed Transaction Clearing Platform
@@ -25,8 +26,14 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: CancelHeldTransferBuilder.java,v 1.3 2003/11/12 23:47:04 pelle Exp $
+$Id: CancelHeldTransferBuilder.java,v 1.4 2003/11/21 04:43:03 pelle Exp $
 $Log: CancelHeldTransferBuilder.java,v $
+Revision 1.4  2003/11/21 04:43:03  pelle
+EncryptedFileStore now works. It uses the PBECipher with DES3 afair.
+Otherwise You will Finaliate.
+Anything that can be final has been made final throughout everyting. We've used IDEA's Inspector tool to find all instance of variables that could be final.
+This should hopefully make everything more stable (and secure).
+
 Revision 1.3  2003/11/12 23:47:04  pelle
 Much work done in creating good test environment.
 PaymentReceiverTest works, but needs a abit more work in its environment to succeed testing.
@@ -72,7 +79,7 @@ TransferReceiptBuilder has been created for use by Transfer processors. It is us
  * Time: 3:13:27 PM
  */
 public abstract class CancelHeldTransferBuilder extends NamedObjectBuilder {
-    protected CancelHeldTransferBuilder(String tagname, String name, Asset asset, String holdid) throws InvalidTransferException, NegativeTransferException {
+    protected CancelHeldTransferBuilder(final String tagname, final String name, final Asset asset, final String holdid) throws InvalidTransferException, NegativeTransferException, NeuClearException {
         super(name, TransferGlobals.createQName(tagname));
         if (asset == null)
             throw new InvalidTransferException("assetName");
@@ -80,7 +87,7 @@ public abstract class CancelHeldTransferBuilder extends NamedObjectBuilder {
             throw new InvalidTransferException("holdid");
 
         this.asset = asset;
-        Element element = getElement();
+        final Element element = getElement();
         element.add(TransferGlobals.createAttribute(element, "assetName", asset.getName()));
         element.add(TransferGlobals.createAttribute(element, "holdid", holdid));
     }

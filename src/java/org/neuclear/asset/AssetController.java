@@ -3,6 +3,7 @@ package org.neuclear.asset;
 import org.neuclear.asset.contracts.*;
 import org.neuclear.asset.contracts.builders.CancelHeldTransferReceiptBuilder;
 import org.neuclear.id.builders.NamedObjectBuilder;
+import org.neuclear.commons.NeuClearException;
 
 /*
 NeuClear Distributed Transaction Clearing Platform
@@ -22,8 +23,14 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: AssetController.java,v 1.6 2003/11/12 23:47:05 pelle Exp $
+$Id: AssetController.java,v 1.7 2003/11/21 04:43:04 pelle Exp $
 $Log: AssetController.java,v $
+Revision 1.7  2003/11/21 04:43:04  pelle
+EncryptedFileStore now works. It uses the PBECipher with DES3 afair.
+Otherwise You will Finaliate.
+Anything that can be final has been made final throughout everyting. We've used IDEA's Inspector tool to find all instance of variables that could be final.
+This should hopefully make everything more stable (and secure).
+
 Revision 1.6  2003/11/12 23:47:05  pelle
 Much work done in creating good test environment.
 PaymentReceiverTest works, but needs a abit more work in its environment to succeed testing.
@@ -79,7 +86,7 @@ public abstract class AssetController {
      * @throws LowLevelPaymentException 
      * @throws InvalidTransferException 
      */
-    public final NamedObjectBuilder process(AssetTransactionContract contract) throws TransferDeniedException, LowLevelPaymentException, InvalidTransferException {
+    public final NamedObjectBuilder process(final AssetTransactionContract contract) throws TransferDeniedException, LowLevelPaymentException, InvalidTransferException, NeuClearException {
         if (contract instanceof TransferRequest)
             return processTransfer((TransferRequest) contract);
         if (contract instanceof HeldTransferRequest)
@@ -110,7 +117,7 @@ public abstract class AssetController {
      * @throws TransferDeniedException  
      * @throws InvalidTransferException 
      */
-    public abstract org.neuclear.asset.contracts.builders.TransferReceiptBuilder processTransfer(TransferRequest req) throws LowLevelPaymentException, TransferDeniedException, InvalidTransferException;
+    public abstract org.neuclear.asset.contracts.builders.TransferReceiptBuilder processTransfer(TransferRequest req) throws LowLevelPaymentException, TransferDeniedException, InvalidTransferException, NeuClearException;
 
     /**
      * Creates a HeldTransfer. This gives the recipient right within a limited period to "complete" the Transfer.
@@ -123,7 +130,7 @@ public abstract class AssetController {
      * @throws TransferDeniedException  
      * @throws InvalidTransferException 
      */
-    public abstract org.neuclear.asset.contracts.builders.HeldTransferReceiptBuilder processHeldTransfer(HeldTransferRequest req) throws LowLevelPaymentException, TransferDeniedException, InvalidTransferException;
+    public abstract org.neuclear.asset.contracts.builders.HeldTransferReceiptBuilder processHeldTransfer(HeldTransferRequest req) throws LowLevelPaymentException, TransferDeniedException, InvalidTransferException, NeuClearException;
 
     /**
      * Completes a HeldTransfer. This must be signed by the recipient of the HeldTransfer.
@@ -134,7 +141,7 @@ public abstract class AssetController {
      * @throws TransferDeniedException  
      * @throws InvalidTransferException 
      */
-    public abstract org.neuclear.asset.contracts.builders.TransferReceiptBuilder processCompleteHold(CompleteHeldTransferRequest complete) throws LowLevelPaymentException, TransferDeniedException, InvalidTransferException;
+    public abstract org.neuclear.asset.contracts.builders.TransferReceiptBuilder processCompleteHold(CompleteHeldTransferRequest complete) throws LowLevelPaymentException, TransferDeniedException, InvalidTransferException, NeuClearException;
 
     /**
      * Cancels a HeldTransfer. This must be signed by the recipient of the HeldTransfer.
@@ -146,7 +153,7 @@ public abstract class AssetController {
      * @throws InvalidTransferException 
      */
 
-    public abstract CancelHeldTransferReceiptBuilder processCancelHold(CancelHeldTransferRequest cancel) throws LowLevelPaymentException, TransferDeniedException, InvalidTransferException;
+    public abstract CancelHeldTransferReceiptBuilder processCancelHold(CancelHeldTransferRequest cancel) throws LowLevelPaymentException, TransferDeniedException, InvalidTransferException, NeuClearException;
 
     //TODO Add getBalance
 }

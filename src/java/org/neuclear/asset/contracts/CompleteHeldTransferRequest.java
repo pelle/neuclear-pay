@@ -13,7 +13,7 @@ import java.util.Date;
  * Time: 5:35:26 PM
  */
 public final class CompleteHeldTransferRequest extends TransferContract {
-    CompleteHeldTransferRequest(SignedNamedCore core, Asset asset, Identity from, Identity to, double amount, Date valuetime, String comment, String holdid) throws NeuClearException {
+    CompleteHeldTransferRequest(final SignedNamedCore core, final Asset asset, final Identity from, final Identity to, final double amount, final Date valuetime, final String comment, final String holdid) throws NeuClearException {
         super(core, asset, to, amount, valuetime, comment);
         this.from = from;
         this.holdid = holdid;

@@ -14,7 +14,7 @@ import java.util.Date;
  */
 public final class HeldTransferReceipt extends TransferReceipt implements Held {
 
-    HeldTransferReceipt(SignedNamedCore core, Asset asset, Identity from, Identity to, String reqid, double amount, Date valuetime, String comment, Date helduntil) throws NeuClearException {
+    HeldTransferReceipt(final SignedNamedCore core, final Asset asset, final Identity from, final Identity to, final String reqid, final double amount, final Date valuetime, final String comment, final Date helduntil) throws NeuClearException {
         super(core, asset, from, to, reqid, amount, valuetime, comment);
         this.helduntil = helduntil;
     }

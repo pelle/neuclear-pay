@@ -9,7 +9,7 @@ import org.neuclear.commons.Utility;
  * Time: 11:39:02 AM
  */
 public abstract class TransferException extends Exception {
-    public TransferException(AssetController proc) {
+    public TransferException(final AssetController proc) {
         this.proc = proc;
     }
 
@@ -17,15 +17,15 @@ public abstract class TransferException extends Exception {
         ;
     }
 
-    protected TransferException(Throwable cause) {
+    protected TransferException(final Throwable cause) {
         super(cause);
     }
 
-    public AssetController getProc() {
+    public final AssetController getProc() {
         return proc;
     }
 
-    public String getMessage() {
+    public final String getMessage() {
         return "NeuClear Transfer Exception: " + Utility.denullString(proc.toString()) + "\n" + getSubMessage();
     }
 

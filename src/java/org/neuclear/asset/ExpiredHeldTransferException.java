@@ -10,13 +10,13 @@ import java.util.Date;
  * Date: Jul 23, 2003
  * Time: 11:38:10 AM
  */
-public class ExpiredHeldTransferException extends InvalidTransferException {
-    public ExpiredHeldTransferException(CompleteHeldTransferRequest held) {
+public final class ExpiredHeldTransferException extends InvalidTransferException {
+    public ExpiredHeldTransferException(final CompleteHeldTransferRequest held) {
         super("expired");
         this.held = held;
     }
 
-    private CompleteHeldTransferRequest held;
+    private final CompleteHeldTransferRequest held;
 
     public CompleteHeldTransferRequest getRequest() {
         return held;

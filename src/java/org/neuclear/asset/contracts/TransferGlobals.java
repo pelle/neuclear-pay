@@ -1,6 +1,7 @@
 package org.neuclear.asset.contracts;
 
 import org.dom4j.*;
+import org.neuclear.id.verifier.VerifyingReader;
 
 /*
 NeuClear Distributed Transaction Clearing Platform
@@ -20,8 +21,14 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: TransferGlobals.java,v 1.2 2003/11/10 17:42:07 pelle Exp $
+$Id: TransferGlobals.java,v 1.3 2003/11/21 04:43:04 pelle Exp $
 $Log: TransferGlobals.java,v $
+Revision 1.3  2003/11/21 04:43:04  pelle
+EncryptedFileStore now works. It uses the PBECipher with DES3 afair.
+Otherwise You will Finaliate.
+Anything that can be final has been made final throughout everyting. We've used IDEA's Inspector tool to find all instance of variables that could be final.
+This should hopefully make everything more stable (and secure).
+
 Revision 1.2  2003/11/10 17:42:07  pelle
 The AssetController interface has been more or less finalized.
 CurrencyController fully implemented
@@ -68,16 +75,26 @@ public final class TransferGlobals {
         return DocumentHelper.createNamespace(XFER_NSPREFIX, XFER_NSURI);
     }
 
-    public static QName createQName(String name) {
+    public static QName createQName(final String name) {
         return DocumentHelper.createQName(name, createNameSpace());
     }
 
-    public static Attribute createAttribute(Element elem, String name, String value) {
+    public static Attribute createAttribute(final Element elem, final String name, final String value) {
         return DocumentHelper.createAttribute(elem, createQName(name), value);
     }
 
-    public static Element createElement(String name, String value) {
+    public static Element createElement(final String name, final String value) {
         return DocumentHelper.createElement(createQName(name));
+    }
+    static {
+        VerifyingReader.getInstance().registerReader(TransferGlobals.CANCEL_RCPT_TAGNAME,new AssetTransactionContract.Reader());
+        VerifyingReader.getInstance().registerReader(TransferGlobals.CANCEL_TAGNAME,new AssetTransactionContract.Reader());
+        VerifyingReader.getInstance().registerReader(TransferGlobals.XFER_TAGNAME,new AssetTransactionContract.Reader());
+        VerifyingReader.getInstance().registerReader(TransferGlobals.HELD_XFER_TAGNAME,new AssetTransactionContract.Reader());
+        VerifyingReader.getInstance().registerReader(TransferGlobals.XFER_RCPT_TAGNAME,new AssetTransactionContract.Reader());
+        VerifyingReader.getInstance().registerReader(TransferGlobals.HELD_XFER_RCPT_TAGNAME,new AssetTransactionContract.Reader());
+        VerifyingReader.getInstance().registerReader(TransferGlobals.COMPLETE_TAGNAME,new AssetTransactionContract.Reader());
+
     }
 
     public static final String XFER_TAGNAME = "TransferRequest";

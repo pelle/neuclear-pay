@@ -23,8 +23,14 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: TransferDeniedException.java,v 1.3 2003/11/10 17:42:07 pelle Exp $
+$Id: TransferDeniedException.java,v 1.4 2003/11/21 04:43:04 pelle Exp $
 $Log: TransferDeniedException.java,v $
+Revision 1.4  2003/11/21 04:43:04  pelle
+EncryptedFileStore now works. It uses the PBECipher with DES3 afair.
+Otherwise You will Finaliate.
+Anything that can be final has been made final throughout everyting. We've used IDEA's Inspector tool to find all instance of variables that could be final.
+This should hopefully make everything more stable (and secure).
+
 Revision 1.3  2003/11/10 17:42:07  pelle
 The AssetController interface has been more or less finalized.
 CurrencyController fully implemented
@@ -56,15 +62,15 @@ SOAPTools was changed to return a stream. This is required by the VerifyingReade
  * Date: Nov 6, 2003
  * Time: 6:18:11 PM
  */
-public class TransferDeniedException extends TransferException {
-    public TransferDeniedException(AssetTransactionContract req) {
+public final class TransferDeniedException extends TransferException {
+    public TransferDeniedException(final AssetTransactionContract req) {
         this.req = req;
     }
-    public TransferDeniedException(CancelHeldTransferRequest req) {
+    public TransferDeniedException(final CancelHeldTransferRequest req) {
         this.req = req;
     }
 
-    public String getSubMessage() {
+    public final String getSubMessage() {
         return "No permission to perform action for :"+req.getSignatory().getName();
     }
 

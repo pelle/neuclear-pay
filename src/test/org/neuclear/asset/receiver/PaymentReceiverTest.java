@@ -41,8 +41,14 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: PaymentReceiverTest.java,v 1.5 2003/11/19 23:32:20 pelle Exp $
+$Id: PaymentReceiverTest.java,v 1.6 2003/11/21 04:43:04 pelle Exp $
 $Log: PaymentReceiverTest.java,v $
+Revision 1.6  2003/11/21 04:43:04  pelle
+EncryptedFileStore now works. It uses the PBECipher with DES3 afair.
+Otherwise You will Finaliate.
+Anything that can be final has been made final throughout everyting. We've used IDEA's Inspector tool to find all instance of variables that could be final.
+This should hopefully make everything more stable (and secure).
+
 Revision 1.5  2003/11/19 23:32:20  pelle
 Signers now can generatekeys via the generateKey() method.
 Refactored the relationship between SignedNamedObject and NamedObjectBuilder a bit.
@@ -111,8 +117,8 @@ CreateTestPayments is a command line utility to create signed payment requests
  * Date: Oct 24, 2003
  * Time: 11:20:31 AM
  */
-public class PaymentReceiverTest extends AbstractReceiverTest {
-    public PaymentReceiverTest(String string) throws NeuClearException, GeneralSecurityException, UnknownLedgerException, LowlevelLedgerException, BookExistsException, IOException, InvalidTransferException, XMLException {
+public final class PaymentReceiverTest extends AbstractReceiverTest {
+    public PaymentReceiverTest(final String string) throws NeuClearException, GeneralSecurityException, UnknownLedgerException, LowlevelLedgerException, BookExistsException, IOException, InvalidTransferException, XMLException {
         super(string);
         asset = (Asset) NSResolver.resolveIdentity(assetName);
 
@@ -130,15 +136,15 @@ public class PaymentReceiverTest extends AbstractReceiverTest {
         createPayments(getAlice(), getBob(), 100);
     }
 
-    public void testSimple() throws Exception, DocumentException, NeuClearException, XMLException {
+    public final void testSimple() throws Exception, DocumentException, NeuClearException, XMLException {
         runDirectoryTest(directory.getAbsolutePath());
     }
 
-    public Receiver getReceiver() {
+    public final Receiver getReceiver() {
         return receiver;
     }
 
-    public String getExtension() {
+    public final String getExtension() {
         return ".xml";
     }
 
@@ -146,12 +152,12 @@ public class PaymentReceiverTest extends AbstractReceiverTest {
         return asset;
     }
 
-    public Object getPreTransactionState(SignedNamedObject obj) throws Exception {
+    public final Object getPreTransactionState(final SignedNamedObject obj) throws Exception {
 
         if (obj instanceof TransferRequest) {
-            TransferRequest transfer = (TransferRequest) obj;
-            double fromBalance = proc.getBalance(transfer.getFrom(), transfer.getTimeStamp());
-            double toBalance = proc.getBalance(transfer.getTo(), transfer.getTimeStamp());
+            final TransferRequest transfer = (TransferRequest) obj;
+            final double fromBalance = proc.getBalance(transfer.getFrom(), transfer.getTimeStamp());
+            final double toBalance = proc.getBalance(transfer.getTo(), transfer.getTimeStamp());
 
             return new double[]{fromBalance, toBalance};
 
@@ -159,11 +165,11 @@ public class PaymentReceiverTest extends AbstractReceiverTest {
         return null; //No state to report
     }
 
-    public boolean verifyTransaction(final SignedNamedObject obj, final Object state) throws Exception {
+    public final boolean verifyTransaction(final SignedNamedObject obj, final Object state) throws Exception {
         if (obj instanceof TransferRequest) {
-            TransferRequest transfer = (TransferRequest) obj;
-            double fromBalance = proc.getBalance(transfer.getFrom(), transfer.getTimeStamp());
-            double toBalance = proc.getBalance(transfer.getTo(), transfer.getTimeStamp());
+            final TransferRequest transfer = (TransferRequest) obj;
+            final double fromBalance = proc.getBalance(transfer.getFrom(), transfer.getTimeStamp());
+            final double toBalance = proc.getBalance(transfer.getTo(), transfer.getTimeStamp());
             final double prebalances[] = (double[]) state;
 
             return (fromBalance == prebalances[0] - transfer.getAmount()) &&
@@ -172,10 +178,10 @@ public class PaymentReceiverTest extends AbstractReceiverTest {
         return false;
     }
 
-    public void createPayments(Identity from, Identity to, double amount) throws InvalidTransferException, XMLException, NeuClearException, IOException, UnsupportedEncodingException {
-        TransferRequestBuilder transfer = new TransferRequestBuilder(asset, from, to, 100, TimeTools.now(), "Test One");
-        SignedNamedObject signed = transfer.sign(getSigner());
-        OutputStream out = new BufferedOutputStream(new FileOutputStream(directory.getAbsolutePath() + "/" + transfer.getLocalName() + ".xml"));
+    public final void createPayments(final Identity from, final Identity to, final double amount) throws InvalidTransferException, XMLException, NeuClearException, IOException, UnsupportedEncodingException {
+        final TransferRequestBuilder transfer = new TransferRequestBuilder(asset, from, to, 100, TimeTools.now(), "Test One");
+        final SignedNamedObject signed = transfer.sign(getSigner());
+        final OutputStream out = new BufferedOutputStream(new FileOutputStream(directory.getAbsolutePath() + "/" + transfer.getLocalName() + ".xml"));
         out.write(signed.getEncoded().getBytes("UTF-8"));
 
     }
@@ -186,5 +192,5 @@ public class PaymentReceiverTest extends AbstractReceiverTest {
     private final File directory;
     private final Receiver receiver;
     private final CurrencyController proc;
-    private double balance = 0.0;
+    private final double balance = 0.0;
 }

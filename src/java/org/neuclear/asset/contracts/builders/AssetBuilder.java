@@ -7,6 +7,7 @@ import org.neuclear.commons.NeuClearException;
 import org.neuclear.commons.crypto.signers.JCESigner;
 import org.neuclear.commons.crypto.signers.TestCaseSigner;
 import org.neuclear.id.builders.IdentityBuilder;
+import org.neuclear.id.SignedNamedObject;
 import org.neuclear.store.FileStore;
 import org.neuclear.store.Store;
 import org.neuclear.xml.XMLException;
@@ -32,8 +33,14 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: AssetBuilder.java,v 1.3 2003/11/20 23:40:50 pelle Exp $
+$Id: AssetBuilder.java,v 1.4 2003/11/21 04:43:03 pelle Exp $
 $Log: AssetBuilder.java,v $
+Revision 1.4  2003/11/21 04:43:03  pelle
+EncryptedFileStore now works. It uses the PBECipher with DES3 afair.
+Otherwise You will Finaliate.
+Anything that can be final has been made final throughout everyting. We've used IDEA's Inspector tool to find all instance of variables that could be final.
+This should hopefully make everything more stable (and secure).
+
 Revision 1.3  2003/11/20 23:40:50  pelle
 Getting all the tests to work in id
 Removing usage of BC in CryptoTools as it was causing issues.
@@ -83,7 +90,7 @@ TransferReceiptBuilder has been created for use by Transfer processors. It is us
  * Date: Oct 3, 2003
  * Time: 3:13:27 PM
  */
-public class AssetBuilder extends IdentityBuilder {
+public final class AssetBuilder extends IdentityBuilder {
     /**
      * Used to create new Assets
      * 
@@ -96,23 +103,23 @@ public class AssetBuilder extends IdentityBuilder {
      * @param decimal    The amount of decimal points.
      * @param minimum    Minimum transaction size
      */
-    public AssetBuilder(String name, PublicKey allow, String repository, String signer, String logger, String receiver, String controller, int decimal, double minimum) {
+    public AssetBuilder(final String name, final PublicKey allow, final String repository, final String signer, final String logger, final String receiver, final String controller, final int decimal, final double minimum) throws NeuClearException {
         super(AssetGlobals.createQName(AssetGlobals.ASSET_TAGNAME), name, allow, repository, signer, logger, receiver);
-        Element elem = getElement();
+        final Element elem = getElement();
         AssetGlobals.createAttribute(elem, "controller", controller);
         AssetGlobals.createAttribute(elem, "decimalpoints", Integer.toString(decimal));
         AssetGlobals.createAttribute(elem, "minimumxact", Double.toString(minimum));
 
     }
 
-    public static void main(String args[]) {
+    public static void main(final String[] args) {
         try {
-            JCESigner signer = new TestCaseSigner();
+            final JCESigner signer = new TestCaseSigner();
             String assetname = "neu://test/bux";
             if (args.length > 0)
                 assetname = args[0];
 
-            AssetBuilder assetraw = new AssetBuilder(assetname,
+            final AssetBuilder assetraw = new AssetBuilder(assetname,
                     signer.getPublicKey(assetname),
                     "http://repository.neuclear.org/",
                     "http://bux.neuclear.org:8080",
@@ -122,8 +129,8 @@ public class AssetBuilder extends IdentityBuilder {
                     2,
                     0.01
             );
-            Asset asset = (Asset) assetraw.sign(signer);
-            Store store = new FileStore("target/testdata/assets");
+            final Asset asset= (Asset) assetraw.sign(signer);
+            final Store store = new FileStore("target/testdata/repository");
             store.receive(asset);
         } catch (GeneralSecurityException e) {
             e.printStackTrace();

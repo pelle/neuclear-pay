@@ -6,6 +6,7 @@ import org.neuclear.asset.InvalidTransferException;
 import org.neuclear.asset.NegativeTransferException;
 import org.neuclear.id.Identity;
 import org.neuclear.id.NSTools;
+import org.neuclear.commons.NeuClearException;
 
 import java.util.Date;
 
@@ -27,8 +28,14 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: TransferRequestBuilder.java,v 1.3 2003/11/10 17:42:07 pelle Exp $
+$Id: TransferRequestBuilder.java,v 1.4 2003/11/21 04:43:03 pelle Exp $
 $Log: TransferRequestBuilder.java,v $
+Revision 1.4  2003/11/21 04:43:03  pelle
+EncryptedFileStore now works. It uses the PBECipher with DES3 afair.
+Otherwise You will Finaliate.
+Anything that can be final has been made final throughout everyting. We've used IDEA's Inspector tool to find all instance of variables that could be final.
+This should hopefully make everything more stable (and secure).
+
 Revision 1.3  2003/11/10 17:42:07  pelle
 The AssetController interface has been more or less finalized.
 CurrencyController fully implemented
@@ -64,10 +71,10 @@ TransferReceiptBuilder has been created for use by Transfer processors. It is us
  * Time: 6:26:13 PM
  */
 public class TransferRequestBuilder extends TransferBuilder {
-    public TransferRequestBuilder(Asset asset, Identity signer, Identity to, double amount, Date valuetime, String comment) throws InvalidTransferException, NegativeTransferException {
+    public TransferRequestBuilder(final Asset asset, final Identity signer, final Identity to, final double amount, final Date valuetime, final String comment) throws InvalidTransferException, NegativeTransferException, NeuClearException {
         this(TransferGlobals.XFER_TAGNAME, asset, signer, to, amount, valuetime, comment);
     }
-     TransferRequestBuilder(String tagname,Asset asset, Identity signer, Identity to, double amount, Date valuetime, String comment) throws InvalidTransferException, NegativeTransferException {
+     TransferRequestBuilder(final String tagname,final Asset asset, final Identity signer, final Identity to, final double amount, final Date valuetime, final String comment) throws InvalidTransferException, NegativeTransferException, NeuClearException {
         super(tagname, asset, signer, to, amount, valuetime, comment);
     }
 }

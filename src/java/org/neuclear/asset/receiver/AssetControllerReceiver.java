@@ -15,6 +15,7 @@ import org.neuclear.receiver.Receiver;
 import org.neuclear.receiver.UnsupportedTransaction;
 import org.neuclear.commons.crypto.signers.Signer;
 import org.neuclear.commons.crypto.CryptoException;
+import org.neuclear.commons.NeuClearException;
 import org.neuclear.xml.ElementProxy;
 import org.neuclear.xml.xmlsec.XMLSecurityException;
 
@@ -43,9 +44,9 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  * Date: Sep 23, 2003
  * Time: 3:03:03 PM
  */
-public class AssetControllerReceiver implements Receiver {
+public final class AssetControllerReceiver implements Receiver {
 
-    public AssetControllerReceiver(AssetController proc, Signer signer) {
+    public AssetControllerReceiver(final AssetController proc, final Signer signer) {
         this.proc = proc;
         this.signer = signer;
     }
@@ -56,14 +57,14 @@ public class AssetControllerReceiver implements Receiver {
      * @param obj 
      * @throws UnsupportedTransaction 
      */
-    public final ElementProxy receive(SignedNamedObject obj) throws UnsupportedTransaction {
+    public final ElementProxy receive(final SignedNamedObject obj) throws UnsupportedTransaction {
         if (obj instanceof AssetTransactionContract) {
-            TransferContract transfer = (TransferContract) obj;
+            final TransferContract transfer = (TransferContract) obj;
             if (!proc.canProcess(transfer.getAsset()))
                 throw new UnsupportedTransaction(obj);
 
             try {
-                NamedObjectBuilder sigReceipt = proc.process(transfer);
+                final NamedObjectBuilder sigReceipt = proc.process(transfer);
                 sigReceipt.sign(transfer.getAsset().getName(), signer);
                 return sigReceipt;
                 //TODO do something with receipt
@@ -77,6 +78,8 @@ public class AssetControllerReceiver implements Receiver {
             } catch (TransferDeniedException e) {
                 e.printStackTrace();  //TODO Handle exception
             } catch (CryptoException e) {
+                e.printStackTrace();  //TODO Handle exception
+            } catch (NeuClearException e) {
                 e.printStackTrace();  //TODO Handle exception
             }
         } else

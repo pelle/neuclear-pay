@@ -15,7 +15,7 @@ import java.util.Date;
  */
 public final class CancelHeldTransferRequest extends AssetTransactionContract{
 
-    CancelHeldTransferRequest(SignedNamedCore core, Asset asset, String holdid) throws NeuClearException {
+    CancelHeldTransferRequest(final SignedNamedCore core, final Asset asset, final String holdid) throws NeuClearException {
         super(core, asset);
         this.holdid = holdid;
     }
