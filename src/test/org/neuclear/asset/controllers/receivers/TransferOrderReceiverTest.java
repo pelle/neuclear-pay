@@ -14,15 +14,18 @@ import org.neuclear.ledger.InvalidTransactionException;
 import org.neuclear.ledger.LedgerController;
 import org.neuclear.ledger.LowlevelLedgerException;
 import org.neuclear.ledger.UnknownBookException;
-import org.neuclear.ledger.hibernate.HibernateLedgerController;
+import org.neuclear.ledger.simple.SimpleLedgerController;
 import org.neuclear.tests.AbstractSigningTest;
 
 import java.security.GeneralSecurityException;
 import java.security.PublicKey;
 
 /*
-$Id: TransferOrderReceiverTest.java,v 1.2 2004/07/22 21:48:46 pelle Exp $
+$Id: TransferOrderReceiverTest.java,v 1.3 2004/09/08 17:41:11 pelle Exp $
 $Log: TransferOrderReceiverTest.java,v $
+Revision 1.3  2004/09/08 17:41:11  pelle
+Changed these tests to use the SimpleLedgerController from the HibernateLedgerController.
+
 Revision 1.2  2004/07/22 21:48:46  pelle
 Further receivers and unit tests for for Exchanges etc.
 I've also changed the internal asset to ledger id from being the pk of the contract signer, to being the pk of the service key.
@@ -48,7 +51,7 @@ public class TransferOrderReceiverTest extends AbstractSigningTest {
     protected void setUp() throws Exception {
         PublicKey pub = signer.generateKey();
         asset = (Asset) new AssetBuilder("test", "http://localhost:8080/rules.html", "http://localhost:8080/Asset", pub, signer.getPublicKey("carol"), 2, 0, "t").convert("bux", signer);
-        ledger = new HibernateLedgerController("test");
+        ledger = new SimpleLedgerController("test");
         receiver = new TransferOrderReceiver(signer, ledger);
     }
 

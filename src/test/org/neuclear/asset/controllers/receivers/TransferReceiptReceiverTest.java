@@ -16,7 +16,7 @@ import org.neuclear.ledger.InvalidTransactionException;
 import org.neuclear.ledger.LedgerController;
 import org.neuclear.ledger.LowlevelLedgerException;
 import org.neuclear.ledger.UnknownBookException;
-import org.neuclear.ledger.hibernate.HibernateLedgerController;
+import org.neuclear.ledger.simple.SimpleLedgerController;
 import org.neuclear.tests.AbstractSigningTest;
 
 import java.security.GeneralSecurityException;
@@ -24,8 +24,11 @@ import java.security.PublicKey;
 import java.util.Date;
 
 /*
-$Id: TransferReceiptReceiverTest.java,v 1.1 2004/08/18 09:42:56 pelle Exp $
+$Id: TransferReceiptReceiverTest.java,v 1.2 2004/09/08 17:41:11 pelle Exp $
 $Log: TransferReceiptReceiverTest.java,v $
+Revision 1.2  2004/09/08 17:41:11  pelle
+Changed these tests to use the SimpleLedgerController from the HibernateLedgerController.
+
 Revision 1.1  2004/08/18 09:42:56  pelle
 Many fixes to the various Signing and SigningRequest Servlets etc.
 
@@ -55,7 +58,7 @@ public class TransferReceiptReceiverTest extends AbstractSigningTest {
         PublicKey pub = signer.generateKey();
         signeralias = new Signatory(pub).getName();
         asset = (Asset) new AssetBuilder("test", "http://localhost:8080/rules.html", "http://localhost:8080/Asset", pub, signer.getPublicKey("carol"), 2, 0, "t").convert("bux", signer);
-        ledger = new HibernateLedgerController("test");
+        ledger = new SimpleLedgerController("test");
         receiver = new TransferReceiptReceiver(ledger);
     }
 
