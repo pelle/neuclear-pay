@@ -18,12 +18,21 @@ import java.util.Date;
  * User: pelleb
  * Date: Nov 10, 2003
  * Time: 11:06:37 AM
- * $Id: AssetTransactionContract.java,v 1.3 2003/11/12 23:47:04 pelle Exp $
+ * $Id: AssetTransactionContract.java,v 1.4 2003/11/19 23:32:20 pelle Exp $
  * $Log: AssetTransactionContract.java,v $
+ * Revision 1.4  2003/11/19 23:32:20  pelle
+ * Signers now can generatekeys via the generateKey() method.
+ * Refactored the relationship between SignedNamedObject and NamedObjectBuilder a bit.
+ * SignedNamedObject now contains the full xml which is returned with getEncoded()
+ * This means that it is now possible to further send on or process a SignedNamedObject, leaving
+ * NamedObjectBuilder for its original purposes of purely generating new Contracts.
+ * NamedObjectBuilder.sign() now returns a SignedNamedObject which is the prefered way of processing it.
+ * Updated all major interfaces that used the old model to use the new model.
+ *
  * Revision 1.3  2003/11/12 23:47:04  pelle
  * Much work done in creating good test environment.
  * PaymentReceiverTest works, but needs a abit more work in its environment to succeed testing.
- *
+ * <p/>
  * Revision 1.2  2003/11/11 21:17:19  pelle
  * Further vital reshuffling.
  * org.neudist.crypto.* and org.neudist.utils.* have been moved to respective areas under org.neuclear.commons

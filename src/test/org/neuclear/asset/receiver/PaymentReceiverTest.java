@@ -19,12 +19,8 @@ import org.neuclear.ledger.implementations.SQLLedger;
 import org.neuclear.receiver.Receiver;
 import org.neuclear.tests.AbstractReceiverTest;
 import org.neuclear.xml.XMLException;
-import org.neuclear.xml.XMLTools;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.security.GeneralSecurityException;
 
 /*
@@ -45,8 +41,17 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: PaymentReceiverTest.java,v 1.4 2003/11/12 23:47:05 pelle Exp $
+$Id: PaymentReceiverTest.java,v 1.5 2003/11/19 23:32:20 pelle Exp $
 $Log: PaymentReceiverTest.java,v $
+Revision 1.5  2003/11/19 23:32:20  pelle
+Signers now can generatekeys via the generateKey() method.
+Refactored the relationship between SignedNamedObject and NamedObjectBuilder a bit.
+SignedNamedObject now contains the full xml which is returned with getEncoded()
+This means that it is now possible to further send on or process a SignedNamedObject, leaving
+NamedObjectBuilder for its original purposes of purely generating new Contracts.
+NamedObjectBuilder.sign() now returns a SignedNamedObject which is the prefered way of processing it.
+Updated all major interfaces that used the old model to use the new model.
+
 Revision 1.4  2003/11/12 23:47:05  pelle
 Much work done in creating good test environment.
 PaymentReceiverTest works, but needs a abit more work in its environment to succeed testing.
@@ -107,7 +112,7 @@ CreateTestPayments is a command line utility to create signed payment requests
  * Time: 11:20:31 AM
  */
 public class PaymentReceiverTest extends AbstractReceiverTest {
-    public PaymentReceiverTest(String string) throws NeuClearException, GeneralSecurityException, UnknownLedgerException, LowlevelLedgerException, BookExistsException, FileNotFoundException, InvalidTransferException, XMLException {
+    public PaymentReceiverTest(String string) throws NeuClearException, GeneralSecurityException, UnknownLedgerException, LowlevelLedgerException, BookExistsException, IOException, InvalidTransferException, XMLException {
         super(string);
         asset = (Asset) NSResolver.resolveIdentity(assetName);
 
@@ -167,11 +172,12 @@ public class PaymentReceiverTest extends AbstractReceiverTest {
         return false;
     }
 
-    public void createPayments(Identity from, Identity to, double amount) throws InvalidTransferException, XMLException, NeuClearException, FileNotFoundException {
+    public void createPayments(Identity from, Identity to, double amount) throws InvalidTransferException, XMLException, NeuClearException, IOException, UnsupportedEncodingException {
         TransferRequestBuilder transfer = new TransferRequestBuilder(asset, from, to, 100, TimeTools.now(), "Test One");
-        transfer.sign(getSigner());
-        OutputStream out = new FileOutputStream(directory.getAbsolutePath() + "/" + transfer.getLocalName() + ".xml");
-        XMLTools.writeFile(out, transfer.getElement());
+        SignedNamedObject signed = transfer.sign(getSigner());
+        OutputStream out = new BufferedOutputStream(new FileOutputStream(directory.getAbsolutePath() + "/" + transfer.getLocalName() + ".xml"));
+        out.write(signed.getEncoded().getBytes("UTF-8"));
+
     }
 
     protected final String assetName = "neu://test/bux";

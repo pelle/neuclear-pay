@@ -3,13 +3,11 @@ package org.neuclear.asset.remote;
 import org.neuclear.asset.contracts.CancelHeldTransferReceipt;
 import org.neuclear.asset.contracts.HeldTransferReceipt;
 import org.neuclear.asset.contracts.TransferReceipt;
-import org.neuclear.asset.contracts.builders.CancelHeldTransferRequestBuilder;
-import org.neuclear.asset.contracts.builders.CompleteHeldTransferRequestBuilder;
-import org.neuclear.asset.contracts.builders.HeldTransferRequestBuilder;
-import org.neuclear.asset.contracts.builders.TransferRequestBuilder;
+import org.neuclear.asset.contracts.builders.*;
 import org.neuclear.commons.NeuClearException;
 import org.neuclear.commons.crypto.signers.Signer;
-import org.neuclear.xml.xmlsec.XMLSecurityException;
+import org.neuclear.id.SignedNamedObject;
+import org.neuclear.xml.XMLException;
 
 /*
 NeuClear Distributed Transaction Clearing Platform
@@ -29,8 +27,17 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: AssetControlClient.java,v 1.5 2003/11/12 23:47:05 pelle Exp $
+$Id: AssetControlClient.java,v 1.6 2003/11/19 23:32:20 pelle Exp $
 $Log: AssetControlClient.java,v $
+Revision 1.6  2003/11/19 23:32:20  pelle
+Signers now can generatekeys via the generateKey() method.
+Refactored the relationship between SignedNamedObject and NamedObjectBuilder a bit.
+SignedNamedObject now contains the full xml which is returned with getEncoded()
+This means that it is now possible to further send on or process a SignedNamedObject, leaving
+NamedObjectBuilder for its original purposes of purely generating new Contracts.
+NamedObjectBuilder.sign() now returns a SignedNamedObject which is the prefered way of processing it.
+Updated all major interfaces that used the old model to use the new model.
+
 Revision 1.5  2003/11/12 23:47:05  pelle
 Much work done in creating good test environment.
 PaymentReceiverTest works, but needs a abit more work in its environment to succeed testing.
@@ -85,26 +92,26 @@ public class AssetControlClient {
         this.signer = signer;
     }
 
-    public TransferReceipt performTransfer(TransferRequestBuilder req) throws NeuClearException, XMLSecurityException {
-        req.sign(signer);
-        return (TransferReceipt) req.getAsset().send(req);
+    public TransferReceipt performTransfer(TransferRequestBuilder req) throws NeuClearException, XMLException {
+        return (TransferReceipt) send(req);
     }
 
-    public HeldTransferReceipt performHeldTransfer(HeldTransferRequestBuilder req) throws NeuClearException, XMLSecurityException {
-        req.sign(signer);
-        return (HeldTransferReceipt) req.getAsset().send(req);
+
+    public HeldTransferReceipt performHeldTransfer(HeldTransferRequestBuilder req) throws NeuClearException, XMLException {
+        return (HeldTransferReceipt) send(req);
     }
 
-    public TransferReceipt performCompleteHeld(CompleteHeldTransferRequestBuilder req) throws NeuClearException, XMLSecurityException {
-        req.sign(signer);
-        return (TransferReceipt) req.getAsset().send(req);
+    public TransferReceipt performCompleteHeld(CompleteHeldTransferRequestBuilder req) throws NeuClearException, XMLException {
+        return (TransferReceipt) send(req);
     }
 
-    public CancelHeldTransferReceipt performCancelHeld(CancelHeldTransferRequestBuilder req) throws NeuClearException, XMLSecurityException {
-        req.sign(signer);
-        return (CancelHeldTransferReceipt) req.getAsset().send(req);
+    public CancelHeldTransferReceipt performCancelHeld(CancelHeldTransferRequestBuilder req) throws NeuClearException, XMLException {
+        return (CancelHeldTransferReceipt) req.getAsset().send(req.sign(signer));
     }
 
+    private SignedNamedObject send(TransferBuilder req) throws NeuClearException, XMLException {
+        return req.getAsset().send(req.sign(signer));
+    }
 
     private final Signer signer;
 }

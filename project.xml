@@ -164,6 +164,12 @@
             <war.bundle>true</war.bundle>
       </properties>
        </dependency>
+       <dependency>
+          <id>servletapi</id>
+          <name>servletapi</name>
+          <version>2.3</version>
+        </dependency>
+
 
   </dependencies>
   <build>

@@ -8,7 +8,6 @@ import org.neuclear.id.Identity;
 import org.neuclear.id.NSTools;
 import org.neuclear.id.NamedObjectReader;
 import org.neuclear.id.SignedNamedObject;
-import org.neuclear.id.builders.NamedObjectBuilder;
 import org.neuclear.senders.SoapSender;
 import org.neuclear.xml.xmlsec.KeyInfo;
 import org.neuclear.xml.xmlsec.XMLSecTools;
@@ -35,8 +34,17 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: Asset.java,v 1.6 2003/11/12 23:47:04 pelle Exp $
+$Id: Asset.java,v 1.7 2003/11/19 23:32:19 pelle Exp $
 $Log: Asset.java,v $
+Revision 1.7  2003/11/19 23:32:19  pelle
+Signers now can generatekeys via the generateKey() method.
+Refactored the relationship between SignedNamedObject and NamedObjectBuilder a bit.
+SignedNamedObject now contains the full xml which is returned with getEncoded()
+This means that it is now possible to further send on or process a SignedNamedObject, leaving
+NamedObjectBuilder for its original purposes of purely generating new Contracts.
+NamedObjectBuilder.sign() now returns a SignedNamedObject which is the prefered way of processing it.
+Updated all major interfaces that used the old model to use the new model.
+
 Revision 1.6  2003/11/12 23:47:04  pelle
 Much work done in creating good test environment.
 PaymentReceiverTest works, but needs a abit more work in its environment to succeed testing.
@@ -101,10 +109,8 @@ public class Asset extends Identity {
      * @return The receipt
      * @throws NeuClearException 
      */
-    public SignedNamedObject send(NamedObjectBuilder obj) throws NeuClearException {
-        if (obj.isSigned())
-            return SoapSender.quickSend(assetController, obj);
-        throw new NeuClearException("Object wasnt signed");
+    public SignedNamedObject send(SignedNamedObject obj) throws NeuClearException {
+        return SoapSender.quickSend(assetController, obj);
     }
 
     /**
