@@ -19,17 +19,18 @@
                  org.neuclear.commons.crypto.signers.Signer,
                  org.neuclear.asset.orders.builders.IssueOrderBuilder,
                  org.neuclear.asset.AssetController,
-                 org.neuclear.asset.servlet.ServletAssetControllerFactory"%>
+                 org.neuclear.asset.servlet.ServletAssetControllerFactory,
+                 org.neuclear.ledger.Book"%>
 <%
-    AssetGlobals.registerReaders();
-    TransferGlobals.registerReaders();
+//    AssetGlobals.registerReaders();
+//    TransferGlobals.registerReaders();
     final Signer signer = ServletSignerFactory.getInstance().createSigner(config);
     Signatory userns=(Signatory) request.getUserPrincipal();
     String service=ServletTools.getInitParam("serviceid",config);
 //    String asseturl=ServletTools.getInitParam("asset",config);
     Asset asset=(Asset)Resolver.resolveIdentity(ServletTools.getAbsoluteURL(request,"/bux.html"));
     double amount=Double.parseDouble(Utility.denullString(request.getParameter("amount"),"0"));
-    boolean submit=!Utility.isEmpty(request.getParameter("submit"));
+    boolean submit=(!Utility.isEmpty(request.getParameter("submit"))&&(amount>=0));
 
 %>
 <html>
@@ -42,21 +43,30 @@ NeuClear Bux
 <div id="banner">
 <img src="../images/logo.png"  alt=" "/>NeuClear Bux</div>
 <div id="subtitle">Request Funds</div>
-<h3>Request Beta Bux</h3>
-
 <div id="content">
 <%
 if (!submit){
+     Book book=(Book) session.getAttribute("book");
 %>
 <p>
        Use this screen to receive free beta bux.
 </p>
 <p>
 <form action="issue.jsp" method="POST">
-    <p>Account Recipient: <%=userns.getName()%></p>
-    <p>Amount:
-    <input type="text" name="amount" value="<%=amount%>"/></p>
-    <p><input type="submit" name="submit" value="Verify"/></p>
+    <h1>Request Beta Bux</h1>
+    <table>
+    <tr><th>Account Nickname</th><td><%=book.getNickname()%></td></tr>
+    <tr><th>Account ID</th><td><%=book.getId()%></td></tr>
+    </table>
+    <p<%=(amount<0)?" class=\"invalid\"":""%>>Amount:<br/>
+    <input type="text" name="amount" value="<%=amount%>" size="10" style="text-align:right"/>
+    <%=(amount<0)?"You can not request a negative amount":""%>
+    </p>
+     <p class="formaction">
+         <input type="submit" name="submit" value="Verify"/>
+         <input type="submit" name="cancel" value="Cancel" onClick="history.go(-1)"/>
+
+     </p>
 
 </form>
 </p>

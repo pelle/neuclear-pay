@@ -20,10 +20,13 @@
                  org.neuclear.asset.AssetController,
                  org.neuclear.asset.servlet.ServletAssetControllerFactory,
                  org.neuclear.ledger.Ledger,
-                 org.neuclear.ledger.servlets.ServletLedgerFactory"%>
+                 org.neuclear.ledger.servlets.ServletLedgerFactory,
+                 org.neuclear.ledger.Book,
+                 org.neuclear.ledger.LowlevelLedgerException,
+                 org.neuclear.ledger.UnknownBookException"%>
 <%
-    AssetGlobals.registerReaders();
-    TransferGlobals.registerReaders();
+//    AssetGlobals.registerReaders();
+//    TransferGlobals.registerReaders();
     final Signer signer = ServletSignerFactory.getInstance().createSigner(config);
     Signatory userns=(Signatory) request.getUserPrincipal();
     String service=ServletTools.getInitParam("serviceid",config);
@@ -36,6 +39,17 @@
     boolean submit=!Utility.isEmpty(request.getParameter("submit"));
     String comment=Utility.denullString(request.getParameter("comment"));
 
+    Book recpbook=null;
+    if (!Utility.isEmpty(recipient)){
+        try {
+            recpbook=ledger.getBook(recipient);
+        } catch (UnknownBookException e) {
+            submit=false;
+        }
+    }
+    final double balance = ledger.getAvailableBalance(userns.getName());
+    if (submit&&(amount>balance||amount<0))
+        submit=false;
 %>
 <html>
 <head><title>
@@ -52,30 +66,44 @@ NeuClear Bux
 <div id="content">
 <%
 if (!submit){
+           Book book=(Book) session.getAttribute("book");
+
 %>
 <p>
-       Use this screen to perform a transfer of funds to another id.
-</p>
-<p>
 <form action="transfer.jsp" method="POST">
-    <p>Account: <br/><%=userns.getName()%></p>
-    <p>Available Balance: <br/><%=ledger.getAvailableBalance(userns.getName())%></p>
+    <h1>Use this screen to perform a transfer of funds to another id.</h1>
+    <table>
+    <tr><th>Account</th><td><%=book.getNickname()%></td></tr>
+    <tr><th>Account ID</th><td><%=book.getId()%></td></tr>
+    <tr><th>Available Balance:</th><td><%=balance%></td></tr>
+    </table>
     <hr/>
-    <p>Recipient:<br/>
-    <input type="text" name="recipient" value="<%=recipient%>"/></p>
-    <p>Amount:<br/>
-    <input type="text" name="amount" value="<%=amount%>"/></p>
+    <p<%=(!Utility.isEmpty(recipient)&&recpbook==null)?" class=\"invalid\"":""%>>Recipient: (Use the full 32 character id, the nickname if known or the first characters of the id)<br/>
+    <input type="text" name="recipient" value="<%=recipient%>" size="32"/>
+    <%=(!Utility.isEmpty(recipient)&&recpbook==null)?"Unknown Account":""%>
+    </p>
+    <p<%=(amount>balance)||(amount<0)?" class=\"invalid\"":""%>>Amount:<br/>
+    <input type="text" name="amount" value="<%=amount%>" size="10" style="text-align:right"/>
+    <%=(amount>balance)?"Insufficient Funds":""%>
+    <%=(amount<0)?"You can not transfer a negative amount":""%>
+    </p>
     <p>Comment:<br/>
-    <input type="text" name="comment" value="<%=comment%>"/></p>
+    <input type="text" name="comment" value="<%=comment%>" size="40"/></p>
     <hr/>
-    <p><input type="submit" name="submit" value="Verify"/></p>
+    <p class="formaction">
+        <input type="submit" name="submit" value="Verify"/>
+        <input type="submit" name="cancel" value="Cancel" onClick="history.go(-1)"/>
+
+    </p>
 
 </form>
 </p>
 <% } else {
+
+
     TransferOrderBuilder transfer=new TransferOrderBuilder(
             asset.getName(),
-            recipient,//new Signatory(signer.getPublicKey(recipient)),
+            recpbook.getId(),//new Signatory(signer.getPublicKey(recipient)),
             new Amount(amount),
             comment
     ) ;

@@ -72,6 +72,8 @@ public final class CurrencyController extends AssetController {
             throw new InvalidTransferException("postive amount");
         } catch (UnknownTransactionException e) {
             throw new LowLevelPaymentException(e);
+        } catch (UnknownBookException e) {
+            throw new InvalidTransferException(e.getSubMessage());
         }
     }
 
@@ -103,6 +105,8 @@ public final class CurrencyController extends AssetController {
             throw new InvalidTransferException("postive amount");
         } catch (UnknownTransactionException e) {
             throw new LowLevelPaymentException(e);
+        } catch (UnknownBookException e) {
+            throw new InvalidTransferException(e.getSubMessage());
         }
     }
 
@@ -124,6 +128,8 @@ public final class CurrencyController extends AssetController {
             throw new InvalidTransferException("postive amount");
         } catch (UnknownTransactionException e) {
             throw new LowLevelPaymentException(e);
+        } catch (UnknownBookException e) {
+            throw new InvalidTransferException(e.getSubMessage());
         }
     }
 

@@ -26,6 +26,7 @@ import org.neuclear.id.receiver.Receiver;
 import org.neuclear.ledger.InvalidTransactionException;
 import org.neuclear.ledger.Ledger;
 import org.neuclear.ledger.LowlevelLedgerException;
+import org.neuclear.ledger.UnknownBookException;
 import org.neuclear.ledger.simple.SimpleLedger;
 import org.neuclear.tests.AbstractSigningTest;
 
@@ -81,7 +82,7 @@ public class CurrencyTests extends AbstractSigningTest {
         auditLedger = null;
     }
 
-    public void testTransfer() throws InvalidTransferException, NeuClearException, InvalidTransactionException, LowlevelLedgerException {
+    public void testTransfer() throws InvalidTransferException, NeuClearException, InvalidTransactionException, LowlevelLedgerException, UnknownBookException {
         fundAccount();
         double alicebalance = ledger.getBalance(getAlice().getName());
         assertAudit(getAlice().getName());
@@ -95,7 +96,7 @@ public class CurrencyTests extends AbstractSigningTest {
         assertAudit(getAlice().getName());
     }
 
-    private void fundAccount() throws InvalidTransactionException, LowlevelLedgerException {
+    private void fundAccount() throws InvalidTransactionException, LowlevelLedgerException, UnknownBookException {
         ledger.transfer("test", getAlice().getName(), 50, "fund");
         auditLedger.transfer("test", getAlice().getName(), 50, "fund");
     }
@@ -105,7 +106,7 @@ public class CurrencyTests extends AbstractSigningTest {
         assertEquals(auditLedger.getAvailableBalance(name), ledger.getAvailableBalance(name), 0);
     }
 
-    public void testExchangeOrderAndExpire() throws InvalidTransferException, NeuClearException, InvalidTransactionException, LowlevelLedgerException {
+    public void testExchangeOrderAndExpire() throws InvalidTransferException, NeuClearException, InvalidTransactionException, LowlevelLedgerException, UnknownBookException {
         fundAccount();
         double alicebalance = ledger.getBalance(getAlice().getName());
         assertEquals(alicebalance, ledger.getAvailableBalance(getAlice().getName()), 0);
@@ -128,7 +129,7 @@ public class CurrencyTests extends AbstractSigningTest {
         assertAudit(getAlice().getName());
     }
 
-    public void testExchangeOrderAndCancelByOwner() throws InvalidTransferException, NeuClearException, InvalidTransactionException, LowlevelLedgerException {
+    public void testExchangeOrderAndCancelByOwner() throws InvalidTransferException, NeuClearException, InvalidTransactionException, LowlevelLedgerException, UnknownBookException {
         fundAccount();
         double alicebalance = ledger.getBalance(getAlice().getName());
         assertEquals(alicebalance, ledger.getAvailableBalance(getAlice().getName()), 0);
@@ -149,7 +150,7 @@ public class CurrencyTests extends AbstractSigningTest {
         assertAudit(getAlice().getName());
     }
 
-    public void testExchangeOrderAndCancelByAgent() throws InvalidTransferException, NeuClearException, InvalidTransactionException, LowlevelLedgerException {
+    public void testExchangeOrderAndCancelByAgent() throws InvalidTransferException, NeuClearException, InvalidTransactionException, LowlevelLedgerException, UnknownBookException {
         fundAccount();
         double alicebalance = ledger.getBalance(getAlice().getName());
         assertEquals(alicebalance, ledger.getAvailableBalance(getAlice().getName()), 0);
@@ -170,7 +171,7 @@ public class CurrencyTests extends AbstractSigningTest {
         assertAudit(getAlice().getName());
     }
 
-    public void testFailOnExchangeOrderAndCancelByBaddie() throws InvalidTransferException, NeuClearException, InvalidTransactionException, LowlevelLedgerException {
+    public void testFailOnExchangeOrderAndCancelByBaddie() throws InvalidTransferException, NeuClearException, InvalidTransactionException, LowlevelLedgerException, UnknownBookException {
         fundAccount();
         double alicebalance = ledger.getBalance(getAlice().getName());
         assertEquals(alicebalance, ledger.getAvailableBalance(getAlice().getName()), 0);
@@ -194,7 +195,7 @@ public class CurrencyTests extends AbstractSigningTest {
         assertAudit(getAlice().getName());
     }
 
-    public void testExchangeOrderAndComplete() throws InvalidTransferException, NeuClearException, InvalidTransactionException, LowlevelLedgerException {
+    public void testExchangeOrderAndComplete() throws InvalidTransferException, NeuClearException, InvalidTransactionException, LowlevelLedgerException, UnknownBookException {
         fundAccount();
         double alicebalance = ledger.getBalance(getAlice().getName());
         assertEquals(alicebalance, ledger.getAvailableBalance(getAlice().getName()), 0);
@@ -216,7 +217,7 @@ public class CurrencyTests extends AbstractSigningTest {
         assertAudit(getAlice().getName());
     }
 
-    public void testFailOnExchangeOrderAndCompleteByOwner() throws InvalidTransferException, NeuClearException, InvalidTransactionException, LowlevelLedgerException {
+    public void testFailOnExchangeOrderAndCompleteByOwner() throws InvalidTransferException, NeuClearException, InvalidTransactionException, LowlevelLedgerException, UnknownBookException {
         fundAccount();
         double alicebalance = ledger.getBalance(getAlice().getName());
         assertEquals(alicebalance, ledger.getAvailableBalance(getAlice().getName()), 0);
@@ -244,7 +245,7 @@ public class CurrencyTests extends AbstractSigningTest {
         assertAudit(getAlice().getName());
     }
 
-    public void testFailOnExchangeOrderAndCompleteByBaddie() throws InvalidTransferException, NeuClearException, InvalidTransactionException, LowlevelLedgerException {
+    public void testFailOnExchangeOrderAndCompleteByBaddie() throws InvalidTransferException, NeuClearException, InvalidTransactionException, LowlevelLedgerException, UnknownBookException {
         fundAccount();
         double alicebalance = ledger.getBalance(getAlice().getName());
         assertEquals(alicebalance, ledger.getAvailableBalance(getAlice().getName()), 0);

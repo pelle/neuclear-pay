@@ -21,6 +21,7 @@ import org.neuclear.id.Signatory;
 import org.neuclear.id.verifier.VerifyingReader;
 import org.neuclear.ledger.InvalidTransactionException;
 import org.neuclear.ledger.LowlevelLedgerException;
+import org.neuclear.ledger.UnknownBookException;
 import org.neuclear.xml.XMLException;
 
 import javax.servlet.ServletException;
@@ -46,8 +47,11 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: AssetControllerServletTest.java,v 1.1 2004/04/20 23:31:03 pelle Exp $
+$Id: AssetControllerServletTest.java,v 1.2 2004/04/23 19:09:35 pelle Exp $
 $Log: AssetControllerServletTest.java,v $
+Revision 1.2  2004/04/23 19:09:35  pelle
+Lots of cleanups and improvements to the userinterface and look of the bux application.
+
 Revision 1.1  2004/04/20 23:31:03  pelle
 All unit tests (junit and cactus) work. The AssetControllerServlet is operational.
 
@@ -107,7 +111,7 @@ public class AssetControllerServletTest extends ServletTestCase {
 
     }
 
-    public void testAuthReq() throws ServletException, IOException, NameResolutionException, InvalidNamedObjectException, NonExistingSignerException, InvalidTransactionException, LowlevelLedgerException {
+    public void testAuthReq() throws ServletException, IOException, NameResolutionException, InvalidNamedObjectException, NonExistingSignerException, InvalidTransactionException, LowlevelLedgerException, UnknownBookException {
         assertEquals(request.getContentType(), "application/x-www-form-urlencoded");
         assertEquals(request.getMethod(), "POST");
         config.setInitParameter("serviceid", "bux");

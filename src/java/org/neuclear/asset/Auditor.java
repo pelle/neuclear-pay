@@ -31,8 +31,11 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: Auditor.java,v 1.4 2004/04/06 16:24:34 pelle Exp $
+$Id: Auditor.java,v 1.5 2004/04/23 19:09:35 pelle Exp $
 $Log: Auditor.java,v $
+Revision 1.5  2004/04/23 19:09:35  pelle
+Lots of cleanups and improvements to the userinterface and look of the bux application.
+
 Revision 1.4  2004/04/06 16:24:34  pelle
 Added two new Data Objects IssuerOrder and IssueReceipt for managing the issuance process.
 Added Issuance support to the Asset and Audit Controllers.
@@ -201,6 +204,8 @@ public class Auditor implements Receiver {
             throw new LowLevelPaymentException(e);
         } catch (InvalidTransactionException e) {
             throw new InvalidTransferException(e.getSubMessage());
+        } catch (UnknownBookException e) {
+            throw new InvalidTransferException(e.getSubMessage());
         }
     }
 
@@ -227,6 +232,8 @@ public class Auditor implements Receiver {
             throw new LowLevelPaymentException(e);
         } catch (InvalidTransactionException e) {
             throw new InvalidTransferException(e.getSubMessage());
+        } catch (UnknownBookException e) {
+            throw new InvalidTransferException(e.getSubMessage());
         }
     }
 
@@ -249,6 +256,8 @@ public class Auditor implements Receiver {
         } catch (LowlevelLedgerException e) {
             throw new LowLevelPaymentException(e);
         } catch (InvalidTransactionException e) {
+            throw new InvalidTransferException(e.getSubMessage());
+        } catch (UnknownBookException e) {
             throw new InvalidTransferException(e.getSubMessage());
         }
     }
