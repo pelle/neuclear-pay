@@ -21,7 +21,7 @@ NeuClear Bux
 <%
     if(!loggedin){
 %>
-<form action="/Authorize" method="POST">
+<form action="Authorize" method="POST">
 <table bgcolor="#FFFFE0"><tr><td valign="top">
     <input name="identity" value="<%=(userns!=null)?userns.getName():""%>" type="text" size="30">
     </td><td valign="top">

@@ -32,8 +32,13 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: AssetControllerServlet.java,v 1.5 2003/12/10 23:52:39 pelle Exp $
+$Id: AssetControllerServlet.java,v 1.6 2003/12/15 23:31:54 pelle Exp $
 $Log: AssetControllerServlet.java,v $
+Revision 1.6  2003/12/15 23:31:54  pelle
+added ServletTools.getInitParam() which first tries the ServletConfig, then the context config.
+All the web.xml's have been updated to support this. Also various further generalizations have been done throughout
+for getServiceid(), getTitle(), getSigner()
+
 Revision 1.5  2003/12/10 23:52:39  pelle
 Did some cleaning up in the builders
 Fixed some stuff in IdentityCreator
@@ -75,46 +80,35 @@ Payment Web Application is getting there.
 public final class AssetControllerServlet extends ReceiverServlet {
     public final void init(final ServletConfig config) throws ServletException {
         super.init(config);
-        serviceid = config.getInitParameter("serviceid");
         datasource = config.getInitParameter("datasource");
         AssetGlobals.registerReaders();
         TransferGlobals.registerReaders();
         INSTANCE = this;
         try {
-            asset = (Asset) NSResolver.resolveIdentity(serviceid);
-            signer = new TestCaseSigner();
+            asset = (Asset) NSResolver.resolveIdentity(getServiceid());
             final AssetControllerReceiver receiver = new AssetControllerReceiver(
                     new CurrencyController(
                             new SQLLedger(
                                     new JNDIConnectionSource(datasource),
-                                    serviceid
+                                    getServiceid()
                             ),
-                            serviceid
+                            getServiceid()
                     ),
-                    signer
+                    getSigner()
 
             );
             setReceiver(receiver);
 
         } catch (Exception e) {
-            e.printStackTrace();
+            ctx.log("AssetControllerServer: "+e.getLocalizedMessage());
+            throw new ServletException(e);
         }
     }
 
     public final Asset getAsset() {
-        final byte test[] = "one two three".getBytes();
-        test[0] = 0;
-
         return asset;
     }
 
-    public TestCaseSigner getSigner() {
-        return signer;
-    }
-
-    public final String getServiceid() {
-        return serviceid;
-    }
 
     public final String getDatasource() {
         return datasource;
@@ -125,8 +119,6 @@ public final class AssetControllerServlet extends ReceiverServlet {
     }
 
     private Asset asset;
-    private String serviceid;
     private String datasource;
     private static AssetControllerServlet INSTANCE;
-    private TestCaseSigner signer;
 }

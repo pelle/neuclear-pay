@@ -1,18 +1,32 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
 <!DOCTYPE web-app
-    PUBLIC "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN"
-    "http://java.sun.com/j2ee/dtds/web-app_2_3.dtd">
+  PUBLIC "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN"
+  "http://java.sun.com/dtd/web-app_2_3.dtd">
 <web-app>
     <display-name>NeuClear Pay WebApp</display-name>
     <description>
 	AssetController App
     </description>
+    <context-param>
+            <param-name>serviceid</param-name>
+            <param-value>neu://test/bux</param-value>
+            <description>NeuClear id of Service</description>
+    </context-param>
+    <context-param>
+             <param-name>title</param-name>
+             <param-value>NeuClear Sample E-Currency Application</param-value>
+    </context-param>
+    <context-param>
+             <param-name>keystore</param-name>
+             <param-value>test</param-value>
+    </context-param>
+    <context-param>
+             <param-name>passphraseagent</param-name>
+             <param-value>test</param-value>
+    </context-param>
     <filter>
         <filter-name>authfilter</filter-name>
         <filter-class>org.neuclear.auth.AuthenticationFilter</filter-class>
-        <init-param>
-            <param-name>serviceid</param-name>
-            <param-value>neu://test/bux</param-value>
-        </init-param>
     </filter>
     <filter-mapping>
         <filter-name>authfilter</filter-name>
@@ -22,39 +36,23 @@
         <servlet-name>assetcontroller</servlet-name>
         <servlet-class>org.neuclear.asset.receiver.servlet.AssetControllerServlet</servlet-class>
         <init-param>
-            <param-name>title</param-name>
-            <param-value>NeuClear Example Application</param-value>
-        </init-param>
-        <init-param>
-            <param-name>serviceid</param-name>
-            <param-value>neu://test/bux</param-value>
-        </init-param>
-        <init-param>
             <param-name>datasource</param-name>
             <param-value>jdbc/AssetDS</param-value>
         </init-param>
         <load-on-startup>1</load-on-startup>
     </servlet>
-    <servlet>
-        <servlet-name>authenticator</servlet-name>
-        <servlet-class>org.neuclear.auth.AuthenticationServlet</servlet-class>
-        <init-param>
-            <param-name>title</param-name>
-            <param-value>NeuClear Example Application</param-value>
-        </init-param>
-        <init-param>
-            <param-name>serviceid</param-name>
-            <param-value>neu://test/bux</param-value>
-        </init-param>
-        <load-on-startup>1</load-on-startup>
-    </servlet>
+     <servlet>
+         <servlet-name>authenticator</servlet-name>
+         <servlet-class>org.neuclear.auth.AuthenticationServlet</servlet-class>
+         <load-on-startup>1</load-on-startup>
+     </servlet>
     <servlet-mapping>
         <servlet-name>assetcontroller</servlet-name>
-        <url-pattern>/Asset</url-pattern>
+        <url-pattern>Asset</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>authenticator</servlet-name>
-        <url-pattern>/Authorize</url-pattern>
+        <url-pattern>Authorize</url-pattern>
     </servlet-mapping>
     <welcome-file-list>
         <welcome-file>index.jsp</welcome-file>
