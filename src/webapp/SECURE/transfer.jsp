@@ -122,7 +122,7 @@ if (!submit){
     SignedNamedObject sig=sigreq.convert(service,signer);
 
 %>
-<form action="http://localhost:11870/Signer" method="POST">
+<form action="http://127.0.0.1:11870/Signer" method="POST">
 <input name="neuclear-request" value="<%=Base64.encode(sig.getEncoded().getBytes())%>" type="hidden">
 <input name="endpoint" value="<%=ServletTools.getAbsoluteURL(request, "/Asset")%>" type="hidden">
 </form>
