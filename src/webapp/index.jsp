@@ -51,9 +51,10 @@ NeuClear Bux
 <%
     if(!loggedin){
 %>
-You need to be running the NeuClear Personal Signer to log in.
+<p>You need to be running the NeuClear Personal Signer to log in.
 <a href="http://dist.neuclear.org/app/neuclear-signer.jnlp">Start with Java Web Start</a>. Note on first run this
-will download 
+will download about 4MB.</p>
+<p>Click here for more information about the <a href="http://neuclear.org/display/neu/Personal+Signer">Personal Signer</a></p>
 <%
     } else {
         %>

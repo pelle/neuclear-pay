@@ -75,7 +75,7 @@
         <dependency>
             <id>neuclear-commons</id>
             <name>neuclear-commons</name>
-            <version>0.7</version>
+            <version>0.7.1</version>
             <properties>
                 <war.bundle>true</war.bundle>
             </properties>
