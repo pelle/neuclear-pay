@@ -1,17 +1,22 @@
 package org.neuclear.exchange.orders.builders;
 
 import org.neuclear.asset.contracts.Asset;
+import org.neuclear.asset.contracts.AssetGlobals;
 import org.neuclear.asset.contracts.builders.AssetBuilder;
 import org.neuclear.commons.NeuClearException;
 import org.neuclear.exchange.contracts.ExchangeAgent;
+import org.neuclear.exchange.contracts.ExchangeAgentGlobals;
 import org.neuclear.exchange.contracts.builders.ExchangeAgentBuilder;
 import org.neuclear.tests.AbstractObjectCreationTest;
 
 import java.security.GeneralSecurityException;
 
 /*
-$Id: AbstractExchangeOrderTest.java,v 1.4 2004/04/23 23:33:15 pelle Exp $
+$Id: AbstractExchangeOrderTest.java,v 1.5 2004/09/08 17:27:41 pelle Exp $
 $Log: AbstractExchangeOrderTest.java,v $
+Revision 1.5  2004/09/08 17:27:41  pelle
+Some unit tests were not registrering their readers.
+
 Revision 1.4  2004/04/23 23:33:15  pelle
 Major update. Added an original url and nickname to Identity and friends.
 
@@ -38,6 +43,8 @@ Created new ServiceBuilder class for creating services. A service is an identity
 public abstract class AbstractExchangeOrderTest extends AbstractObjectCreationTest {
     public AbstractExchangeOrderTest(final String string) throws NeuClearException, GeneralSecurityException {
         super(string);
+        AssetGlobals.registerReaders();
+        ExchangeAgentGlobals.registerReaders();
         bux = createTestAsset();
         agent = createTestExchangeAgent();
         shoes = createShoeAsset();

@@ -2,8 +2,10 @@ package org.neuclear.asset.orders.builders;
 
 import org.neuclear.asset.InvalidTransferException;
 import org.neuclear.asset.contracts.Asset;
+import org.neuclear.asset.contracts.AssetGlobals;
 import org.neuclear.asset.contracts.builders.AssetBuilder;
 import org.neuclear.asset.orders.Amount;
+import org.neuclear.asset.orders.TransferGlobals;
 import org.neuclear.asset.orders.TransferOrder;
 import org.neuclear.asset.orders.TransferReceipt;
 import org.neuclear.commons.NeuClearException;
@@ -34,8 +36,11 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: TransferReceiptBuilderTest.java,v 1.5 2004/05/24 18:31:32 pelle Exp $
+$Id: TransferReceiptBuilderTest.java,v 1.6 2004/09/08 17:27:40 pelle Exp $
 $Log: TransferReceiptBuilderTest.java,v $
+Revision 1.6  2004/09/08 17:27:40  pelle
+Some unit tests were not registrering their readers.
+
 Revision 1.5  2004/05/24 18:31:32  pelle
 Changed asset id in ledger to be asset.getSignatory().getName().
 Made SigningRequestServlet and SigningServlet a bit clearer.
@@ -85,6 +90,8 @@ Started the unit tests for the new payment message format.
 public class TransferReceiptBuilderTest extends AbstractObjectCreationTest {
     public TransferReceiptBuilderTest(String string) throws NeuClearException, GeneralSecurityException {
         super(string);
+        AssetGlobals.registerReaders();
+        TransferGlobals.registerReaders();
         asset = createTestAsset();
     }
 
