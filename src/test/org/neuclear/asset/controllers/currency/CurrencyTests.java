@@ -1,10 +1,10 @@
 package org.neuclear.asset.controllers.currency;
 
-import org.neuclear.asset.Auditor;
 import org.neuclear.asset.InvalidTransferException;
 import org.neuclear.asset.contracts.Asset;
 import org.neuclear.asset.contracts.AssetGlobals;
 import org.neuclear.asset.contracts.builders.AssetBuilder;
+import org.neuclear.asset.controllers.auditor.Auditor;
 import org.neuclear.asset.orders.Amount;
 import org.neuclear.asset.orders.TransferReceipt;
 import org.neuclear.asset.orders.builders.TransferOrderBuilder;

@@ -1,5 +1,8 @@
-package org.neuclear.asset;
+package org.neuclear.asset.controllers.auditor;
 
+import org.neuclear.asset.InvalidTransferException;
+import org.neuclear.asset.LowLevelPaymentException;
+import org.neuclear.asset.TransferDeniedException;
 import org.neuclear.asset.contracts.Asset;
 import org.neuclear.asset.orders.IssueOrder;
 import org.neuclear.asset.orders.IssueReceipt;
@@ -31,8 +34,11 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: Auditor.java,v 1.7 2004/05/01 00:23:12 pelle Exp $
+$Id: Auditor.java,v 1.1 2004/05/05 22:05:22 pelle Exp $
 $Log: Auditor.java,v $
+Revision 1.1  2004/05/05 22:05:22  pelle
+Moved the Auditor to its own package
+
 Revision 1.7  2004/05/01 00:23:12  pelle
 Added Ledger field to Transaction as well as to getBalance() and friends.
 
