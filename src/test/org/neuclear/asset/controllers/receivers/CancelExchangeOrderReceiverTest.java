@@ -6,10 +6,10 @@ import org.neuclear.asset.orders.Amount;
 import org.neuclear.commons.NeuClearException;
 import org.neuclear.exchange.contracts.ExchangeAgentGlobals;
 import org.neuclear.exchange.orders.BidItem;
-import org.neuclear.exchange.orders.ExchangeCompletedReceipt;
+import org.neuclear.exchange.orders.CancelExchangeReceipt;
 import org.neuclear.exchange.orders.ExchangeOrderGlobals;
 import org.neuclear.exchange.orders.ExchangeOrderReceipt;
-import org.neuclear.exchange.orders.builders.ExchangeCompletionOrderBuilder;
+import org.neuclear.exchange.orders.builders.CancelExchangeOrderBuilder;
 import org.neuclear.exchange.orders.builders.ExchangeOrderBuilder;
 import org.neuclear.id.Signatory;
 import org.neuclear.id.SignedNamedObject;
@@ -23,8 +23,11 @@ import java.security.GeneralSecurityException;
 import java.util.Date;
 
 /*
-$Id: CancelExchangeOrderReceiverTest.java,v 1.2 2004/08/18 09:42:56 pelle Exp $
+$Id: CancelExchangeOrderReceiverTest.java,v 1.3 2004/09/08 16:50:49 pelle Exp $
 $Log: CancelExchangeOrderReceiverTest.java,v $
+Revision 1.3  2004/09/08 16:50:49  pelle
+All unit tests now pass
+
 Revision 1.2  2004/08/18 09:42:56  pelle
 Many fixes to the various Signing and SigningRequest Servlets etc.
 
@@ -80,12 +83,12 @@ public class CancelExchangeOrderReceiverTest extends AbstractExchangeReceiverTes
         assertEquals(0, ledger.getBalance(asset.getServiceId(), recipient.getName()), 0);
         assertEquals(0, ledger.getAvailableBalance(asset.getServiceId(), recipient.getName()), 0);
 
-        ExchangeCompletedReceipt completed = (ExchangeCompletedReceipt) receiver.receive(new ExchangeCompletionOrderBuilder(receipt, new Date(), recipient.getName(), new Amount(10), "did it").convert("exchange", signer));
-        assertNotNull(completed);
-        assertEquals(0, ledger.getBalance(asset.getServiceId(), sender.getName()), 0);
-        assertEquals(0, ledger.getAvailableBalance(asset.getServiceId(), sender.getName()), 0);
-        assertEquals(10, ledger.getBalance(asset.getServiceId(), recipient.getName()), 0);
-        assertEquals(10, ledger.getAvailableBalance(asset.getServiceId(), recipient.getName()), 0);
+        CancelExchangeReceipt cancelled = (CancelExchangeReceipt) receiver.receive(new CancelExchangeOrderBuilder(receipt).convert("exchange", signer));
+        assertNotNull(cancelled);
+        assertEquals(10, ledger.getBalance(asset.getServiceId(), sender.getName()), 0);
+        assertEquals(10, ledger.getAvailableBalance(asset.getServiceId(), sender.getName()), 0);
+        assertEquals(0, ledger.getBalance(asset.getServiceId(), recipient.getName()), 0);
+        assertEquals(0, ledger.getAvailableBalance(asset.getServiceId(), recipient.getName()), 0);
 
     }
 
