@@ -29,8 +29,16 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: Asset.java,v 1.10 2003/12/10 23:52:39 pelle Exp $
+$Id: Asset.java,v 1.11 2003/12/19 18:02:35 pelle Exp $
 $Log: Asset.java,v $
+Revision 1.11  2003/12/19 18:02:35  pelle
+Revamped a lot of exception handling throughout the framework, it has been simplified in most places:
+- For most cases the main exception to worry about now is InvalidNamedObjectException.
+- Most lowerlevel exception that cant be handled meaningful are now wrapped in the LowLevelException, a
+  runtime exception.
+- Source and Store patterns each now have their own exceptions that generalizes the various physical
+  exceptions that can happen in that area.
+
 Revision 1.10  2003/12/10 23:52:39  pelle
 Did some cleaning up in the builders
 Fixed some stuff in IdentityCreator
@@ -101,7 +109,7 @@ SOAPTools was changed to return a stream. This is required by the VerifyingReade
  * @see org.neuclear.asset.contracts.builders.AssetBuilder
  */
 public final class Asset extends Identity {
-    protected Asset(final SignedNamedCore core, final String repository, final String signer, final String logger, final String receiver, final PublicKey pub, final int decimal, final double minimumTransaction) throws NeuClearException {
+    protected Asset(final SignedNamedCore core, final String repository, final String signer, final String logger, final String receiver, final PublicKey pub, final int decimal, final double minimumTransaction) {
         super(core, repository, signer, logger, receiver, pub);
         this.decimal = decimal;
         this.multiplier = (int) Math.round(Math.pow(10, -decimal));
@@ -141,23 +149,26 @@ public final class Asset extends Identity {
          * @param elem 
          * @return 
          */
-        public final SignedNamedObject read(final SignedNamedCore core, final Element elem) throws NeuClearException, XMLSecurityException {
-            if (!elem.getNamespace().equals(AssetGlobals.createNameSpace()))
-                throw new UnsupportedOperationException("");
-            final String repository = elem.attributeValue(DocumentHelper.createQName("repository", NSTools.NS_NEUID));
-            final String signer = elem.attributeValue(DocumentHelper.createQName("signer", NSTools.NS_NEUID));
-            final String logger = elem.attributeValue(DocumentHelper.createQName("logger", NSTools.NS_NEUID));
-            final String receiver = elem.attributeValue(DocumentHelper.createQName("receiver", NSTools.NS_NEUID));
+        public final SignedNamedObject read(final SignedNamedCore core, final Element elem) throws InvalidNamedObjectException {
+            if (!elem.getNamespace().equals(AssetGlobals.NS_ASSET))
+                throw new InvalidNamedObjectException(core.getName(),"Not in XML NameSpace: "+AssetGlobals.NS_ASSET.getURI());
+            final String repository = elem.attributeValue(createNEUIDQName("repository"));
+            final String signer = elem.attributeValue(createNEUIDQName("signer"));
+            final String logger = elem.attributeValue(createNEUIDQName("logger"));
+            final String receiver = elem.attributeValue(createNEUIDQName("receiver"));
 
-            final Element allowElement = elem.element(DocumentHelper.createQName("allow", NSTools.NS_NEUID));
-            final KeyInfo ki = new KeyInfo(allowElement.element(XMLSecTools.createQName("KeyInfo")));
-            final PublicKey pub = ki.getPublicKey();
-            final String dec = elem.attributeValue("decimalpoints");
-            final int decimal = (!Utility.isEmpty(dec)) ? Integer.parseInt(dec) : 0;
-            final String min = elem.attributeValue("minimumxact");
-            final double minimum = (!Utility.isEmpty(min)) ? Double.parseDouble(min) : 0;
-
-            return new Asset(core, repository, signer, logger, receiver, pub, decimal, minimum);
+            final Element allowElement = InvalidNamedObjectException.assertContainsElementQName(core,elem,createNEUIDQName("allow"));
+            try {
+                final KeyInfo ki = new KeyInfo(InvalidNamedObjectException.assertContainsElementQName(allowElement, XMLSecTools.createQName("KeyInfo")));
+                final PublicKey pub = ki.getPublicKey();
+                final String dec = elem.attributeValue("decimalpoints");
+                final int decimal = (!Utility.isEmpty(dec)) ? Integer.parseInt(dec) : 0;
+                final String min = elem.attributeValue("minimumxact");
+                final double minimum = (!Utility.isEmpty(min)) ? Double.parseDouble(min) : 0;
+                return new Asset(core, repository, signer, logger, receiver, pub, decimal, minimum);
+            } catch (XMLSecurityException e) {
+                throw new InvalidNamedObjectException(core.getName(),e);
+            }
         }
 
 

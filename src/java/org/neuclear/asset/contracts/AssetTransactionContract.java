@@ -4,22 +4,28 @@ import org.dom4j.Element;
 import org.neuclear.commons.NeuClearException;
 import org.neuclear.commons.Utility;
 import org.neuclear.commons.time.TimeTools;
-import org.neuclear.id.Identity;
-import org.neuclear.id.NamedObjectReader;
-import org.neuclear.id.SignedNamedCore;
-import org.neuclear.id.SignedNamedObject;
+import org.neuclear.id.*;
 import org.neuclear.id.resolver.NSResolver;
 import org.neuclear.receiver.UnsupportedTransaction;
 
 import java.util.Date;
+import java.text.ParseException;
 
 /**
  * (C) 2003 Antilles Software Ventures SA
  * User: pelleb
  * Date: Nov 10, 2003
  * Time: 11:06:37 AM
- * $Id: AssetTransactionContract.java,v 1.9 2003/12/10 23:52:39 pelle Exp $
+ * $Id: AssetTransactionContract.java,v 1.10 2003/12/19 18:02:35 pelle Exp $
  * $Log: AssetTransactionContract.java,v $
+ * Revision 1.10  2003/12/19 18:02:35  pelle
+ * Revamped a lot of exception handling throughout the framework, it has been simplified in most places:
+ * - For most cases the main exception to worry about now is InvalidNamedObjectException.
+ * - Most lowerlevel exception that cant be handled meaningful are now wrapped in the LowLevelException, a
+ *   runtime exception.
+ * - Source and Store patterns each now have their own exceptions that generalizes the various physical
+ *   exceptions that can happen in that area.
+ *
  * Revision 1.9  2003/12/10 23:52:39  pelle
  * Did some cleaning up in the builders
  * Fixed some stuff in IdentityCreator
@@ -72,7 +78,7 @@ import java.util.Date;
 public class AssetTransactionContract extends SignedNamedObject {
     private final Asset asset;
 
-    AssetTransactionContract(final SignedNamedCore core, final Asset asset) throws NeuClearException {
+    AssetTransactionContract(final SignedNamedCore core, final Asset asset)  {
         super(core);
         this.asset = asset;
     }
@@ -89,45 +95,51 @@ public class AssetTransactionContract extends SignedNamedObject {
          * @param elem 
          * @return 
          */
-        public final SignedNamedObject read(final SignedNamedCore core, final Element elem) throws NeuClearException {
-            if (!elem.getNamespaceURI().equals(TransferGlobals.XFER_NSURI))
-                throw new UnsupportedTransaction(core);
+        public final SignedNamedObject read(final SignedNamedCore core, final Element elem) throws InvalidNamedObjectException {
+            if (!elem.getNamespace().equals(AssetGlobals.NS_ASSET))
+                throw new InvalidNamedObjectException(core.getName(),"Not in XML NameSpace: "+AssetGlobals.NS_ASSET.getURI());
 
-            final Asset asset = (Asset) NSResolver.resolveIdentity(elem.attributeValue("assetName"));
+            try {
+                //TODO Validate properly
+                final Asset asset = (Asset) NSResolver.resolveIdentity(elem.attributeValue("assetName"));
 
-            final String holdid = elem.attributeValue("holdid");
-            if (elem.getName().equals(TransferGlobals.CANCEL_TAGNAME))
-                return new CancelHeldTransferRequest(core, asset, holdid);
-            if (elem.getName().equals(TransferGlobals.CANCEL_RCPT_TAGNAME))
-                return new CancelHeldTransferReceipt(core, asset, holdid);
+                final String holdid = elem.attributeValue("holdid");
+                if (elem.getName().equals(TransferGlobals.CANCEL_TAGNAME))
+                    return new CancelHeldTransferRequest(core, asset, holdid);
+                if (elem.getName().equals(TransferGlobals.CANCEL_RCPT_TAGNAME))
+                    return new CancelHeldTransferReceipt(core, asset, holdid);
 
-            final double amount = Double.parseDouble(elem.attributeValue("amount"));
-            final Date valuetime = TimeTools.parseTimeStamp(elem.attributeValue("valuetime"));
-            final Identity to = NSResolver.resolveIdentity(elem.attributeValue("recipient"));
-            final Element commentElement = elem.element(TransferGlobals.createQName("comment"));
+                final double amount = Double.parseDouble(elem.attributeValue("amount"));
+                final Date valuetime = TimeTools.parseTimeStamp(elem.attributeValue("valuetime"));
+                final Identity to = NSResolver.resolveIdentity(elem.attributeValue("recipient"));
+                final Element commentElement = elem.element(TransferGlobals.createQName("comment"));
 
-            final String comment = (commentElement != null) ? commentElement.getText() : "";
-            if (elem.getName().equals(TransferGlobals.XFER_TAGNAME))
-                return new TransferRequest(core, asset, to, amount, valuetime, comment);
+                final String comment = (commentElement != null) ? commentElement.getText() : "";
+                if (elem.getName().equals(TransferGlobals.XFER_TAGNAME))
+                    return new TransferRequest(core, asset, to, amount, valuetime, comment);
 
-            Date helduntil = null;
-            if (!Utility.isEmpty(elem.attributeValue("valuetime")))
-                helduntil = TimeTools.parseTimeStamp(elem.attributeValue("valuetime"));
-            if (elem.getName().equals(TransferGlobals.HELD_XFER_TAGNAME))
-                return new HeldTransferRequest(core, asset, to, amount, valuetime, comment, helduntil);
+                Date helduntil = null;
+                if (!Utility.isEmpty(elem.attributeValue("valuetime")))
+                    helduntil = TimeTools.parseTimeStamp(elem.attributeValue("valuetime"));
+                if (elem.getName().equals(TransferGlobals.HELD_XFER_TAGNAME))
+                    return new HeldTransferRequest(core, asset, to, amount, valuetime, comment, helduntil);
 
-            final Identity from = NSResolver.resolveIdentity(elem.attributeValue("sender"));
-            final String reqid = elem.attributeValue("reqid");
-            if (elem.getName().equals(TransferGlobals.XFER_RCPT_TAGNAME))
-                return new TransferReceipt(core, asset, from, to, reqid, amount, valuetime, comment);
+                final Identity from = NSResolver.resolveIdentity(elem.attributeValue("sender"));
+                final String reqid = elem.attributeValue("reqid");
+                if (elem.getName().equals(TransferGlobals.XFER_RCPT_TAGNAME))
+                    return new TransferReceipt(core, asset, from, to, reqid, amount, valuetime, comment);
 
-            if (elem.getName().equals(TransferGlobals.HELD_XFER_RCPT_TAGNAME))
-                return new HeldTransferReceipt(core, asset, from, to, reqid, amount, valuetime, comment, helduntil);
+                if (elem.getName().equals(TransferGlobals.HELD_XFER_RCPT_TAGNAME))
+                    return new HeldTransferReceipt(core, asset, from, to, reqid, amount, valuetime, comment, helduntil);
 
-            if (elem.getName().equals(TransferGlobals.COMPLETE_TAGNAME))
-                return new CompleteHeldTransferRequest(core, asset, from, to, amount, valuetime, comment, holdid);
-
-            throw new UnsupportedTransaction(core);
+                if (elem.getName().equals(TransferGlobals.COMPLETE_TAGNAME))
+                    return new CompleteHeldTransferRequest(core, asset, from, to, amount, valuetime, comment, holdid);
+            } catch (ParseException e) {
+                throw new InvalidNamedObjectException(core.getName(),e);
+            } catch (NameResolutionException e) {
+                throw new InvalidNamedObjectException(core.getName(),e);
+            }
+            throw new InvalidNamedObjectException(core.getName(),"Not Matched");
         }
 
     }

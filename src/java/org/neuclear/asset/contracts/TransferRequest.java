@@ -14,7 +14,7 @@ import java.util.Date;
  */
 public class TransferRequest extends TransferContract {
 
-    TransferRequest(final SignedNamedCore core, final Asset asset, final Identity to, final double amount, final Date valuetime, final String comment) throws NeuClearException {
+    TransferRequest(final SignedNamedCore core, final Asset asset, final Identity to, final double amount, final Date valuetime, final String comment)  {
         super(core, asset, to, amount, valuetime, comment);
     }
 
