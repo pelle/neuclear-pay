@@ -51,7 +51,7 @@ public final class CurrencyController extends AssetController {
         } catch (LowlevelLedgerException e) {
             throw new LowLevelPaymentException(e);
         } catch (InvalidTransactionException e) {
-            throw new InvalidTransferException(e.getSubMessage());
+            throw new InvalidTransferException(e);
         } catch (NegativeTransferException e) {
             throw new InvalidTransferException("postive amount");
         } catch (UnknownTransactionException e) {
@@ -70,7 +70,7 @@ public final class CurrencyController extends AssetController {
         } catch (LowlevelLedgerException e) {
             throw new LowLevelPaymentException(e);
         } catch (InvalidTransactionException e) {
-            throw new InvalidTransferException(e.getSubMessage());
+            throw new InvalidTransferException(e);
         } catch (NegativeTransferException e) {
             throw new InvalidTransferException("postive amount");
         } catch (UnknownTransactionException e) {
@@ -87,11 +87,11 @@ public final class CurrencyController extends AssetController {
         } catch (LowlevelLedgerException e) {
             throw new LowLevelPaymentException(e);
         } catch (UnknownTransactionException e) {
-            throw new InvalidTransferException(e.getLocalizedMessage());
+            throw new InvalidTransferException(e);
         } catch (TransactionExpiredException e) {
-            throw new InvalidTransferException(e.getLocalizedMessage());
+            throw new InvalidTransferException(e);
         } catch (InvalidTransactionException e) {
-            throw new InvalidTransferException(e.getLocalizedMessage());
+            throw new InvalidTransferException(e);
         }
     }
 
@@ -102,7 +102,7 @@ public final class CurrencyController extends AssetController {
         } catch (LowlevelLedgerException e) {
             throw new LowLevelPaymentException(e);
         } catch (UnknownTransactionException e) {
-            throw new InvalidTransferException(e.getLocalizedMessage());
+            throw new InvalidTransferException(e);
         }
     }
 

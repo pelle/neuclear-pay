@@ -29,8 +29,11 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: Auditor.java,v 1.2 2004/04/05 22:08:23 pelle Exp $
+$Id: Auditor.java,v 1.3 2004/04/05 22:54:05 pelle Exp $
 $Log: Auditor.java,v $
+Revision 1.3  2004/04/05 22:54:05  pelle
+API changes in Ledger to support Auditor and CurrencyController in Pay
+
 Revision 1.2  2004/04/05 22:08:23  pelle
 CurrencyController and AuditController now now pass all unit tests in CurrencyTests.
 
@@ -144,6 +147,12 @@ public class Auditor implements Receiver {
                 process((ExchangeOrderReceipt) contract);
             if (contract instanceof ExchangeCompletedReceipt)
                 process((ExchangeCompletedReceipt) contract);
+            if (contract instanceof TransferOrder)
+                process((TransferOrder) contract);
+            if (contract instanceof ExchangeOrder)
+                process((ExchangeOrder) contract);
+            if (contract instanceof ExchangeCompletionOrder)
+                process((ExchangeCompletionOrder) contract);
             if (contract instanceof CancelExchangeReceipt)
                 process((CancelExchangeReceipt) contract);
         } catch (LowLevelPaymentException e) {
@@ -162,40 +171,54 @@ public class Auditor implements Receiver {
     }
 
     public final void process(final TransferReceipt receipt) throws InvalidTransferException, LowLevelPaymentException, TransferDeniedException, NeuClearException {
-
         try {
             final TransferOrder req = receipt.getOrder();
-            final PostedTransaction posted = ledger.verifiedTransfer(req.getDigest(), req.getSignatory().getName(), req.getRecipient(), req.getAmount().getAmount(), req.getComment());
+            if (!ledger.transactionExists(req.getDigest()))
+                process(req);
             ledger.setReceiptId(req.getDigest(), receipt.getDigest());
         } catch (LowlevelLedgerException e) {
             throw new LowLevelPaymentException(e);
-        } catch (InvalidTransactionException e) {
-            throw new InvalidTransferException(e.getSubMessage());
         } catch (UnknownTransactionException e) {
             throw new LowLevelPaymentException(e);
         }
     }
 
-
-    public final void process(final ExchangeOrderReceipt receipt) throws InvalidTransferException, LowLevelPaymentException, TransferDeniedException, NeuClearException {
+    public final void process(final TransferOrder req) throws InvalidTransferException, LowLevelPaymentException {
         try {
-            final ExchangeOrder req = receipt.getOrder();
-            final PostedHeldTransaction posted = ledger.hold(req.getDigest(), req.getSignatory().getName(), req.getAgent().getSignatory().getName(), req.getExpiry(), req.getAmount().getAmount(), req.getComment());
-            ledger.setHeldReceiptId(req.getDigest(), receipt.getDigest());
+            ledger.transfer(req.getDigest(), req.getSignatory().getName(), req.getRecipient(), req.getAmount().getAmount(), req.getComment());
         } catch (LowlevelLedgerException e) {
             throw new LowLevelPaymentException(e);
         } catch (InvalidTransactionException e) {
             throw new InvalidTransferException(e.getSubMessage());
+        }
+    }
+
+    public final void process(final ExchangeOrderReceipt receipt) throws LowLevelPaymentException, InvalidTransferException {
+        try {
+            final ExchangeOrder req = receipt.getOrder();
+            if (!ledger.heldTransactionExists(req.getDigest()))
+                process(req);
+            ledger.setHeldReceiptId(req.getDigest(), receipt.getDigest());
+        } catch (LowlevelLedgerException e) {
+            throw new LowLevelPaymentException(e);
         } catch (UnknownTransactionException e) {
             throw new LowLevelPaymentException(e);
         }
     }
 
-    public final void process(final ExchangeCompletedReceipt receipt) throws LowLevelPaymentException, InvalidTransferException, TransferDeniedException, NeuClearException {
+    public final void process(final ExchangeOrder req) throws InvalidTransferException, LowLevelPaymentException {
         try {
-            ExchangeCompletionOrder complete = receipt.getOrder();
-            PostedTransaction tran = ledger.complete(complete.getReceipt().getOrder().getDigest(), complete.getAmount().getAmount(), complete.getComment());
-            ledger.setReceiptId(complete.getReceipt().getOrder().getDigest(), receipt.getDigest());
+            ledger.hold(req.getDigest(), req.getSignatory().getName(), req.getAgent().getSignatory().getName(), req.getExpiry(), req.getAmount().getAmount(), req.getComment());
+        } catch (LowlevelLedgerException e) {
+            throw new LowLevelPaymentException(e);
+        } catch (InvalidTransactionException e) {
+            throw new InvalidTransferException(e.getSubMessage());
+        }
+    }
+
+    public final void process(final ExchangeCompletionOrder complete) throws LowLevelPaymentException, InvalidTransferException, TransferDeniedException, NeuClearException {
+        try {
+            ledger.complete(complete.getReceipt().getOrder().getDigest(), complete.getAmount().getAmount(), complete.getComment());
         } catch (LowlevelLedgerException e) {
             throw new LowLevelPaymentException(e);
         } catch (UnknownTransactionException e) {
@@ -203,6 +226,19 @@ public class Auditor implements Receiver {
         } catch (TransactionExpiredException e) {
             throw new InvalidTransferException(e.getLocalizedMessage());
         } catch (InvalidTransactionException e) {
+            throw new InvalidTransferException(e.getLocalizedMessage());
+        }
+    }
+
+    public final void process(final ExchangeCompletedReceipt receipt) throws LowLevelPaymentException, InvalidTransferException, TransferDeniedException, NeuClearException {
+        try {
+            ExchangeCompletionOrder order = receipt.getOrder();
+            if (!ledger.transactionExists(order.getReceipt().getOrder().getDigest()))
+                process(order);
+            ledger.setReceiptId(order.getReceipt().getOrder().getDigest(), receipt.getDigest());
+        } catch (LowlevelLedgerException e) {
+            throw new LowLevelPaymentException(e);
+        } catch (UnknownTransactionException e) {
             throw new InvalidTransferException(e.getLocalizedMessage());
         }
     }
@@ -218,7 +254,6 @@ public class Auditor implements Receiver {
             throw new InvalidTransferException(e.getLocalizedMessage());
         }
     }
-
 
     private final Ledger ledger;
     private final Service asset;
