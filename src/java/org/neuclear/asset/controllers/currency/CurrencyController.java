@@ -16,11 +16,10 @@ import java.util.Date;
 import java.util.Iterator;
 
 /**
- * Created by IntelliJ IDEA.
- * User: pelleb
- * Date: Jul 21, 2003
- * Time: 5:11:49 PM
- * To change this template use Options | File Templates.
+ * The CurrencyController is an AssetController implementation that manages an Electronic currency based
+ * on book entries.<p>
+ * The book entries are managed by <a href="http://neuclear.org/ledger/">NeuClear Ledger</a> which by default
+ * uses a SQL database to store the entries.
  */
 public final class CurrencyController extends AssetController {
 //    public CurrencyController(String ledgername,String title,String reserve) throws LedgerCreationException, LowlevelLedgerException, BookExistsException {

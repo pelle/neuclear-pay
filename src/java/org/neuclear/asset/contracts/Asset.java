@@ -36,8 +36,11 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: Asset.java,v 1.3 2003/11/10 19:27:52 pelle Exp $
+$Id: Asset.java,v 1.4 2003/11/10 21:08:41 pelle Exp $
 $Log: Asset.java,v $
+Revision 1.4  2003/11/10 21:08:41  pelle
+More JavaDoc
+
 Revision 1.3  2003/11/10 19:27:52  pelle
 Mainly documentation.
 
@@ -59,9 +62,14 @@ SOAPTools was changed to return a stream. This is required by the VerifyingReade
 */
 
 /**
- * User: pelleb
- * Date: Nov 6, 2003
- * Time: 6:27:21 PM
+ * The asset contains information about a tradeable Asset. The Asset is in itself a subclass of Identity, which
+ * means that any transactions signed by it must be in the format of <tt>neu://assetname/1231q145452452345</tt>
+ * where assetname is the unique NeuClear wide AssetCertificate.<p>
+ * As a subclass of Identity you cant instantiate these classes your self, but must be gotten in this form:<p>
+ * <tt>(Asset)NSResolver.resolveIdentity("neu://assetname");</tt><p>
+ * To create your own assets use AssetBuilder sign it using a valid NeuClear signer and post its description
+ * to your default online repository. Then anyone can access your Assets through the above interface.
+ * @see org.neuclear.asset.contracts.builders.AssetBuilder
  */
 public class Asset extends Identity {
     private Asset(String name, Identity signatory, Timestamp timestamp, String digest, String repository, String signer, String logger, String receiver, PublicKey pub, String assetController,int decimalpoint,double minimumTransaction) throws NeuClearException {

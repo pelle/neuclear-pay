@@ -38,8 +38,11 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: AssetControlClient.java,v 1.2 2003/11/10 19:27:53 pelle Exp $
+$Id: AssetControlClient.java,v 1.3 2003/11/10 21:08:41 pelle Exp $
 $Log: AssetControlClient.java,v $
+Revision 1.3  2003/11/10 21:08:41  pelle
+More JavaDoc
+
 Revision 1.2  2003/11/10 19:27:53  pelle
 Mainly documentation.
 
@@ -74,10 +77,8 @@ SOAPTools was changed to return a stream. This is required by the VerifyingReade
 */
 
 /**
- * Uses the built in java interface to perform payments on remote services.
- * User: pelleb
- * Date: Nov 6, 2003
- * Time: 5:59:09 PM
+ * This client can be used to perform all the major Asset Transfer functionality using the Assets remote asset server.
+ *
  */
 public class AssetControlClient  {
     public AssetControlClient(Signer signer) throws NeuClearException {
