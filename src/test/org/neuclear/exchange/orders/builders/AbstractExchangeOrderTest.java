@@ -10,8 +10,11 @@ import org.neuclear.tests.AbstractObjectCreationTest;
 import java.security.GeneralSecurityException;
 
 /*
-$Id: AbstractExchangeOrderTest.java,v 1.3 2004/04/17 19:28:01 pelle Exp $
+$Id: AbstractExchangeOrderTest.java,v 1.4 2004/04/23 23:33:15 pelle Exp $
 $Log: AbstractExchangeOrderTest.java,v $
+Revision 1.4  2004/04/23 23:33:15  pelle
+Major update. Added an original url and nickname to Identity and friends.
+
 Revision 1.3  2004/04/17 19:28:01  pelle
 Identity is now fully html based as is the ServiceBuilder.
 VerifyingReader correctly identifies html files and parses them as such.
@@ -41,25 +44,25 @@ public abstract class AbstractExchangeOrderTest extends AbstractObjectCreationTe
     }
 
     public Asset createTestAsset() throws NeuClearException {
-        AssetBuilder builder = new AssetBuilder("http://bux.neuclear.org", "bux",
+        AssetBuilder builder = new AssetBuilder("bux", "http://bux.neuclear.org", "bux",
                 getSigner().getPublicKey("bux"),
                 getSigner().getPublicKey("buxissuer"),
-                2, 0);
+                2, 0, "bux");
         return (Asset) builder.convert(PROMOTER, getSigner());
 
     }
 
     public Asset createShoeAsset() throws NeuClearException {
-        AssetBuilder builder = new AssetBuilder("http://shoes.neuclear.org", "shoes",
+        AssetBuilder builder = new AssetBuilder("shoes", "http://shoes.neuclear.org", "http://shoes.neuclear.org",
                 getSigner().getPublicKey("shoes"),
                 getSigner().getPublicKey("shoesissuer"),
-                2, 0);
+                2, 0, "pairs of shoes");
         return (Asset) builder.convert(PROMOTER, getSigner());
 
     }
 
     public ExchangeAgent createTestExchangeAgent() throws NeuClearException {
-        ExchangeAgentBuilder builder = new ExchangeAgentBuilder("http://tradex.neuclear.org", "tradex",
+        ExchangeAgentBuilder builder = new ExchangeAgentBuilder("tradex", "http://tradex.neuclear.org", "http://tradex.neuclear.org",
                 getSigner().getPublicKey("exchange"));
         return (ExchangeAgent) builder.convert("carol", getSigner());
 

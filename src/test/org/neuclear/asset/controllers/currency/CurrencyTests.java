@@ -293,10 +293,10 @@ public class CurrencyTests extends AbstractSigningTest {
 
 
     public Asset createTestAsset() throws NeuClearException {
-        AssetBuilder builder = new AssetBuilder("http://bux.neuclear.org", "bux",
+        AssetBuilder builder = new AssetBuilder("bux", "http://bux.neuclear.org/bux.html", "html://bux.neuclear.org/bux.html",
                 getSigner().getPublicKey("bux"),
                 getIssuer().getPublicKey(),
-                2, 0);
+                2, 0, "bux");
         final SignedNamedObject object = builder.convert("ivan", getSigner());
         System.out.println("Object type: " + object.getClass().getName());
         return (Asset) object;
@@ -304,16 +304,16 @@ public class CurrencyTests extends AbstractSigningTest {
     }
 
     public Asset createShoeAsset() throws NeuClearException {
-        AssetBuilder builder = new AssetBuilder("http://shoes.neuclear.org", "shoes",
+        AssetBuilder builder = new AssetBuilder("Super Shoes", "http://shoes.neuclear.org/shoes.html", "http://shoes.neuclear.org/Asset",
                 getSigner().getPublicKey("shoes"),
                 getIssuer().getPublicKey(),
-                2, 0);
+                2, 0, "pairs of shoes");
         return (Asset) builder.convert("neu://test", getSigner());
 
     }
 
     public ExchangeAgent createTestExchangeAgent() throws NeuClearException {
-        ExchangeAgentBuilder builder = new ExchangeAgentBuilder("http://tradex.neuclear.org", "Tradex",
+        ExchangeAgentBuilder builder = new ExchangeAgentBuilder("Tradex", "http://tradex.neuclear.org/rules.html", "http://tradex.neuclear.org/Exchange",
                 getSigner().getPublicKey("neu://bob@test"));
         return (ExchangeAgent) builder.convert("neu://test", getSigner());
 

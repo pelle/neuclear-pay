@@ -26,8 +26,11 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: ExchangeAgent.java,v 1.6 2004/04/20 17:47:17 pelle Exp $
+$Id: ExchangeAgent.java,v 1.7 2004/04/23 23:33:14 pelle Exp $
 $Log: ExchangeAgent.java,v $
+Revision 1.7  2004/04/23 23:33:14  pelle
+Major update. Added an original url and nickname to Identity and friends.
+
 Revision 1.6  2004/04/20 17:47:17  pelle
 Fixes to ExchangeAgent to make it work with html contracts
 CurrencyTests fail.
@@ -62,8 +65,8 @@ Got rid of much of the inheritance that was lying around and thought a bit furth
  * Time: 11:04:32 PM
  */
 public class ExchangeAgent extends Service {
-    public ExchangeAgent(SignedNamedCore core, String serviceUrl, PublicKey serviceKey, Targets targets) {
-        super(core, serviceUrl, serviceKey, targets);
+    private ExchangeAgent(SignedNamedCore core, String name, String original, String serviceUrl, PublicKey serviceKey, Targets targets) {
+        super(core, name, original, serviceUrl, serviceKey, targets);
     }
 
     public static final class Reader implements NamedObjectReader {
@@ -81,7 +84,10 @@ public class ExchangeAgent extends Service {
             try {
                 final PublicKey sPub = extractPublicKey(serviceKeyElement);
                 final Targets targets = Targets.parseList(elem);
-                return new ExchangeAgent(core, url.getValue(), sPub, targets);
+                final String nickname = extractNickName(elem, core);
+                final String original = extractOrginalUrl(elem);
+
+                return new ExchangeAgent(core, nickname, original, url.getValue(), sPub, targets);
             } catch (XMLSecurityException e) {
                 throw new InvalidNamedObjectException("invalid exchange agent xml");
             }

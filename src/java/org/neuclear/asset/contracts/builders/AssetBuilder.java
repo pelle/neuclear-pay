@@ -33,8 +33,11 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: AssetBuilder.java,v 1.15 2004/04/21 23:22:19 pelle Exp $
+$Id: AssetBuilder.java,v 1.16 2004/04/23 23:33:13 pelle Exp $
 $Log: AssetBuilder.java,v $
+Revision 1.16  2004/04/23 23:33:13  pelle
+Major update. Added an original url and nickname to Identity and friends.
+
 Revision 1.15  2004/04/21 23:22:19  pelle
 Integrated Browser with the asset controller
 Updated look and feel
@@ -150,8 +153,8 @@ public final class AssetBuilder extends ServiceBuilder {
      * @param minimum
      * @throws NeuClearException
      */
-    public AssetBuilder(final String title, final String serviceUrl, final PublicKey serviceKey, final PublicKey issuerKey, final int decimal, final double minimum) throws NeuClearException {
-        super(AssetGlobals.ASSET_TAGNAME, title, serviceUrl, serviceKey);
+    public AssetBuilder(final String title, final String originalurl, final String serviceUrl, final PublicKey serviceKey, final PublicKey issuerKey, final int decimal, final double minimum, final String units) throws NeuClearException {
+        super(AssetGlobals.ASSET_TAGNAME, title, originalurl, serviceUrl, serviceKey);
         addKeyInfo("asset.issuer.publickey", issuerKey, "Issuers Key");
         addFeature("asset.decimalpoints", "Decimal Points", Integer.toString(decimal), "Decimal Points");
         addFeature("asset.miminmum", "Minimum Transaction", Double.toString(minimum), "The Minumum Transaction size");
@@ -165,13 +168,15 @@ public final class AssetBuilder extends ServiceBuilder {
             AssetGlobals.registerReaders();
 
             final AssetBuilder assetraw = new AssetBuilder("Bux",
+                    "http://bux.neuclear.org/bux.html",
                     "http://bux.neuclear.org/Asset",
                     signer.getPublicKey("bux"),
                     signer.getPublicKey("carol"),
                     2,
-                    0.01);
-            assetraw.getDescription().setText("NeuClear Test Currency");
-            assetraw.getRules().setText("You know the rules, there are no rules!!!");
+                    0.01, "bux");
+            assetraw.getDescription().setText("NeuClear Test Currency of no value.");
+            assetraw.getRules().setText("You know the rules, there are no rules!!! No, really this is for testing purposes only. There" +
+                    "are no implied rights or promises involved in this asset.");
             assetraw.sign("ivan", signer);
             File out = new File("target/testdata/assets/bux.html");
             out.getParentFile().mkdirs();

@@ -24,8 +24,11 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: ExchangeAgentBuilder.java,v 1.2 2004/04/17 19:28:00 pelle Exp $
+$Id: ExchangeAgentBuilder.java,v 1.3 2004/04/23 23:33:13 pelle Exp $
 $Log: ExchangeAgentBuilder.java,v $
+Revision 1.3  2004/04/23 23:33:13  pelle
+Major update. Added an original url and nickname to Identity and friends.
+
 Revision 1.2  2004/04/17 19:28:00  pelle
 Identity is now fully html based as is the ServiceBuilder.
 VerifyingReader correctly identifies html files and parses them as such.
@@ -125,8 +128,8 @@ public final class ExchangeAgentBuilder extends ServiceBuilder {
      * @throws org.neuclear.commons.NeuClearException
      *
      */
-    public ExchangeAgentBuilder(final String title, final String serviceUrl, final PublicKey serviceKey) throws NeuClearException {
-        super(ExchangeAgentGlobals.EXCHANGEAGENT_TAGNAME, title, serviceUrl, serviceKey);
+    public ExchangeAgentBuilder(final String title, final String original, final String serviceUrl, final PublicKey serviceKey) throws NeuClearException {
+        super(ExchangeAgentGlobals.EXCHANGEAGENT_TAGNAME, title, original, serviceUrl, serviceKey);
     }
 
 }

@@ -28,8 +28,11 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: Asset.java,v 1.18 2004/04/18 01:06:06 pelle Exp $
+$Id: Asset.java,v 1.19 2004/04/23 23:33:13 pelle Exp $
 $Log: Asset.java,v $
+Revision 1.19  2004/04/23 23:33:13  pelle
+Major update. Added an original url and nickname to Identity and friends.
+
 Revision 1.18  2004/04/18 01:06:06  pelle
 Asset now parses the xhtml file for its details.
 
@@ -137,12 +140,13 @@ SOAPTools was changed to return a stream. This is required by the VerifyingReade
  * @see org.neuclear.asset.contracts.builders.AssetBuilder
  */
 public final class Asset extends Service {
-    protected Asset(final SignedNamedCore core, final String serviceUrl, final PublicKey servicekey, final PublicKey issuerKey, final Targets targets, final int decimal, final double minimumTransaction) {
-        super(core, serviceUrl, servicekey, targets);
+    protected Asset(final SignedNamedCore core, final String nickname, final String original, final String serviceUrl, final PublicKey servicekey, final PublicKey issuerKey, final Targets targets, final int decimal, final double minimumTransaction, final String units) {
+        super(core, nickname, original, serviceUrl, servicekey, targets);
         this.issuerKey = issuerKey;
         this.decimal = decimal;
         this.multiplier = (int) Math.round(Math.pow(10, -decimal));
         this.minimumTransaction = minimumTransaction;
+        this.units = units;
     }
 
 /*
@@ -196,6 +200,10 @@ public final class Asset extends Service {
         return minimumTransaction;
     }
 
+    public String getUnits() {
+        return units;
+    }
+
     public static final class Reader implements NamedObjectReader {
         /**
          * Read object from Element and fill in its details
@@ -215,7 +223,11 @@ public final class Asset extends Service {
                 final int decimal = extractDecimalPoints(elem);
                 final double minimum = extractMinimumTransactionAmount(elem);
                 final Targets targets = Targets.parseList(elem);
-                return new Asset(core, url.getValue(), sPub, iPub, targets, decimal, minimum);
+                final String nickname = extractNickName(elem, core);
+                final String original = extractOrginalUrl(elem);
+                final Element unitselem = XMLTools.getByID(elem, "asset.units");
+                final String units = (unitselem == null) ? "units" : unitselem.getTextTrim();
+                return new Asset(core, nickname, original, url.getValue(), sPub, iPub, targets, decimal, minimum, units);
             } catch (XMLSecurityException e) {
                 throw new InvalidNamedObjectException("invalid asset xml");
             }
@@ -244,4 +256,5 @@ public final class Asset extends Service {
     private final int decimal;
     private final int multiplier;
     private final double minimumTransaction;
+    private final String units;
 }

@@ -10,8 +10,11 @@ import org.neuclear.tests.AbstractObjectCreationTest;
 import java.security.GeneralSecurityException;
 
 /*
-$Id: ExchangeAgentBuilderTest.java,v 1.3 2004/04/20 17:47:24 pelle Exp $
+$Id: ExchangeAgentBuilderTest.java,v 1.4 2004/04/23 23:33:15 pelle Exp $
 $Log: ExchangeAgentBuilderTest.java,v $
+Revision 1.4  2004/04/23 23:33:15  pelle
+Major update. Added an original url and nickname to Identity and friends.
+
 Revision 1.3  2004/04/20 17:47:24  pelle
 Fixes to ExchangeAgent to make it work with html contracts
 CurrencyTests fail.
@@ -56,7 +59,7 @@ public class ExchangeAgentBuilderTest extends AbstractObjectCreationTest {
     }
 
     protected Builder createBuilder() throws Exception {
-        return new ExchangeAgentBuilder("Exchange", URL,
+        return new ExchangeAgentBuilder("Exchange", URL, URL,
                 getSigner().getPublicKey("neu://test/bux"));
     }
 

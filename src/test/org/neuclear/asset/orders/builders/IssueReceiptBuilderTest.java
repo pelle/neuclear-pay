@@ -34,8 +34,11 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: IssueReceiptBuilderTest.java,v 1.2 2004/04/17 19:28:00 pelle Exp $
+$Id: IssueReceiptBuilderTest.java,v 1.3 2004/04/23 23:33:15 pelle Exp $
 $Log: IssueReceiptBuilderTest.java,v $
+Revision 1.3  2004/04/23 23:33:15  pelle
+Major update. Added an original url and nickname to Identity and friends.
+
 Revision 1.2  2004/04/17 19:28:00  pelle
 Identity is now fully html based as is the ServiceBuilder.
 VerifyingReader correctly identifies html files and parses them as such.
@@ -114,10 +117,10 @@ public class IssueReceiptBuilderTest extends AbstractObjectCreationTest {
     }
 
     public Service createTestAsset() throws NeuClearException {
-        AssetBuilder builder = new AssetBuilder("http://bux.neuclear.org", "bux",
-                getSigner().getPublicKey("neu://test/bux"),
-                getSigner().getPublicKey("neu://test"),
-                2, 0);
+        Builder builder = new AssetBuilder("bux", "http://bux.neuclear.org/bux.html", "http://bux.neuclear.org/Asset",
+                getSigner().getPublicKey("bux"),
+                getAlice().getPublicKey(),
+                2, 0, "bux");
         return (Service) builder.convert(NAME, getSigner());
 
     }

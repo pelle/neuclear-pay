@@ -10,8 +10,11 @@ import org.neuclear.tests.AbstractObjectCreationTest;
 import java.security.GeneralSecurityException;
 
 /*
-$Id: AssetBuilderTest.java,v 1.3 2004/04/18 01:06:06 pelle Exp $
+$Id: AssetBuilderTest.java,v 1.4 2004/04/23 23:33:14 pelle Exp $
 $Log: AssetBuilderTest.java,v $
+Revision 1.4  2004/04/23 23:33:14  pelle
+Major update. Added an original url and nickname to Identity and friends.
+
 Revision 1.3  2004/04/18 01:06:06  pelle
 Asset now parses the xhtml file for its details.
 
@@ -56,13 +59,13 @@ public class AssetBuilderTest extends AbstractObjectCreationTest {
     }
 
     protected Builder createBuilder() throws Exception {
-        return new AssetBuilder("bux", URL,
+        return new AssetBuilder("bux", "http://bux.neuclear.org/bux.html", "http://bux.neuclear.org/Asset",
                 getSigner().getPublicKey("bux"),
                 getAlice().getPublicKey(),
-                DECIMAL, MINIMUM);
+                DECIMAL, MINIMUM, "bux");
     }
 
-    private static final String URL = "http://bux.neuclear.org";
+    private static final String URL = "http://bux.neuclear.org/Asset";
     private static final int DECIMAL = 2;
     private static final int MINIMUM = 0;
 
