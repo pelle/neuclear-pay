@@ -272,6 +272,14 @@
             <name>commons-cli</name>
             <version>1.0</version>
         </dependency>
+        <dependency>
+            <groupId>maven-taglib</groupId>
+            <artifactId>maven-taglib-plugin</artifactId>
+            <version>1.1</version>
+            <type>plugin</type>
+            <url>http://maven-taglib.sourceforge.net</url>
+        </dependency>
+
     </dependencies>
     <build>
         <sourceDirectory>src/java</sourceDirectory>
@@ -308,5 +316,8 @@
         </resources>
 
     </build>
+    <reports>
+        <report>taglib</report>
+    </reports>
 </project>
 
