@@ -32,8 +32,12 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: AssetControlClient.java,v 1.13 2004/01/13 23:37:30 pelle Exp $
+$Id: AssetControlClient.java,v 1.14 2004/04/29 13:16:31 pelle Exp $
 $Log: AssetControlClient.java,v $
+Revision 1.14  2004/04/29 13:16:31  pelle
+Changed Identity.receive(obj) to Identity.send(obj) it makes more sense.
+Updated documentation.
+
 Revision 1.13  2004/01/13 23:37:30  pelle
 Refactoring parts of the core of XMLSignature. There shouldnt be any real API changes.
 
@@ -138,7 +142,7 @@ SOAPTools was changed to return a stream. This is required by the VerifyingReade
 public final class AssetControlClient {
     public AssetControlClient(String name, final Signer signer) throws NeuClearException {
         this.signer = signer;
-        this.name=name;
+        this.name = name;
     }
 
     public final TransferReceipt performTransfer(final TransferOrderBuilder req) throws NeuClearException, XMLException {
@@ -159,8 +163,8 @@ public final class AssetControlClient {
     }
 
     private SignedNamedObject send(final Builder req) throws NeuClearException, XMLException {
-        final AssetTransactionContract object = (AssetTransactionContract) req.convert(name,signer);
-        return object.getAsset().receive(object);
+        final AssetTransactionContract object = (AssetTransactionContract) req.convert(name, signer);
+        return object.getAsset().send(object);
     }
 
     private final Signer signer;

@@ -37,7 +37,7 @@ public class TransferReceipt extends AssetTransactionContract {
     private void log(final String signername) throws NeuClearException {
         final Identity signer = (Identity) Resolver.resolveFromCache(signername);
         if (signer != null) {
-            signer.receive(this);
+            signer.send(this);
         }
     }
 
