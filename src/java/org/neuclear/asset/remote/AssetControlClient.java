@@ -14,9 +14,9 @@ import org.neuclear.ledger.UnknownBookException;
 import org.neuclear.id.verifier.VerifyingReader;
 import org.neuclear.senders.SoapSender;
 import org.neuclear.senders.Sender;
-import org.neudist.crypto.Signer;
-import org.neudist.xml.xmlsec.XMLSecurityException;
-import org.neudist.xml.soap.SOAPTools;
+import org.neuclear.commons.crypto.signers.Signer;
+import org.neuclear.xml.xmlsec.XMLSecurityException;
+import org.neuclear.xml.soap.SOAPTools;
 
 import java.util.Date;
 
@@ -38,8 +38,14 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: AssetControlClient.java,v 1.3 2003/11/10 21:08:41 pelle Exp $
+$Id: AssetControlClient.java,v 1.4 2003/11/11 21:17:19 pelle Exp $
 $Log: AssetControlClient.java,v $
+Revision 1.4  2003/11/11 21:17:19  pelle
+Further vital reshuffling.
+org.neudist.crypto.* and org.neudist.utils.* have been moved to respective areas under org.neuclear.commons
+org.neuclear.signers.* as well as org.neuclear.passphraseagents have been moved under org.neuclear.commons.crypto as well.
+Did a bit of work on the Canonicalizer and changed a few other minor bits.
+
 Revision 1.3  2003/11/10 21:08:41  pelle
 More JavaDoc
 

@@ -10,10 +10,10 @@ import org.neuclear.asset.contracts.builders.TransferReceiptBuilder;
 import org.neuclear.senders.SoapSender;
 import org.dom4j.Element;
 import org.dom4j.DocumentHelper;
-import org.neudist.xml.xmlsec.XMLSecurityException;
-import org.neudist.xml.xmlsec.KeyInfo;
-import org.neudist.xml.xmlsec.XMLSecTools;
-import org.neudist.utils.Utility;
+import org.neuclear.xml.xmlsec.XMLSecurityException;
+import org.neuclear.xml.xmlsec.KeyInfo;
+import org.neuclear.xml.xmlsec.XMLSecTools;
+import org.neuclear.commons.Utility;
 
 import java.security.PublicKey;
 import java.sql.Timestamp;
@@ -36,8 +36,14 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: Asset.java,v 1.4 2003/11/10 21:08:41 pelle Exp $
+$Id: Asset.java,v 1.5 2003/11/11 21:17:19 pelle Exp $
 $Log: Asset.java,v $
+Revision 1.5  2003/11/11 21:17:19  pelle
+Further vital reshuffling.
+org.neudist.crypto.* and org.neudist.utils.* have been moved to respective areas under org.neuclear.commons
+org.neuclear.signers.* as well as org.neuclear.passphraseagents have been moved under org.neuclear.commons.crypto as well.
+Did a bit of work on the Canonicalizer and changed a few other minor bits.
+
 Revision 1.4  2003/11/10 21:08:41  pelle
 More JavaDoc
 

@@ -6,9 +6,9 @@ import org.neuclear.id.NamedObjectReader;
 import org.neuclear.id.resolver.NSResolver;
 import org.neuclear.commons.NeuClearException;
 import org.neuclear.receiver.UnsupportedTransaction;
-import org.neuclear.time.TimeTools;
+import org.neuclear.commons.time.TimeTools;
 import org.dom4j.Element;
-import org.neudist.utils.Utility;
+import org.neuclear.commons.Utility;
 
 import java.sql.Timestamp;
 import java.util.Date;
@@ -18,8 +18,14 @@ import java.util.Date;
  * User: pelleb
  * Date: Nov 10, 2003
  * Time: 11:06:37 AM
- * $Id: AssetTransactionContract.java,v 1.1 2003/11/10 17:42:07 pelle Exp $
+ * $Id: AssetTransactionContract.java,v 1.2 2003/11/11 21:17:19 pelle Exp $
  * $Log: AssetTransactionContract.java,v $
+ * Revision 1.2  2003/11/11 21:17:19  pelle
+ * Further vital reshuffling.
+ * org.neudist.crypto.* and org.neudist.utils.* have been moved to respective areas under org.neuclear.commons
+ * org.neuclear.signers.* as well as org.neuclear.passphraseagents have been moved under org.neuclear.commons.crypto as well.
+ * Did a bit of work on the Canonicalizer and changed a few other minor bits.
+ *
  * Revision 1.1  2003/11/10 17:42:07  pelle
  * The AssetController interface has been more or less finalized.
  * CurrencyController fully implemented

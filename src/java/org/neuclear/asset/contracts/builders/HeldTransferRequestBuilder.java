@@ -6,7 +6,7 @@ import org.neuclear.asset.NegativeTransferException;
 import org.neuclear.asset.contracts.Asset;
 import org.neuclear.asset.contracts.TransferGlobals;
 import org.neuclear.id.Identity;
-import org.neuclear.time.TimeTools;
+import org.neuclear.commons.time.TimeTools;
 
 import java.util.Date;
 
@@ -28,8 +28,14 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: HeldTransferRequestBuilder.java,v 1.1 2003/11/08 01:39:57 pelle Exp $
+$Id: HeldTransferRequestBuilder.java,v 1.2 2003/11/11 21:17:19 pelle Exp $
 $Log: HeldTransferRequestBuilder.java,v $
+Revision 1.2  2003/11/11 21:17:19  pelle
+Further vital reshuffling.
+org.neudist.crypto.* and org.neudist.utils.* have been moved to respective areas under org.neuclear.commons
+org.neuclear.signers.* as well as org.neuclear.passphraseagents have been moved under org.neuclear.commons.crypto as well.
+Did a bit of work on the Canonicalizer and changed a few other minor bits.
+
 Revision 1.1  2003/11/08 01:39:57  pelle
 WARNING this rev is majorly unstable and will almost certainly not compile.
 More major refactoring in neuclear-pay.

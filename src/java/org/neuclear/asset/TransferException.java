@@ -1,6 +1,6 @@
 package org.neuclear.asset;
 
-import org.neudist.utils.Utility;
+import org.neuclear.commons.Utility;
 
 
 /**

@@ -74,7 +74,7 @@
        <dependency>
           <id>neuclear-commons</id>
        <name>neuclear-commons</name>
-       <version>0.3</version>
+       <version>0.4-SNAPSHOT</version>
        </dependency>
        <dependency>
            <id>picocontainer</id>
@@ -87,12 +87,12 @@
        <dependency>
           <id>neuclear-id</id>
        <name>neuclear-id</name>
-       <version>0.7</version>
+       <version>0.8-SNAPSHOT</version>
        </dependency>
        <dependency>
-           <id>neudist-xmlsig</id>
-           <name>neudist-xmlsig</name>
-           <version>0.9</version>
+           <id>neuclear-xmlsig</id>
+           <name>neuclear-xmlsig</name>
+           <version>0.10-SNAPSHOT</version>
            <properties>
                  <war.bundle.jar>true</war.bundle.jar>
            </properties>
@@ -119,7 +119,7 @@
           <name>commons-cli</name>
           <version>1.0-beta-2</version>
         </dependency>
-<!-- dependency>
+    <dependency>
       <id>bouncycastle</id>
       <name>bouncycastle</name>
       <version>115</version>
@@ -128,47 +128,11 @@
             <war.bundle.jar>false</war.bundle.jar>
       </properties>
     </dependency>
-    -->
    <dependency>
       <id>junit</id>
       <name>junit</name>
       <version>3.8</version>
     </dependency>
-<!--    <dependency>
-      <id>regexp</id>
-      <name>regexp</name>
-      <version>1.2</version>
-      <properties>
-            <war.bundle.jar>true</war.bundle.jar>
-      </properties>
-    </dependency>
-   <dependency>
-      <id>oscore</id>
-      <name>oscore</name>
-      <version>2.0.1</version>
-      <properties>
-            <war.bundle.jar>true</war.bundle.jar>
-      </properties>
-    </dependency>
-   <dependency>
-      <id>servletapi</id>
-      <name>servletapi</name>
-      <version>2.2</version>
-    </dependency>
-       <dependency>
-          <id>commons-cli</id>
-          <name>commons-cli</name>
-          <version>1.0-beta-2</version>
-        </dependency>
-
-      <dependency>
-      <id>waterken-adt</id>
-      <version>2.0-beta13</version>
-      <properties>
-            <war.bundle.jar>true</war.bundle.jar>
-      </properties>
-    </dependency>
-           -->
   </dependencies>
   <build>
 
@@ -179,15 +143,13 @@
     <unitTestSourceDirectory>src/test</unitTestSourceDirectory>
     <integrationUnitTestSourceDirectory/>
 
-    <aspectSourceDirectory/>
-
     <!-- Unit test cases -->
     <unitTest>
       <includes>
         <include>**/*Test.java</include>
       </includes>
       <excludes>
-        <exclude>**/StoreTest.java</exclude>
+        <exclude>**/Abstract*.java</exclude>
       </excludes>
     </unitTest>
 

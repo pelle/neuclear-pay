@@ -13,9 +13,10 @@ import org.neuclear.ledger.UnBalancedTransactionException;
 import org.neuclear.ledger.UnknownBookException;
 import org.neuclear.receiver.Receiver;
 import org.neuclear.receiver.UnsupportedTransaction;
-import org.neudist.crypto.Signer;
-import org.neudist.xml.ElementProxy;
-import org.neudist.xml.xmlsec.XMLSecurityException;
+import org.neuclear.commons.crypto.signers.Signer;
+import org.neuclear.commons.crypto.CryptoException;
+import org.neuclear.xml.ElementProxy;
+import org.neuclear.xml.xmlsec.XMLSecurityException;
 
 /*
 NeuClear Distributed Transaction Clearing Platform
@@ -74,6 +75,8 @@ public class AssetControllerReceiver implements Receiver {
             } catch (XMLSecurityException e) {
                 e.printStackTrace();  //TODO Handle exception
             } catch (TransferDeniedException e) {
+                e.printStackTrace();  //TODO Handle exception
+            } catch (CryptoException e) {
                 e.printStackTrace();  //TODO Handle exception
             }
         } else
