@@ -21,29 +21,35 @@
   <url>http://neuclear.org/pay/</url>
     <repository>
      <connection>
-         scm:cvs:pserver:anonymous@cvs.neudist.sourceforge.net:/cvsroot/neudist:neuclear-pay
+         scm:cvs:pserver:anonymous@cvs.neuclear.sourceforge.net:/cvsroot/neuclear:neuclear-pay
      </connection>
      <url>
-      http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/neudist/neuclear-pay/
+      http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/neuclear/neuclear-pay/
     </url>
   </repository>
 
   <siteAddress>neuclear.org</siteAddress>
   <siteDirectory>/home/sites/neuclear.org/public_html/pay/</siteDirectory>
-  <issueTrackingUrl>http://neudist.org:8080/jira/secure/BrowseProject.jspa</issueTrackingUrl>
+  <issueTrackingUrl>http://devone.veraxpay.com:9090/</issueTrackingUrl>
   <mailingLists>
     <mailingList>
-      <name>NeuDist Announce</name>
-      <subscribe>http://lists.sourceforge.net/lists/listinfo/neudist-announce</subscribe>
-      <unsubscribe>http://lists.sourceforge.net/lists/listinfo/neudist-announce</unsubscribe>
-      <archive>http://www.geocrawler.com/redir-sf.php3?list=neudist-announce</archive>
+      <name>NeuClear Announce</name>
+      <subscribe>http://lists.sourceforge.net/lists/listinfo/neuclear-announce</subscribe>
+      <unsubscribe>http://lists.sourceforge.net/lists/listinfo/neuclear-announce</unsubscribe>
+      <archive>http://www.geocrawler.com/redir-sf.php3?list=neuclear-announce</archive>
     </mailingList>
     <mailingList>
-      <name>NeuDist Discuss</name>
-      <subscribe>http://lists.sourceforge.net/lists/listinfo/neudist-discuss</subscribe>
-      <unsubscribe>http://lists.sourceforge.net/lists/listinfo/neudist-discuss</unsubscribe>
-      <archive>http://www.geocrawler.com/redir-sf.php3?list=neudist-discuss</archive>
+      <name>NeuClear General</name>
+      <subscribe>http://lists.sourceforge.net/lists/listinfo/neuclear-general</subscribe>
+      <unsubscribe>http://lists.sourceforge.net/lists/listinfo/neuclear-general</unsubscribe>
+      <archive>http://www.geocrawler.com/redir-sf.php3?list=neuclear-general</archive>
     </mailingList>
+      <mailingList>
+        <name>NeuClear Develop</name>
+        <subscribe>http://lists.sourceforge.net/lists/listinfo/neuclear-develop</subscribe>
+        <unsubscribe>http://lists.sourceforge.net/lists/listinfo/neuclear-develop</unsubscribe>
+        <archive>http://www.geocrawler.com/redir-sf.php3?list=neuclear-develop</archive>
+      </mailingList>
   </mailingLists>
 
   <developers>
