@@ -3,11 +3,11 @@ package org.neuclear.asset.orders.builders;
 import org.dom4j.Element;
 import org.neuclear.asset.InvalidTransferException;
 import org.neuclear.asset.NegativeTransferException;
+import org.neuclear.asset.contracts.Asset;
 import org.neuclear.asset.orders.TransferGlobals;
 import org.neuclear.asset.orders.Value;
 import org.neuclear.commons.NeuClearException;
 import org.neuclear.commons.Utility;
-import org.neuclear.id.Service;
 import org.neuclear.id.Signatory;
 import org.neuclear.id.builders.Builder;
 
@@ -29,8 +29,11 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: IssueOrderBuilder.java,v 1.3 2004/04/28 00:22:28 pelle Exp $
+$Id: IssueOrderBuilder.java,v 1.4 2004/05/12 18:07:52 pelle Exp $
 $Log: IssueOrderBuilder.java,v $
+Revision 1.4  2004/05/12 18:07:52  pelle
+Fixed lotsof problems found in the unit tests.
+
 Revision 1.3  2004/04/28 00:22:28  pelle
 Fixed the strange verification error
 Added bunch of new unit tests to support this.
@@ -158,7 +161,7 @@ TransferReceiptBuilder has been created for use by Transfer processors. It is us
  * Time: 3:13:27 PM
  */
 public class IssueOrderBuilder extends Builder {
-    public IssueOrderBuilder(final Service asset, final Signatory recipient, final Value amount, final String comment) throws InvalidTransferException, NegativeTransferException, NeuClearException {
+    public IssueOrderBuilder(final Asset asset, final Signatory recipient, final Value amount, final String comment) throws InvalidTransferException, NegativeTransferException, NeuClearException {
         this(asset.getDigest(), recipient.getName(), amount, comment);
     }
 

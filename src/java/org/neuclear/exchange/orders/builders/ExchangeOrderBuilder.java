@@ -34,8 +34,11 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: ExchangeOrderBuilder.java,v 1.6 2004/05/11 22:52:52 pelle Exp $
+$Id: ExchangeOrderBuilder.java,v 1.7 2004/05/12 18:07:52 pelle Exp $
 $Log: ExchangeOrderBuilder.java,v $
+Revision 1.7  2004/05/12 18:07:52  pelle
+Fixed lotsof problems found in the unit tests.
+
 Revision 1.6  2004/05/11 22:52:52  pelle
 The update to ledger expectedly broke a few things around CurrencyController and friends. Most but not all is now fixed.
 
@@ -155,7 +158,7 @@ public class ExchangeOrderBuilder extends Builder {
             throw new InvalidTransferException("agent");
 
         final Element element = getElement();
-        element.add(ExchangeOrderGlobals.createElement(ExchangeOrderGlobals.AGENT_TAG, agent.getURL()));
+        element.add(ExchangeOrderGlobals.createElement(ExchangeOrderGlobals.AGENT_TAG, agent.getName()));
         element.add(TransferGlobals.createElement(TransferGlobals.ASSET_TAG, asset.getDigest()));
         element.add(TransferGlobals.createValueTag(amount));
         element.add(ExchangeOrderGlobals.createElement(ExchangeOrderGlobals.EXPIRY_TAG, TimeTools.formatTimeStamp(expiry)));

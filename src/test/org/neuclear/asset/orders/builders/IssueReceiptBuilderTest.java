@@ -1,15 +1,16 @@
 package org.neuclear.asset.orders.builders;
 
 import org.neuclear.asset.InvalidTransferException;
-import org.neuclear.asset.contracts.builders.AssetBuilder;
+import org.neuclear.asset.contracts.Asset;
+import org.neuclear.asset.contracts.AssetGlobals;
 import org.neuclear.asset.orders.Amount;
 import org.neuclear.asset.orders.IssueOrder;
 import org.neuclear.asset.orders.IssueReceipt;
 import org.neuclear.commons.NeuClearException;
 import org.neuclear.commons.crypto.signers.NonExistingSignerException;
-import org.neuclear.id.Service;
 import org.neuclear.id.SignedNamedObject;
 import org.neuclear.id.builders.Builder;
+import org.neuclear.id.resolver.Resolver;
 import org.neuclear.tests.AbstractObjectCreationTest;
 import org.neuclear.xml.XMLException;
 
@@ -34,8 +35,11 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: IssueReceiptBuilderTest.java,v 1.3 2004/04/23 23:33:15 pelle Exp $
+$Id: IssueReceiptBuilderTest.java,v 1.4 2004/05/12 18:07:53 pelle Exp $
 $Log: IssueReceiptBuilderTest.java,v $
+Revision 1.4  2004/05/12 18:07:53  pelle
+Fixed lotsof problems found in the unit tests.
+
 Revision 1.3  2004/04/23 23:33:15  pelle
 Major update. Added an original url and nickname to Identity and friends.
 
@@ -86,6 +90,7 @@ Started the unit tests for the new payment message format.
 public class IssueReceiptBuilderTest extends AbstractObjectCreationTest {
     public IssueReceiptBuilderTest(String string) throws NeuClearException, GeneralSecurityException {
         super(string);
+        AssetGlobals.registerReaders();
         asset = createTestAsset();
     }
 
@@ -95,12 +100,12 @@ public class IssueReceiptBuilderTest extends AbstractObjectCreationTest {
         IssueReceipt receipt = (IssueReceipt) obj;
         assertNotNull(receipt.getValueTime());
         assertEquals(asset.getDigest(), receipt.getAsset().getDigest());
-        assertEquals(getSigner().getPublicKey("neu://test").getEncoded(), receipt.getSignatory().getPublicKey().getEncoded());
+        assertEquals(getSigner().getPublicKey("bux").getEncoded(), receipt.getSignatory().getPublicKey().getEncoded());
 
         IssueOrder order = receipt.getOrder();
         assertNotNull(order);
         assertEquals(asset.getDigest(), order.getAsset().getDigest());
-        assertEquals(getSigner().getPublicKey("neu://test").getEncoded(), order.getSignatory().getPublicKey().getEncoded());
+        assertEquals(getSigner().getPublicKey("carol").getEncoded(), order.getSignatory().getPublicKey().getEncoded());
 
         assertEquals("Test", order.getComment());
         assertEquals(20.0, order.getAmount().getAmount(), 0);
@@ -113,17 +118,21 @@ public class IssueReceiptBuilderTest extends AbstractObjectCreationTest {
     protected Builder createBuilder() throws NeuClearException, InvalidTransferException, XMLException {
         Builder builder = new IssueOrderBuilder(asset, getAlice(), new Amount(20), "Test");
 //        System.out.println(builder.asXML());
-        return new IssueReceiptBuilder((IssueOrder) builder.convert(NAME, getSigner()), new Date());
+        return new IssueReceiptBuilder((IssueOrder) builder.convert("carol", getSigner()), new Date());
     }
 
-    public Service createTestAsset() throws NeuClearException {
-        Builder builder = new AssetBuilder("bux", "http://bux.neuclear.org/bux.html", "http://bux.neuclear.org/Asset",
-                getSigner().getPublicKey("bux"),
-                getAlice().getPublicKey(),
-                2, 0, "bux");
-        return (Service) builder.convert(NAME, getSigner());
-
+    public Asset createTestAsset() throws NeuClearException {
+//        Builder builder = new AssetBuilder("bux", "http://bux.neuclear.org/bux.html", "http://bux.neuclear.org/Asset",
+//                getSigner().getPublicKey("bux"),
+//                getAlice().getPublicKey(),
+//                2, 0, "bux");
+//        return (Service) builder.convert(NAME, getSigner());
+        return (Asset) Resolver.resolveIdentity("http://bux.neuclear.org/bux.html");
     }
 
-    private Service asset;
+    protected String getSignersAlias() {
+        return "bux";
+    }
+
+    private Asset asset;
 }

@@ -1,14 +1,15 @@
 package org.neuclear.asset.orders.builders;
 
 import org.neuclear.asset.InvalidTransferException;
-import org.neuclear.asset.contracts.builders.AssetBuilder;
+import org.neuclear.asset.contracts.Asset;
+import org.neuclear.asset.contracts.AssetGlobals;
 import org.neuclear.asset.orders.Amount;
 import org.neuclear.asset.orders.IssueOrder;
 import org.neuclear.commons.NeuClearException;
 import org.neuclear.commons.crypto.signers.NonExistingSignerException;
-import org.neuclear.id.Service;
 import org.neuclear.id.SignedNamedObject;
 import org.neuclear.id.builders.Builder;
+import org.neuclear.id.resolver.Resolver;
 import org.neuclear.tests.AbstractObjectCreationTest;
 import org.neuclear.xml.XMLException;
 
@@ -32,8 +33,11 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: IssueOrderBuilderTest.java,v 1.4 2004/04/28 00:22:29 pelle Exp $
+$Id: IssueOrderBuilderTest.java,v 1.5 2004/05/12 18:07:53 pelle Exp $
 $Log: IssueOrderBuilderTest.java,v $
+Revision 1.5  2004/05/12 18:07:53  pelle
+Fixed lotsof problems found in the unit tests.
+
 Revision 1.4  2004/04/28 00:22:29  pelle
 Fixed the strange verification error
 Added bunch of new unit tests to support this.
@@ -91,6 +95,8 @@ Started the unit tests for the new payment message format.
 public class IssueOrderBuilderTest extends AbstractObjectCreationTest {
     public IssueOrderBuilderTest(String string) throws NeuClearException, GeneralSecurityException {
         super(string);
+        AssetGlobals.registerReaders();
+
         asset = createTestAsset();
     }
 
@@ -99,7 +105,7 @@ public class IssueOrderBuilderTest extends AbstractObjectCreationTest {
         assertTrue(obj instanceof IssueOrder);
         IssueOrder order = (IssueOrder) obj;
         assertEquals(asset.getDigest(), order.getAsset().getDigest());
-        assertEquals(getSigner().getPublicKey("neu://test").getEncoded(), order.getSignatory().getPublicKey().getEncoded());
+        assertEquals(getSigner().getPublicKey("carol").getEncoded(), order.getSignatory().getPublicKey().getEncoded());
 //        assertEquals(getBob().getPublicKey().getEncoded(), order.getRecipient().getSignatory().getPublicKey().getEncoded());
         assertEquals("Test", order.getComment());
         assertEquals(20.0, order.getAmount().getAmount(), 0);
@@ -110,7 +116,7 @@ public class IssueOrderBuilderTest extends AbstractObjectCreationTest {
     }
 
     protected String getSignersAlias() {
-        return "neu://alice@test";    //To change body of overridden methods use File | Settings | File Templates.
+        return "carol";    //To change body of overridden methods use File | Settings | File Templates.
     }
 
     protected Builder createBuilder() throws NeuClearException, InvalidTransferException, XMLException {
@@ -119,14 +125,14 @@ public class IssueOrderBuilderTest extends AbstractObjectCreationTest {
         return builder;
     }
 
-    public Service createTestAsset() throws NeuClearException {
-        Builder builder = new AssetBuilder("bux", "http://bux.neuclear.org/bux.html", "http://bux.neuclear.org/Asset",
-                getSigner().getPublicKey("bux"),
-                getAlice().getPublicKey(),
-                2, 0, "bux");
-        return (Service) builder.convert(NAME, getSigner());
-
+    public Asset createTestAsset() throws NeuClearException {
+//        Builder builder = new AssetBuilder("bux", "http://bux.neuclear.org/bux.html", "http://bux.neuclear.org/Asset",
+//                getSigner().getPublicKey("bux"),
+//                getAlice().getPublicKey(),
+//                2, 0, "bux");
+//        return (Service) builder.convert(NAME, getSigner());
+        return (Asset) Resolver.resolveIdentity("http://bux.neuclear.org/bux.html");
     }
 
-    private Service asset;
+    private Asset asset;
 }

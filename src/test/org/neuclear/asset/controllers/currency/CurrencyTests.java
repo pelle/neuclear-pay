@@ -11,7 +11,6 @@ import org.neuclear.asset.orders.builders.TransferOrderBuilder;
 import org.neuclear.commons.NeuClearException;
 import org.neuclear.exchange.contracts.ExchangeAgent;
 import org.neuclear.exchange.contracts.ExchangeAgentGlobals;
-import org.neuclear.exchange.contracts.builders.ExchangeAgentBuilder;
 import org.neuclear.exchange.orders.BidItem;
 import org.neuclear.exchange.orders.CancelExchangeReceipt;
 import org.neuclear.exchange.orders.ExchangeCompletedReceipt;
@@ -23,6 +22,7 @@ import org.neuclear.id.InvalidNamedObjectException;
 import org.neuclear.id.SignedNamedObject;
 import org.neuclear.id.builders.Builder;
 import org.neuclear.id.receiver.Receiver;
+import org.neuclear.id.resolver.Resolver;
 import org.neuclear.ledger.InvalidTransactionException;
 import org.neuclear.ledger.LedgerController;
 import org.neuclear.ledger.LowlevelLedgerException;
@@ -116,15 +116,21 @@ public class CurrencyTests extends AbstractSigningTest {
         assertEquals(alicebalance, ledger.getAvailableBalance(asset.getDigest(), getAlice().getName()), 0);
         assertAudit(getAlice().getName());
 
-        Builder builder = new ExchangeOrderBuilder(asset, agent, new Amount(20), new Date(System.currentTimeMillis() + 10000), new BidItem[]{new BidItem(shoes, new Amount(10))}, "give me shoes");
+        final long expire = System.currentTimeMillis() + 20000;
+        Builder builder = new ExchangeOrderBuilder(asset, agent, new Amount(20), new Date(expire), new BidItem[]{new BidItem(shoes, new Amount(10))}, "give me shoes");
         SignedNamedObject receipt = process(builder);
         assertNotNull(receipt);
         assertTrue(receipt instanceof ExchangeOrderReceipt);
         assertEquals(alicebalance, ledger.getBalance(asset.getDigest(), getAlice().getName()), 0);
-        assertEquals(alicebalance - 20, ledger.getAvailableBalance(asset.getDigest(), getAlice().getName()), 0);
+        final double avail = ledger.getAvailableBalance(asset.getDigest(), getAlice().getName());
+        assertTrue(System.currentTimeMillis() <= expire && (alicebalance - 20) == avail);
         assertAudit(getAlice().getName());
         try {
-            Thread.currentThread().sleep(10000);
+            final long left = expire - System.currentTimeMillis();
+            if (left > 0) {
+                System.out.println("sleeping " + left);
+                Thread.currentThread().sleep(left);
+            }
         } catch (InterruptedException e) {
             ;
         }
@@ -139,7 +145,7 @@ public class CurrencyTests extends AbstractSigningTest {
         assertEquals(alicebalance, ledger.getAvailableBalance(asset.getDigest(), getAlice().getName()), 0);
         assertAudit(getAlice().getName());
 
-        Builder builder = new ExchangeOrderBuilder(asset, agent, new Amount(20), new Date(System.currentTimeMillis() + 10000), new BidItem[]{new BidItem(shoes, new Amount(10))}, "give me shoes");
+        Builder builder = new ExchangeOrderBuilder(asset, agent, new Amount(20), new Date(System.currentTimeMillis() + 20000), new BidItem[]{new BidItem(shoes, new Amount(10))}, "give me shoes");
         SignedNamedObject receipt = process(builder);
         assertNotNull(receipt);
         assertTrue(receipt instanceof ExchangeOrderReceipt);
@@ -160,7 +166,7 @@ public class CurrencyTests extends AbstractSigningTest {
         assertEquals(alicebalance, ledger.getAvailableBalance(asset.getDigest(), getAlice().getName()), 0);
         assertAudit(getAlice().getName());
 
-        Builder builder = new ExchangeOrderBuilder(asset, agent, new Amount(20), new Date(System.currentTimeMillis() + 10000), new BidItem[]{new BidItem(shoes, new Amount(10))}, "give me shoes");
+        Builder builder = new ExchangeOrderBuilder(asset, agent, new Amount(20), new Date(System.currentTimeMillis() + 20000), new BidItem[]{new BidItem(shoes, new Amount(10))}, "give me shoes");
         SignedNamedObject receipt = process(builder);
         assertNotNull(receipt);
         assertTrue(receipt instanceof ExchangeOrderReceipt);
@@ -181,7 +187,7 @@ public class CurrencyTests extends AbstractSigningTest {
         assertEquals(alicebalance, ledger.getAvailableBalance(asset.getDigest(), getAlice().getName()), 0);
         assertAudit(getAlice().getName());
 
-        Builder builder = new ExchangeOrderBuilder(asset, agent, new Amount(20), new Date(System.currentTimeMillis() + 10000), new BidItem[]{new BidItem(shoes, new Amount(10))}, "give me shoes");
+        Builder builder = new ExchangeOrderBuilder(asset, agent, new Amount(20), new Date(System.currentTimeMillis() + 30000), new BidItem[]{new BidItem(shoes, new Amount(10))}, "give me shoes");
         SignedNamedObject receipt = process(builder);
         assertNotNull(receipt);
         assertTrue(receipt instanceof ExchangeOrderReceipt);
@@ -205,7 +211,7 @@ public class CurrencyTests extends AbstractSigningTest {
         assertEquals(alicebalance, ledger.getAvailableBalance(asset.getDigest(), getAlice().getName()), 0);
         assertAudit(getAlice().getName());
 
-        Builder builder = new ExchangeOrderBuilder(asset, agent, new Amount(20), new Date(System.currentTimeMillis() + 20000), new BidItem[]{new BidItem(shoes, new Amount(10))}, "give me shoes");
+        Builder builder = new ExchangeOrderBuilder(asset, agent, new Amount(20), new Date(System.currentTimeMillis() + 30000), new BidItem[]{new BidItem(shoes, new Amount(10))}, "give me shoes");
         SignedNamedObject receipt = process(builder);
         assertNotNull(receipt);
         assertTrue(receipt instanceof ExchangeOrderReceipt);
@@ -227,7 +233,7 @@ public class CurrencyTests extends AbstractSigningTest {
         assertEquals(alicebalance, ledger.getAvailableBalance(asset.getDigest(), getAlice().getName()), 0);
         assertAudit(getAlice().getName());
 
-        Builder builder = new ExchangeOrderBuilder(asset, agent, new Amount(20), new Date(System.currentTimeMillis() + 20000), new BidItem[]{new BidItem(shoes, new Amount(10))}, "give me shoes");
+        Builder builder = new ExchangeOrderBuilder(asset, agent, new Amount(20), new Date(System.currentTimeMillis() + 30000), new BidItem[]{new BidItem(shoes, new Amount(10))}, "give me shoes");
         SignedNamedObject receipt = process(builder);
         assertNotNull(receipt);
         assertTrue(receipt instanceof ExchangeOrderReceipt);
@@ -255,7 +261,7 @@ public class CurrencyTests extends AbstractSigningTest {
         assertEquals(alicebalance, ledger.getAvailableBalance(asset.getDigest(), getAlice().getName()), 0);
         assertAudit(getAlice().getName());
 
-        Builder builder = new ExchangeOrderBuilder(asset, agent, new Amount(20), new Date(System.currentTimeMillis() + 20000), new BidItem[]{new BidItem(shoes, new Amount(10))}, "give me shoes");
+        Builder builder = new ExchangeOrderBuilder(asset, agent, new Amount(20), new Date(System.currentTimeMillis() + 30000), new BidItem[]{new BidItem(shoes, new Amount(10))}, "give me shoes");
         SignedNamedObject receipt = process(builder);
         assertNotNull(receipt);
         assertTrue(receipt instanceof ExchangeOrderReceipt);
@@ -284,7 +290,7 @@ public class CurrencyTests extends AbstractSigningTest {
     }
 
     private SignedNamedObject processAgent(Builder builder) throws NeuClearException {
-        final SignedNamedObject obj = builder.convert("agent", getSigner());
+        final SignedNamedObject obj = builder.convert("exchange", getSigner());
 
         return auditor.receive(proc.receive(obj));
     }
@@ -317,10 +323,10 @@ public class CurrencyTests extends AbstractSigningTest {
     }
 
     public ExchangeAgent createTestExchangeAgent() throws NeuClearException {
-        ExchangeAgentBuilder builder = new ExchangeAgentBuilder("Tradex", "http://tradex.neuclear.org/rules.html", "http://tradex.neuclear.org/Exchange",
-                getSigner().getPublicKey("agent"));
-        return (ExchangeAgent) builder.convert("neu://test", getSigner());
-
+//        ExchangeAgentBuilder builder = new ExchangeAgentBuilder("Tradex", "http://tradex.neuclear.org/rules.html", "http://tradex.neuclear.org/Exchange",
+//                getSigner().getPublicKey("exchange"));
+//        return (ExchangeAgent) builder.convert("neu://test", getSigner());
+        return (ExchangeAgent) Resolver.resolveIdentity("http://tradex.neuclear.org/rules.html");
     }
 
     private Receiver proc;

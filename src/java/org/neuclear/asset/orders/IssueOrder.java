@@ -52,7 +52,7 @@ public final class IssueOrder extends AssetTransactionContract {
             if (!elem.getName().equals(TransferGlobals.ISSUE_TAGNAME))
                 throw new InvalidNamedObjectException(core.getName(), "Incorrect XML Tagname for reader: " + TransferGlobals.XFER_TAGNAME);
             final Asset asset = TransferGlobals.parseAssetTag(elem);
-            if (asset.getIssuer() != null && core.getSignatory().getPublicKey().equals(asset.getIssuer()))
+            if (asset.getIssuer() != null && core.getSignatory().equals(asset.getIssuer()))
                 return new IssueOrder(core,
                         asset,
                         TransferGlobals.parseRecipientTag(elem),

@@ -2,10 +2,7 @@ package org.neuclear.exchange.orders;
 
 import org.dom4j.Element;
 import org.neuclear.asset.orders.TransferGlobals;
-import org.neuclear.id.InvalidNamedObjectException;
-import org.neuclear.id.NamedObjectReader;
-import org.neuclear.id.SignedNamedCore;
-import org.neuclear.id.SignedNamedObject;
+import org.neuclear.id.*;
 
 /**
  * User: pelleb
@@ -40,7 +37,7 @@ public final class CancelExchangeOrder extends ExchangeTransactionContract {
             if (elem.getName().equals(ExchangeOrderGlobals.CANCEL_TAGNAME)) {
                 final ExchangeOrderReceipt receipt = (ExchangeOrderReceipt) TransferGlobals.parseEmbedded(elem, ExchangeOrderGlobals.createQName(ExchangeOrderGlobals.EXCHANGE_RCPT_TAGNAME));
                 if (core.getSignatory().getName().equals(receipt.getOrder().getSignatory().getName())
-                        || core.getSignatory().getPublicKey().equals(receipt.getOrder().getAgent().getServiceKey()))
+                        || core.getSignatory().equals(new Signatory(receipt.getOrder().getAgent().getServiceKey())))
                     return new CancelExchangeOrder(core, receipt);
                 throw new InvalidNamedObjectException("Signer does not have permission to Cancel");
             }
