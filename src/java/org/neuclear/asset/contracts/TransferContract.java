@@ -4,6 +4,7 @@ import org.dom4j.Element;
 import org.neuclear.id.Identity;
 import org.neuclear.id.NamedObjectReader;
 import org.neuclear.id.SignedNamedObject;
+import org.neuclear.id.SignedNamedCore;
 import org.neuclear.id.resolver.NSResolver;
 import org.neuclear.receiver.UnsupportedTransaction;
 import org.neuclear.commons.NeuClearException;
@@ -43,13 +44,12 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  * Time: 3:07:54 PM
  */
 public abstract class TransferContract extends AssetTransactionContract {
-    TransferContract(String name, Identity signer, Timestamp timestamp, String digest,
-                     Asset asset, Identity to, double amount,Date valuetime,String comment) throws NeuClearException {
-        super(name, signer, timestamp, digest,asset);
-        this.to = to;
+    TransferContract(SignedNamedCore core, Asset asset, Identity to, double amount,  Date valuetime, String comment) throws NeuClearException {
+        super(core, asset);
         this.amount = amount;
-        this.valuetime = valuetime;
         this.comment = (comment != null) ? comment : "";
+        this.to = to;
+        this.valuetime = valuetime;
     }
 
     public final double getAmount() {

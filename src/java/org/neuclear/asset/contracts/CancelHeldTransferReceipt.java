@@ -3,6 +3,7 @@ package org.neuclear.asset.contracts;
 import org.neuclear.commons.NeuClearException;
 import org.neuclear.id.Identity;
 import org.neuclear.id.SignedNamedObject;
+import org.neuclear.id.SignedNamedCore;
 
 import java.sql.Timestamp;
 import java.util.Date;
@@ -12,16 +13,14 @@ import java.util.Date;
  * Date: Jul 21, 2003
  * Time: 5:35:26 PM
  */
-public class CancelHeldTransferReceipt extends AssetTransactionContract{
+public final class CancelHeldTransferReceipt extends AssetTransactionContract{
 
-    CancelHeldTransferReceipt(String name, Identity signer, Timestamp timestamp, String digest,
-                                       Asset asset, String holdid) throws NeuClearException {
-        super(name, signer, timestamp, digest,asset);
-        this.holdid=holdid;
+    CancelHeldTransferReceipt(SignedNamedCore core, Asset asset, String holdid) throws NeuClearException {
+        super(core, asset);
+        this.holdid = holdid;
     }
 
-
-    public String getHoldId() {
+    public final String getHoldId() {
         return holdid;
     }
 

@@ -7,6 +7,7 @@ import org.neuclear.commons.time.TimeTools;
 import org.neuclear.id.Identity;
 import org.neuclear.id.NamedObjectReader;
 import org.neuclear.id.SignedNamedObject;
+import org.neuclear.id.SignedNamedCore;
 import org.neuclear.id.resolver.NSResolver;
 import org.neuclear.receiver.UnsupportedTransaction;
 
@@ -18,8 +19,11 @@ import java.util.Date;
  * User: pelleb
  * Date: Nov 10, 2003
  * Time: 11:06:37 AM
- * $Id: AssetTransactionContract.java,v 1.4 2003/11/19 23:32:20 pelle Exp $
+ * $Id: AssetTransactionContract.java,v 1.5 2003/11/20 16:01:59 pelle Exp $
  * $Log: AssetTransactionContract.java,v $
+ * Revision 1.5  2003/11/20 16:01:59  pelle
+ * Updated all the Contracts to use the new security model.
+ *
  * Revision 1.4  2003/11/19 23:32:20  pelle
  * Signers now can generatekeys via the generateKey() method.
  * Refactored the relationship between SignedNamedObject and NamedObjectBuilder a bit.
@@ -47,10 +51,11 @@ import java.util.Date;
 public class AssetTransactionContract extends SignedNamedObject {
     private final Asset asset;
 
-    public AssetTransactionContract(String name, Identity signer, Timestamp timestamp, String digest, Asset asset) throws NeuClearException {
-        super(name, signer, timestamp, digest);
+    AssetTransactionContract(SignedNamedCore core, Asset asset) throws NeuClearException {
+        super(core);
         this.asset = asset;
     }
+
 
     public final Asset getAsset() {
         return asset;
@@ -63,40 +68,40 @@ public class AssetTransactionContract extends SignedNamedObject {
          * @param elem 
          * @return 
          */
-        public SignedNamedObject read(Element elem, String name, Identity signatory, String digest, Timestamp timestamp) throws NeuClearException {
+        public final SignedNamedObject read(SignedNamedCore core, Element elem) throws NeuClearException {
             if (elem.getNamespaceURI().equals(TransferGlobals.XFER_NSURI))
                 throw new UnsupportedTransaction(null);
 
             Asset asset = (Asset) NSResolver.resolveIdentity(elem.attributeValue("assetName"));
             String holdid = elem.attributeValue("holdid");
             if (elem.getName().equals(TransferGlobals.CANCEL_TAGNAME))
-                return new CancelHeldTransferRequest(name, signatory, timestamp, digest, asset, holdid);
+                return new CancelHeldTransferRequest(core, asset, holdid);
             if (elem.getName().equals(TransferGlobals.CANCEL_RCPT_TAGNAME))
-                return new CancelHeldTransferReceipt(name, signatory, timestamp, digest, asset, holdid);
+                return new CancelHeldTransferReceipt(core, asset, holdid);
 
             double amount = Double.parseDouble(elem.attributeValue("amount"));
             Date valuetime = TimeTools.parseTimeStamp(elem.attributeValue("valuetime"));
             Identity to = NSResolver.resolveIdentity(elem.attributeValue("recipient"));
             String comment = elem.attributeValue("comment");
             if (elem.getName().equals(TransferGlobals.XFER_TAGNAME))
-                return new TransferRequest(name, signatory, timestamp, digest, asset, to, amount, valuetime, comment);
+                return new TransferRequest(core, asset, to, amount, valuetime, comment);
 
             Date helduntil = null;
             if (!Utility.isEmpty(elem.attributeValue("valuetime")))
                 helduntil = TimeTools.parseTimeStamp(elem.attributeValue("valuetime"));
             if (elem.getName().equals(TransferGlobals.HELD_XFER_TAGNAME))
-                return new HeldTransferRequest(name, signatory, timestamp, digest, asset, to, amount, valuetime, comment, helduntil);
+                return new HeldTransferRequest(core, asset, to, amount, valuetime, comment, helduntil);
 
             Identity from = NSResolver.resolveIdentity(elem.attributeValue("sender"));
             String reqid = elem.attributeValue("reqid");
             if (elem.getName().equals(TransferGlobals.XFER_RCPT_TAGNAME))
-                return new TransferReceipt(name, signatory, timestamp, digest, asset, from, to, reqid, amount, valuetime, comment);
+                return new TransferReceipt(core, asset, from, to, reqid, amount, valuetime, comment);
 
             if (elem.getName().equals(TransferGlobals.HELD_XFER_RCPT_TAGNAME))
-                return new HeldTransferReceipt(name, signatory, timestamp, digest, asset, from, to, reqid, amount, valuetime, comment, helduntil);
+                return new HeldTransferReceipt(core, asset, from, to, reqid, amount, valuetime, comment, helduntil);
 
             if (elem.getName().equals(TransferGlobals.COMPLETE_TAGNAME))
-                return new CompleteHeldTransferRequest(name, signatory, timestamp, digest, asset, from, to, amount, valuetime, comment, holdid);
+                return new CompleteHeldTransferRequest(core, asset, from, to, amount, valuetime, comment, holdid);
 
             throw new UnsupportedTransaction(null);
         }

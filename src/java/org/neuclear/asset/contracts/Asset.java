@@ -4,10 +4,7 @@ import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
 import org.neuclear.commons.NeuClearException;
 import org.neuclear.commons.Utility;
-import org.neuclear.id.Identity;
-import org.neuclear.id.NSTools;
-import org.neuclear.id.NamedObjectReader;
-import org.neuclear.id.SignedNamedObject;
+import org.neuclear.id.*;
 import org.neuclear.senders.SoapSender;
 import org.neuclear.xml.xmlsec.KeyInfo;
 import org.neuclear.xml.xmlsec.XMLSecTools;
@@ -34,8 +31,11 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: Asset.java,v 1.7 2003/11/19 23:32:19 pelle Exp $
+$Id: Asset.java,v 1.8 2003/11/20 16:01:59 pelle Exp $
 $Log: Asset.java,v $
+Revision 1.8  2003/11/20 16:01:59  pelle
+Updated all the Contracts to use the new security model.
+
 Revision 1.7  2003/11/19 23:32:19  pelle
 Signers now can generatekeys via the generateKey() method.
 Refactored the relationship between SignedNamedObject and NamedObjectBuilder a bit.
@@ -90,15 +90,16 @@ SOAPTools was changed to return a stream. This is required by the VerifyingReade
  * @see org.neuclear.asset.contracts.builders.AssetBuilder
  */
 public class Asset extends Identity {
-    private Asset(String name, Identity signatory, Timestamp timestamp, String digest, String repository, String signer, String logger, String receiver, PublicKey pub, String assetController, int decimalpoint, double minimumTransaction) throws NeuClearException {
-        super(name, signatory, timestamp, digest, repository, signer, logger, receiver, pub);
+    protected Asset(SignedNamedCore core, String repository, String signer, String logger, String receiver, PublicKey pub, String assetController, int decimal, double minimumTransaction) throws NeuClearException {
+        super(core, repository, signer, logger, receiver, pub);
         this.assetController = assetController;
-        this.decimal = decimalpoint;
-        this.multiplier = (int) Math.round(Math.pow(10, -decimalpoint));
-        this.minimumTransaction = minimumTransaction;
+        this.decimal = decimal;
+        this.multiplier = (int) Math.round(Math.pow(10, -decimal));
+        this.minimumTransaction=minimumTransaction;
     }
 
-    public String getControllerURL() {
+
+    public final String getControllerURL() {
         return assetController;
     }
 
@@ -109,7 +110,7 @@ public class Asset extends Identity {
      * @return The receipt
      * @throws NeuClearException 
      */
-    public SignedNamedObject send(SignedNamedObject obj) throws NeuClearException {
+    public final SignedNamedObject send(SignedNamedObject obj) throws NeuClearException {
         return SoapSender.quickSend(assetController, obj);
     }
 
@@ -119,7 +120,7 @@ public class Asset extends Identity {
      * @param amount 
      * @return 
      */
-    public boolean isValidAmount(double amount) {
+    public final boolean isValidAmount(double amount) {
         return amount >= minimumTransaction;
     }
 
@@ -129,7 +130,7 @@ public class Asset extends Identity {
      * @param amount 
      * @return 
      */
-    public double round(double amount) {
+    public final double round(double amount) {
         if (amount < minimumTransaction)
             return minimumTransaction;
         if (decimal == 0)
@@ -145,7 +146,7 @@ public class Asset extends Identity {
          * @param elem 
          * @return 
          */
-        public SignedNamedObject read(Element elem, String name, Identity signatory, String digest, Timestamp timestamp) throws NeuClearException, XMLSecurityException {
+        public final SignedNamedObject read(SignedNamedCore core, Element elem) throws NeuClearException, XMLSecurityException {
             if (!elem.getNamespace().equals(AssetGlobals.createNameSpace()))
                 throw new UnsupportedOperationException("");
             String assetController = elem.attributeValue("controller");
@@ -162,8 +163,9 @@ public class Asset extends Identity {
             String min = elem.attributeValue("minimumxact");
             double minimum = (!Utility.isEmpty(min)) ? Double.parseDouble(min) : 0;
 
-            return new Asset(name, signatory, timestamp, digest, repository, signer, logger, receiver, pub, assetController, decimal, minimum);
+            return new Asset(core, repository, signer, logger, receiver, pub, assetController, decimal, minimum);
         }
+
 
 
     }
