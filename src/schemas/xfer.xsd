@@ -1,7 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-$Id: xfer.xsd,v 1.1 2004/01/06 23:26:49 pelle Exp $
+$Id: xfer.xsd,v 1.2 2004/01/07 16:15:50 pelle Exp $
 $Log: xfer.xsd,v $
+Revision 1.2  2004/01/07 16:15:50  pelle
+I have updated all the current schemas, cleaned out the defunct ones and "completed"
+the xfer and exch schemas.
+
 Revision 1.1  2004/01/06 23:26:49  pelle
 Started restructuring the original xml schemas.
 Updated the Exchange and transfer orders.
@@ -10,27 +14,37 @@ Updated the Exchange and transfer orders.
 <xs:schema targetNamespace="http://neuclear.org/neu/xfer.xsd"
     xmlns:xs="http://www.w3.org/2001/XMLSchema"
     xmlns="http://neuclear.org/neu/xfer.xsd"
+    xmlns:neuid="http://neuclear.org/neu/neuid.xsd"
     elementFormDefault="qualified" version="0.3" id="xfer">
+ 	<xs:import namespace="http://neuclear.org/neu/neuid.xsd" schemaLocation="../../../neuclear-id/src/schemas/neuid.xsd" />
 
-    <xs:complexType name="TransferOrderType">
-		<xs:complexContent>
-			<xs:extension base="neuid:NamedObjectType">
-                <xs:sequence>
-                    <xs:element name="Recipient" type="xs:anyURI" minOccurs="1" maxOccurs="1" nillable="false"/>
-                    <xs:element name="Asset" type="xs:anyURI"  minOccurs="1" maxOccurs="1" nillable="false" />
-                    <xs:element name="Amount" type="xs:double"  minOccurs="1" maxOccurs="1" nillable="false" />
-                    <xs:element name="Comment" type="xs:text"  minOccurs="0" maxOccurs="1" nillable="true" />
-                </xs:sequence>
-			</xs:extension>
-		</xs:complexContent>
-	</xs:complexType>
-    <xs:complexType name="TransferReceiptType">
-        <xs:sequence>
-            <xs:element ref="TransferOrder"/>
-        </xs:sequence>
-        <xs:attribute name="valuetime" type="xs:dateTime" use="required"/>
-    </xs:complexType>
-    <xs:element name="TransferOrder" type="TransferOrderType" nillable="false"/>
-    <xs:element name="TransferReceipt" type="TransferReceiptType" nillable="false"/>
+    <xs:element name="Recipient" type="neuid:NamedObjectReference" nillable="false"/>
 
+    <xs:element name="TransferOrder" nillable="false">
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="neuid:NamedObjectType">
+                    <xs:sequence>
+                        <xs:element name="Recipient" type="neuid:NamedObjectReference" minOccurs="1" maxOccurs="1" nillable="false"/>
+                        <xs:element ref="Asset" minOccurs="1" maxOccurs="1"/>
+                        <xs:element name="Amount" type="xs:double"  minOccurs="1" maxOccurs="1" nillable="false" />
+                        <xs:element name="Comment" type="xs:string"  minOccurs="0" maxOccurs="1" nillable="true" />
+                    </xs:sequence>
+                </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="TransferReceipt" nillable="false">
+        <xs:complexType >
+            <xs:complexContent>
+                <xs:extension base="neuid:NamedObjectType">
+                    <xs:sequence>
+                        <xs:element name="ValueTime" type="xs:dateTime"  minOccurs="1" maxOccurs="1"/>
+                        <xs:element ref="TransferOrder" minOccurs="1" maxOccurs="1"/>
+                    </xs:sequence>
+                </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
 </xs:schema>

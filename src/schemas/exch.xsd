@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+$Id: exch.xsd,v 1.2 2004/01/07 16:15:50 pelle Exp $
+$Log: exch.xsd,v $
+Revision 1.2  2004/01/07 16:15:50  pelle
+I have updated all the current schemas, cleaned out the defunct ones and "completed"
+the xfer and exch schemas.
+
+-->
+<xs:schema targetNamespace="http://neuclear.org/neu/exch.xsd"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns="http://neuclear.org/neu/exch.xsd"
+    xmlns:xfer="http://neuclear.org/neu/xfer.xsd"
+    xmlns:neuid="http://neuclear.org/neu/neuid.xsd"
+    elementFormDefault="qualified" version="0.3" id="xfer">
+ 	<xs:import namespace="http://neuclear.org/neu/neuid.xsd" schemaLocation="../../../neuclear-id/src/schemas/neuid.xsd" />
+    <xs:import namespace="http://neuclear.org/neu/xfer.xsd" schemaLocation="xfer.xsd"/>
+
+    <xs:element name="Agent" type="neuid:NamedObjectReference" nillable="false"/>
+    <xs:element name="SettlementAsset" type="neuid:NamedObjectReference" nillable="false"/>
+    <xs:element name="BidAsset" type="neuid:NamedObjectReference" nillable="false"/>
+
+    <xs:element name="ExchangeOrderRef" type="neuid:NamedObjectReference" nillable="false"/>
+
+    <xs:element name="ExchangeOrder" nillable="false">
+        <xs:annotation>
+            <xs:documentation xml:lang="en">
+                Provides a signed request from an account holder to an asset controller to prepare an exchange transaction.
+                This holds the specific funds to the expiry date set in the Order and transfers it to the ExchangeAgent,
+                who attempts to match the exchange.
+            </xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="neuid:NamedObjectType">
+                    <xs:sequence>
+                        <xs:element ref="Agent" minOccurs="1" maxOccurs="1" />
+                        <xs:element ref="SettlementAsset" minOccurs="1" maxOccurs="1" />
+                        <xs:element ref="BidAsset" minOccurs="1" maxOccurs="1" />
+                        <xs:element name="Amount" type="xs:double"  minOccurs="1" maxOccurs="1" nillable="false" />
+                        <xs:element name="Comment" type="xs:string"  minOccurs="0" maxOccurs="1" nillable="true" />
+                        <xs:element name="expires" type="xs:dateTime" minOccurs="1" maxOccurs="1" nillable="false"/>
+                    </xs:sequence>
+                </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:complexType name="ExchangeOrderActionType">
+		<xs:complexContent>
+			<xs:extension base="neuid:NamedObjectType">
+                <xs:sequence>
+                    <xs:element ref="ExchangeOrderRef" minOccurs="1" maxOccurs="1"/>
+                </xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+    <xs:element name="CancelExchangeOrder" type="ExchangeOrderActionType" nillable="false"/>
+
+    <xs:element name="ExchangeCompletionOrder" nillable="false">
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="ExchangeOrderActionType">
+                    <xs:sequence>
+                        <xs:element name="Amount" type="xs:double"  minOccurs="1" maxOccurs="1" nillable="false" />
+                        <xs:element name="ExchangeTime" type="xs:dateTime" minOccurs="1" maxOccurs="1" nillable="false"/>
+                        <xs:element ref="ExchangeOrderReceipt" minOccurs="1" maxOccurs="1"/>
+                        <xs:element name="Comment" type="xs:string"  minOccurs="0" maxOccurs="1" nillable="true" />
+                    </xs:sequence>
+                </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="ExchangeOrderReceipt" nillable="false">
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="neuid:NamedObjectType">
+                    <xs:sequence>
+                        <xs:element ref="ExchangeOrder" minOccurs="1" maxOccurs="1"/>
+                    </xs:sequence>
+                    <xs:attribute name="valuetime" type="xs:dateTime" use="required"/>
+                </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="CancelExchangeOrderReceipt" nillable="false" >
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="neuid:NamedObjectType">
+                    <xs:sequence>
+                        <xs:element ref="CancelExchangeOrder" minOccurs="1" maxOccurs="1"/>
+                    </xs:sequence>
+                    <xs:attribute name="valuetime" type="xs:dateTime" use="required"/>
+                </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="ExchangeCompletedReceiptType" nillable="false">
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="neuid:NamedObjectType">
+                    <xs:sequence>
+                        <xs:element ref="ExchangeCompletionOrder" minOccurs="1" maxOccurs="1"/>
+                    </xs:sequence>
+                    <xs:attribute name="valuetime" type="xs:dateTime" use="required"/>
+                </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
+</xs:schema>
