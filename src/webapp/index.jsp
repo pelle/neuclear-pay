@@ -39,7 +39,8 @@ NeuClear Bux
 </tr>
 <tr><td colspan="2" bgcolor="#F0F0FF">
 You need to be running the NeuClear Personal Signer to log in.
-<a href="http://old.neuclear.org/signer/jnlp/neuclear-signer.jnlp">Start with Java Web Start</a>
+<a href="http://dist.neuclear.org/app/neuclear-signer.jnlp">Start with Java Web Start</a>. Note on first run this
+will download 
 </td></tr></table>
 </form>
 <%
