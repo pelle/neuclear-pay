@@ -30,8 +30,11 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: AssetController.java,v 1.4 2003/11/10 17:42:07 pelle Exp $
+$Id: AssetController.java,v 1.5 2003/11/10 19:27:53 pelle Exp $
 $Log: AssetController.java,v $
+Revision 1.5  2003/11/10 19:27:53  pelle
+Mainly documentation.
+
 Revision 1.4  2003/11/10 17:42:07  pelle
 The AssetController interface has been more or less finalized.
 CurrencyController fully implemented
@@ -63,12 +66,23 @@ SOAPTools was changed to return a stream. This is required by the VerifyingReade
 */
 
 /**
+ *
+ * This abstract class generalizes all actions that an AssetController must implement to manage Assets according to the
+ * <a href="http://neuclear.org">NeuClear</a> model.
  * User: pelleb
  * Date: Nov 6, 2003
  * Time: 3:53:17 PM
  */
 public abstract class AssetController {
 
+    /**
+     * Process the the request and returns and unsigned object for signing and sending.
+     * @param contract
+     * @return
+     * @throws TransferDeniedException
+     * @throws LowLevelPaymentException
+     * @throws InvalidTransferException
+     */
     public final NamedObjectBuilder process(AssetTransactionContract contract) throws  TransferDeniedException,LowLevelPaymentException, InvalidTransferException{
         if (contract instanceof TransferRequest)
             return processTransfer((TransferRequest)contract);
@@ -79,16 +93,59 @@ public abstract class AssetController {
         if (contract instanceof CancelHeldTransferRequest)
             return processCancelHold((CancelHeldTransferRequest) contract);
 
-        return null;//TODO implement for all
+        return null;
     }
+
+    /**
+     * Verify that the asset controller handles the given asset
+     * @param asset
+     * @return true if able to process
+     */
     public abstract boolean canProcess(Asset asset);
 
+
+    /**
+     * Performs an asset transfer.
+     * @param req TransferRequest
+     * @return Unsigned Receipt
+     * @throws LowLevelPaymentException
+     * @throws TransferDeniedException
+     * @throws InvalidTransferException
+     */
     public abstract org.neuclear.asset.contracts.builders.TransferReceiptBuilder processTransfer(TransferRequest req) throws LowLevelPaymentException, TransferDeniedException, InvalidTransferException;
 
+    /**
+     * Creates a HeldTransfer. This gives the recipient right within a limited period to "complete" the Transfer.
+     * Completion means performing the actual transfer with an amount up to but not greater than the amount set in the
+     * HeldTransfer Object.
+     * @param req Valid HeldTransferRequest
+     * @return Unsigned HeldTransferReceiptBuilder
+     * @throws LowLevelPaymentException
+     * @throws TransferDeniedException
+     * @throws InvalidTransferException
+     */
     public abstract org.neuclear.asset.contracts.builders.HeldTransferReceiptBuilder processHeldTransfer(HeldTransferRequest req) throws LowLevelPaymentException, TransferDeniedException, InvalidTransferException;
 
+    /**
+     * Completes a HeldTransfer. This must be signed by the recipient of the HeldTransfer.
+     * @param complete
+     * @return Unsigned TransferReceiptBuilder
+     * @throws LowLevelPaymentException
+     * @throws TransferDeniedException
+     * @throws InvalidTransferException
+     */
     public abstract org.neuclear.asset.contracts.builders.TransferReceiptBuilder processCompleteHold(CompleteHeldTransferRequest complete) throws LowLevelPaymentException, TransferDeniedException, InvalidTransferException;
+
+    /**
+     * Cancels a HeldTransfer. This must be signed by the recipient of the HeldTransfer.
+     * @param cancel
+     * @return Unsigned CancelHeldTransferReceiptBuilder
+     * @throws LowLevelPaymentException
+     * @throws TransferDeniedException
+     * @throws InvalidTransferException
+     */
 
     public abstract CancelHeldTransferReceiptBuilder processCancelHold(CancelHeldTransferRequest cancel) throws LowLevelPaymentException, TransferDeniedException, InvalidTransferException;
 
+    //TODO Add getBalance
 }

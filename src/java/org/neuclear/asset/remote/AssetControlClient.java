@@ -38,8 +38,11 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: AssetControlClient.java,v 1.1 2003/11/10 17:42:07 pelle Exp $
+$Id: AssetControlClient.java,v 1.2 2003/11/10 19:27:53 pelle Exp $
 $Log: AssetControlClient.java,v $
+Revision 1.2  2003/11/10 19:27:53  pelle
+Mainly documentation.
+
 Revision 1.1  2003/11/10 17:42:07  pelle
 The AssetController interface has been more or less finalized.
 CurrencyController fully implemented
@@ -83,19 +86,19 @@ public class AssetControlClient  {
 
     public TransferReceipt performTransfer(TransferRequestBuilder req) throws NeuClearException, XMLSecurityException {
         req.sign(signer);
-        return (TransferReceipt) Sender.quickSend(req.getAsset().getControllerURL(),req);
+        return (TransferReceipt)req.getAsset().send(req);
     }
     public HeldTransferReceipt performHeldTransfer(HeldTransferRequestBuilder req) throws NeuClearException, XMLSecurityException {
         req.sign(signer);
-        return (HeldTransferReceipt) Sender.quickSend(req.getAsset().getControllerURL(),req);
+        return (HeldTransferReceipt) req.getAsset().send(req);
     }
     public TransferReceipt performCompleteHeld(CompleteHeldTransferRequestBuilder req) throws NeuClearException, XMLSecurityException {
         req.sign(signer);
-        return (TransferReceipt) Sender.quickSend(req.getAsset().getControllerURL(),req);
+        return (TransferReceipt) req.getAsset().send(req);
     }
     public CancelHeldTransferReceipt performCancelHeld(CancelHeldTransferRequestBuilder req) throws NeuClearException, XMLSecurityException {
         req.sign(signer);
-        return (CancelHeldTransferReceipt) Sender.quickSend(req.getAsset().getControllerURL(),req);
+        return (CancelHeldTransferReceipt) req.getAsset().send(req);
     }
 
 

@@ -5,6 +5,7 @@ import org.neuclear.id.Identity;
 import org.neuclear.id.SignedNamedObject;
 import org.neuclear.id.NamedObjectReader;
 import org.neuclear.id.NSTools;
+import org.neuclear.id.builders.NamedObjectBuilder;
 import org.neuclear.asset.contracts.builders.TransferReceiptBuilder;
 import org.neuclear.senders.SoapSender;
 import org.dom4j.Element;
@@ -12,6 +13,7 @@ import org.dom4j.DocumentHelper;
 import org.neudist.xml.xmlsec.XMLSecurityException;
 import org.neudist.xml.xmlsec.KeyInfo;
 import org.neudist.xml.xmlsec.XMLSecTools;
+import org.neudist.utils.Utility;
 
 import java.security.PublicKey;
 import java.sql.Timestamp;
@@ -34,8 +36,11 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: Asset.java,v 1.2 2003/11/10 17:42:07 pelle Exp $
+$Id: Asset.java,v 1.3 2003/11/10 19:27:52 pelle Exp $
 $Log: Asset.java,v $
+Revision 1.3  2003/11/10 19:27:52  pelle
+Mainly documentation.
+
 Revision 1.2  2003/11/10 17:42:07  pelle
 The AssetController interface has been more or less finalized.
 CurrencyController fully implemented
@@ -59,20 +64,53 @@ SOAPTools was changed to return a stream. This is required by the VerifyingReade
  * Time: 6:27:21 PM
  */
 public class Asset extends Identity {
-    private Asset(String name, Identity signatory, Timestamp timestamp, String digest, String repository, String signer, String logger, String receiver, PublicKey pub, String assetController) throws NeuClearException {
+    private Asset(String name, Identity signatory, Timestamp timestamp, String digest, String repository, String signer, String logger, String receiver, PublicKey pub, String assetController,int decimalpoint,double minimumTransaction) throws NeuClearException {
         super(name, signatory, timestamp, digest, repository, signer, logger, receiver, pub);
         this.assetController = assetController;
+        this.decimal=decimalpoint;
+        this.multiplier=(int)Math.round(Math.pow(10,-decimalpoint));
+        this.minimumTransaction=minimumTransaction;
     }
 
     public String getControllerURL() {
         return assetController;
     }
-
-    public SignedNamedObject send(TransferReceiptBuilder obj) throws NeuClearException {
+    /**
+     * Sends a contract to the Assets controller.
+     * @param obj NamedObjectBuilder
+     * @return The receipt
+     * @throws NeuClearException
+     */
+    public SignedNamedObject send(NamedObjectBuilder obj) throws NeuClearException {
         if (obj.isSigned())
             return SoapSender.quickSend(assetController, obj);
-        throw null;
+        throw new NeuClearException("Object wasnt signed");
     }
+
+    /**
+     * Checks if an amount is valid within the boundaries of the asset.
+     * @param amount
+     * @return
+     */
+    public boolean isValidAmount(double amount) {
+        return amount>=minimumTransaction;
+    }
+
+    /**
+     * Rounds a given value to fit within the valid numbers of the
+     * @param amount
+     * @return
+     */
+    public double round(double amount) {
+        if (amount<minimumTransaction)
+            return minimumTransaction;
+        if (decimal==0)
+            return amount;
+        return Math.round(amount*multiplier)/multiplier;
+    }
+
+
+
     public static final class Reader implements NamedObjectReader {
         /**
          * Read object from Element and fill in its details
@@ -92,11 +130,18 @@ public class Asset extends Identity {
             Element allowElement = elem.element(DocumentHelper.createQName("allow", NSTools.NS_NEUID));
             KeyInfo ki = new KeyInfo(allowElement.element(XMLSecTools.createQName("KeyInfo")));
             PublicKey pub = ki.getPublicKey();
+            String dec = elem.attributeValue("decimalpoints");
+            int decimal=(!Utility.isEmpty(dec))?Integer.parseInt(dec):0;
+            String min=elem.attributeValue("minimumxact");
+            double minimum=(!Utility.isEmpty(min))?Double.parseDouble(min):0;
 
-            return new Asset(name,signatory, timestamp, digest, repository,signer, logger, receiver, pub,assetController);
+            return new Asset(name,signatory, timestamp, digest, repository,signer, logger, receiver, pub,assetController,decimal,minimum);
         }
 
 
     }
     private final String assetController;
+    private final int decimal;
+    private final int multiplier;
+    private final double minimumTransaction;
 }
