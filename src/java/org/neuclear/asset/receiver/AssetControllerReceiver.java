@@ -1,21 +1,15 @@
 package org.neuclear.asset.receiver;
 
-import org.neuclear.asset.*;
+import org.neuclear.asset.AssetController;
+import org.neuclear.asset.TransferException;
 import org.neuclear.asset.contracts.*;
-import org.neuclear.asset.contracts.builders.TransferReceiptBuilder;
-import org.neuclear.asset.contracts.builders.TransferBuilder;
+import org.neuclear.commons.NeuClearException;
+import org.neuclear.commons.crypto.signers.Signer;
 import org.neuclear.id.SignedNamedObject;
 import org.neuclear.id.builders.NamedObjectBuilder;
 import org.neuclear.id.verifier.VerifyingReader;
-import org.neuclear.ledger.InvalidTransactionException;
-import org.neuclear.ledger.LowlevelLedgerException;
-import org.neuclear.ledger.UnBalancedTransactionException;
-import org.neuclear.ledger.UnknownBookException;
 import org.neuclear.receiver.Receiver;
 import org.neuclear.receiver.UnsupportedTransaction;
-import org.neuclear.commons.crypto.signers.Signer;
-import org.neuclear.commons.crypto.CryptoException;
-import org.neuclear.commons.NeuClearException;
 import org.neuclear.xml.ElementProxy;
 import org.neuclear.xml.xmlsec.XMLSecurityException;
 
@@ -57,7 +51,7 @@ public final class AssetControllerReceiver implements Receiver {
      * @param obj 
      * @throws UnsupportedTransaction 
      */
-    public final ElementProxy receive(final SignedNamedObject obj) throws UnsupportedTransaction {
+    public final ElementProxy receive(final SignedNamedObject obj) throws NeuClearException {
         if (obj instanceof AssetTransactionContract) {
             final TransferContract transfer = (TransferContract) obj;
             if (!proc.canProcess(transfer.getAsset()))
@@ -69,22 +63,14 @@ public final class AssetControllerReceiver implements Receiver {
                 return sigReceipt;
                 //TODO do something with receipt
 
-            } catch (InvalidTransferException e) {
-                e.printStackTrace();  //TODO Handle exception
-            } catch (LowLevelPaymentException e) {
-                e.printStackTrace();  //TODO Handle exception
             } catch (XMLSecurityException e) {
-                e.printStackTrace();  //TODO Handle exception
-            } catch (TransferDeniedException e) {
-                e.printStackTrace();  //TODO Handle exception
-            } catch (CryptoException e) {
-                e.printStackTrace();  //TODO Handle exception
-            } catch (NeuClearException e) {
-                e.printStackTrace();  //TODO Handle exception
+                throw new NeuClearException(e);
+
+            } catch (TransferException e) {
+                throw new NeuClearException(e);
             }
         } else
             throw new UnsupportedTransaction(obj);
-        return null;
     }
 
     private final AssetController proc;

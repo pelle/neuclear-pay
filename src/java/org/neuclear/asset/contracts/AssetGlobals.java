@@ -21,8 +21,14 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: AssetGlobals.java,v 1.5 2003/11/21 04:43:04 pelle Exp $
+$Id: AssetGlobals.java,v 1.6 2003/11/22 00:22:28 pelle Exp $
 $Log: AssetGlobals.java,v $
+Revision 1.6  2003/11/22 00:22:28  pelle
+All unit tests in commons, id and xmlsec now work.
+AssetController now successfully processes payments in the unit test.
+Payment Web App has working form that creates a TransferRequest presents it to the signer
+and forwards it to AssetControlServlet. (Which throws an XML Parser Exception) I think the XMLReaderServlet is bust.
+
 Revision 1.5  2003/11/21 04:43:04  pelle
 EncryptedFileStore now works. It uses the PBECipher with DES3 afair.
 Otherwise You will Finaliate.
@@ -106,8 +112,13 @@ public final class AssetGlobals {
     public static final String ASSET_TAGNAME = "Asset";
     public static final String XFER_ASSETS = "http://neuclear.org/neu/assets";
     public static final String ASSET_NSPREFIX = "asset";
+
+    public static void registerReaders() {
+        VerifyingReader.getInstance().registerReader(AssetGlobals.ASSET_TAGNAME, new Asset.Reader());
+    }
+
     static {
-        VerifyingReader.getInstance().registerReader(AssetGlobals.ASSET_TAGNAME,new Asset.Reader());
+        registerReaders();
     }
 
 }

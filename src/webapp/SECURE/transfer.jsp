@@ -4,9 +4,17 @@
                  org.neuclear.id.resolver.NSResolver,
                  org.neuclear.asset.contracts.Asset,
                  org.neuclear.commons.time.TimeTools,
-                 org.neuclear.id.builders.SignatureRequestBuilder"%>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/sql" prefix="sql" %>
+                 org.neuclear.id.builders.SignatureRequestBuilder,
+                 org.neuclear.asset.contracts.AssetGlobals,
+                 org.neuclear.asset.contracts.TransferGlobals,
+                 org.neuclear.asset.receiver.servlet.AssetControllerServlet,
+                 org.neuclear.id.SignedNamedObject,
+                 org.neuclear.commons.crypto.Base64,
+                 org.neuclear.commons.servlets.ServletTools"%>
 <%
+    AssetGlobals.registerReaders();
+    TransferGlobals.registerReaders();
+    AssetControllerServlet controller=AssetControllerServlet.getInstance();
     Identity userns=(Identity) request.getUserPrincipal();
 
     String recipient=Utility.denullString(request.getParameter("recipient"));
@@ -38,20 +46,29 @@ if (!submit){
 </form>
 </p>
 <% } else {
+    Servlet servlet=config.getServletContext().getServlet("");
     TransferRequestBuilder transfer=new TransferRequestBuilder(
-            (Asset)NSResolver.resolveIdentity("neu://test/bux"),
+            controller.getAsset(),
             userns,
             NSResolver.resolveIdentity(recipient),
             amount,
             TimeTools.now(),
             comment
     ) ;
-    SignatureRequestBuilder sigreq=new SignatureRequestBuilder("neu://test/bux",userns.getName(),transfer,comment);
-
+    SignatureRequestBuilder sigreq=new SignatureRequestBuilder(controller.getServiceid(),userns.getName(),transfer,comment);
+    SignedNamedObject sig=sigreq.sign(controller.getSigner());
 
 %>
+<form action="<%=userns.getSigner()%>" method="POST">
+<input name="base64xml" value="<%=Base64.encode(sig.getEncoded().getBytes())%>" type="hidden">
+<input name="endpoint" value="<%=ServletTools.getAbsoluteURL(request, "/Asset")%>" type="hidden">
+</form>
     Transfering to Signing Server
-
+<script language="javascript">
+<!--
+document.forms[0].submit();
+-->
+</script>
 <%
 }
     %>

@@ -1,8 +1,9 @@
 package org.neuclear.asset.receiver;
 
-import org.dom4j.DocumentException;
 import org.neuclear.asset.InvalidTransferException;
 import org.neuclear.asset.contracts.Asset;
+import org.neuclear.asset.contracts.AssetGlobals;
+import org.neuclear.asset.contracts.TransferGlobals;
 import org.neuclear.asset.contracts.TransferRequest;
 import org.neuclear.asset.contracts.builders.TransferRequestBuilder;
 import org.neuclear.asset.controllers.currency.CurrencyController;
@@ -17,10 +18,11 @@ import org.neuclear.ledger.LowlevelLedgerException;
 import org.neuclear.ledger.UnknownLedgerException;
 import org.neuclear.ledger.implementations.SQLLedger;
 import org.neuclear.receiver.Receiver;
-import org.neuclear.tests.AbstractReceiverTest;
+import org.neuclear.tests.AbstractSigningTest;
 import org.neuclear.xml.XMLException;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.security.GeneralSecurityException;
 
 /*
@@ -41,8 +43,14 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: PaymentReceiverTest.java,v 1.6 2003/11/21 04:43:04 pelle Exp $
+$Id: PaymentReceiverTest.java,v 1.7 2003/11/22 00:22:29 pelle Exp $
 $Log: PaymentReceiverTest.java,v $
+Revision 1.7  2003/11/22 00:22:29  pelle
+All unit tests in commons, id and xmlsec now work.
+AssetController now successfully processes payments in the unit test.
+Payment Web App has working form that creates a TransferRequest presents it to the signer
+and forwards it to AssetControlServlet. (Which throws an XML Parser Exception) I think the XMLReaderServlet is bust.
+
 Revision 1.6  2003/11/21 04:43:04  pelle
 EncryptedFileStore now works. It uses the PBECipher with DES3 afair.
 Otherwise You will Finaliate.
@@ -117,9 +125,11 @@ CreateTestPayments is a command line utility to create signed payment requests
  * Date: Oct 24, 2003
  * Time: 11:20:31 AM
  */
-public final class PaymentReceiverTest extends AbstractReceiverTest {
+public final class PaymentReceiverTest extends AbstractSigningTest {
     public PaymentReceiverTest(final String string) throws NeuClearException, GeneralSecurityException, UnknownLedgerException, LowlevelLedgerException, BookExistsException, IOException, InvalidTransferException, XMLException {
         super(string);
+        AssetGlobals.registerReaders();
+        TransferGlobals.registerReaders();
         asset = (Asset) NSResolver.resolveIdentity(assetName);
 
         proc = new CurrencyController(
@@ -130,15 +140,8 @@ public final class PaymentReceiverTest extends AbstractReceiverTest {
                 , assetName
         );
         receiver = new AssetControllerReceiver(proc, getSigner());
-        directory = new File("target/testdata/payments");
-        directory.mkdirs();
-        createPayments(getBob(), getAlice(), 100);
-        createPayments(getAlice(), getBob(), 100);
     }
 
-    public final void testSimple() throws Exception, DocumentException, NeuClearException, XMLException {
-        runDirectoryTest(directory.getAbsolutePath());
-    }
 
     public final Receiver getReceiver() {
         return receiver;
@@ -150,6 +153,17 @@ public final class PaymentReceiverTest extends AbstractReceiverTest {
 
     public final Asset getAsset() {
         return asset;
+    }
+
+    public final void testTransactions() throws Exception, IOException, InvalidTransferException, NeuClearException {
+        performTransaction(createPayments(getAlice(), getBob(), 100));
+        performTransaction(createPayments(getBob(), getAlice(), 100));
+    }
+
+    public void performTransaction(SignedNamedObject obj) throws Exception {
+        Object pre = getPreTransactionState(obj);
+        org.neuclear.xml.ElementProxy receipt = receiver.receive(obj);
+        assertTrue(verifyTransaction(obj, pre));
     }
 
     public final Object getPreTransactionState(final SignedNamedObject obj) throws Exception {
@@ -178,19 +192,20 @@ public final class PaymentReceiverTest extends AbstractReceiverTest {
         return false;
     }
 
-    public final void createPayments(final Identity from, final Identity to, final double amount) throws InvalidTransferException, XMLException, NeuClearException, IOException, UnsupportedEncodingException {
-        final TransferRequestBuilder transfer = new TransferRequestBuilder(asset, from, to, 100, TimeTools.now(), "Test One");
-        final SignedNamedObject signed = transfer.sign(getSigner());
-        final OutputStream out = new BufferedOutputStream(new FileOutputStream(directory.getAbsolutePath() + "/" + transfer.getLocalName() + ".xml"));
-        out.write(signed.getEncoded().getBytes("UTF-8"));
-
+    public final SignedNamedObject createPayments(final Identity from, final Identity to, final double amount) throws InvalidTransferException, XMLException, NeuClearException, IOException, UnsupportedEncodingException {
+        final TransferRequestBuilder transfer = new TransferRequestBuilder(asset, from, to, amount, TimeTools.now(), "Test One");
+        return transfer.sign(getSigner());
     }
 
     protected final String assetName = "neu://test/bux";
 
     private final Asset asset;
-    private final File directory;
     private final Receiver receiver;
     private final CurrencyController proc;
     private final double balance = 0.0;
+
+    static {
+        AssetGlobals.class.getClass();
+        TransferGlobals.class.getClass();
+    }
 }

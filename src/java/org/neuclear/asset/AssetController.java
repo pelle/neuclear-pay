@@ -2,8 +2,8 @@ package org.neuclear.asset;
 
 import org.neuclear.asset.contracts.*;
 import org.neuclear.asset.contracts.builders.CancelHeldTransferReceiptBuilder;
-import org.neuclear.id.builders.NamedObjectBuilder;
 import org.neuclear.commons.NeuClearException;
+import org.neuclear.id.builders.NamedObjectBuilder;
 
 /*
 NeuClear Distributed Transaction Clearing Platform
@@ -23,8 +23,14 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: AssetController.java,v 1.7 2003/11/21 04:43:04 pelle Exp $
+$Id: AssetController.java,v 1.8 2003/11/22 00:22:29 pelle Exp $
 $Log: AssetController.java,v $
+Revision 1.8  2003/11/22 00:22:29  pelle
+All unit tests in commons, id and xmlsec now work.
+AssetController now successfully processes payments in the unit test.
+Payment Web App has working form that creates a TransferRequest presents it to the signer
+and forwards it to AssetControlServlet. (Which throws an XML Parser Exception) I think the XMLReaderServlet is bust.
+
 Revision 1.7  2003/11/21 04:43:04  pelle
 EncryptedFileStore now works. It uses the PBECipher with DES3 afair.
 Otherwise You will Finaliate.
@@ -88,13 +94,13 @@ public abstract class AssetController {
      */
     public final NamedObjectBuilder process(final AssetTransactionContract contract) throws TransferDeniedException, LowLevelPaymentException, InvalidTransferException, NeuClearException {
         if (contract instanceof TransferRequest)
-            return processTransfer((TransferRequest) contract);
+            return process((TransferRequest) contract);
         if (contract instanceof HeldTransferRequest)
-            return processHeldTransfer((HeldTransferRequest) contract);
+            return process((HeldTransferRequest) contract);
         if (contract instanceof CompleteHeldTransferRequest)
-            return processCompleteHold((CompleteHeldTransferRequest) contract);
+            return process((CompleteHeldTransferRequest) contract);
         if (contract instanceof CancelHeldTransferRequest)
-            return processCancelHold((CancelHeldTransferRequest) contract);
+            return process((CancelHeldTransferRequest) contract);
 
         return null;
     }
@@ -117,7 +123,7 @@ public abstract class AssetController {
      * @throws TransferDeniedException  
      * @throws InvalidTransferException 
      */
-    public abstract org.neuclear.asset.contracts.builders.TransferReceiptBuilder processTransfer(TransferRequest req) throws LowLevelPaymentException, TransferDeniedException, InvalidTransferException, NeuClearException;
+    public abstract org.neuclear.asset.contracts.builders.TransferReceiptBuilder process(TransferRequest req) throws LowLevelPaymentException, TransferDeniedException, InvalidTransferException, NeuClearException;
 
     /**
      * Creates a HeldTransfer. This gives the recipient right within a limited period to "complete" the Transfer.
@@ -130,7 +136,7 @@ public abstract class AssetController {
      * @throws TransferDeniedException  
      * @throws InvalidTransferException 
      */
-    public abstract org.neuclear.asset.contracts.builders.HeldTransferReceiptBuilder processHeldTransfer(HeldTransferRequest req) throws LowLevelPaymentException, TransferDeniedException, InvalidTransferException, NeuClearException;
+    public abstract org.neuclear.asset.contracts.builders.HeldTransferReceiptBuilder process(HeldTransferRequest req) throws LowLevelPaymentException, TransferDeniedException, InvalidTransferException, NeuClearException;
 
     /**
      * Completes a HeldTransfer. This must be signed by the recipient of the HeldTransfer.
@@ -141,7 +147,7 @@ public abstract class AssetController {
      * @throws TransferDeniedException  
      * @throws InvalidTransferException 
      */
-    public abstract org.neuclear.asset.contracts.builders.TransferReceiptBuilder processCompleteHold(CompleteHeldTransferRequest complete) throws LowLevelPaymentException, TransferDeniedException, InvalidTransferException, NeuClearException;
+    public abstract org.neuclear.asset.contracts.builders.TransferReceiptBuilder process(CompleteHeldTransferRequest complete) throws LowLevelPaymentException, TransferDeniedException, InvalidTransferException, NeuClearException;
 
     /**
      * Cancels a HeldTransfer. This must be signed by the recipient of the HeldTransfer.
@@ -153,7 +159,9 @@ public abstract class AssetController {
      * @throws InvalidTransferException 
      */
 
-    public abstract CancelHeldTransferReceiptBuilder processCancelHold(CancelHeldTransferRequest cancel) throws LowLevelPaymentException, TransferDeniedException, InvalidTransferException, NeuClearException;
+    public abstract CancelHeldTransferReceiptBuilder process(CancelHeldTransferRequest cancel) throws LowLevelPaymentException, TransferDeniedException, InvalidTransferException, NeuClearException;
+
+
 
     //TODO Add getBalance
 }

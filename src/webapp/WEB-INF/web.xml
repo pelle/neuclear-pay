@@ -18,6 +18,23 @@
 
     </filter>
     <servlet>
+        <servlet-name>assetcontroller</servlet-name>
+        <servlet-class>org.neuclear.asset.receiver.servlet.AssetControllerServlet</servlet-class>
+        <init-param>
+          <param-name>title</param-name>
+          <param-value>NeuClear Example Application</param-value>
+        </init-param>
+        <init-param>
+          <param-name>serviceid</param-name>
+          <param-value>neu://test/bux</param-value>
+        </init-param>
+        <init-param>
+            <param-name>datasource</param-name>
+            <param-value>jdbc/AssetDS</param-value>
+        </init-param>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+    <servlet>
         <servlet-name>authenticator</servlet-name>
         <servlet-class>org.neuclear.auth.AuthenticationServlet</servlet-class>
         <init-param>
@@ -26,7 +43,7 @@
         </init-param>
         <init-param>
           <param-name>serviceid</param-name>
-          <param-value>neu://test</param-value>
+          <param-value>neu://test/bux</param-value>
         </init-param>
         <load-on-startup>1</load-on-startup>
     </servlet>
@@ -36,6 +53,10 @@
     </filter-mapping>
 
 
+    <servlet-mapping>
+        <servlet-name>assetcontroller</servlet-name>
+        <url-pattern>/Asset</url-pattern>
+    </servlet-mapping>
     <servlet-mapping>
         <servlet-name>authenticator</servlet-name>
         <url-pattern>/Authorize</url-pattern>

@@ -1,6 +1,8 @@
 package org.neuclear.asset.receiver.servlet;
 
 import org.neuclear.asset.contracts.Asset;
+import org.neuclear.asset.contracts.AssetGlobals;
+import org.neuclear.asset.contracts.TransferGlobals;
 import org.neuclear.asset.controllers.currency.CurrencyController;
 import org.neuclear.asset.receiver.AssetControllerReceiver;
 import org.neuclear.commons.crypto.signers.TestCaseSigner;
@@ -30,8 +32,14 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: AssetControllerServlet.java,v 1.3 2003/11/21 04:43:04 pelle Exp $
+$Id: AssetControllerServlet.java,v 1.4 2003/11/22 00:22:28 pelle Exp $
 $Log: AssetControllerServlet.java,v $
+Revision 1.4  2003/11/22 00:22:28  pelle
+All unit tests in commons, id and xmlsec now work.
+AssetController now successfully processes payments in the unit test.
+Payment Web App has working form that creates a TransferRequest presents it to the signer
+and forwards it to AssetControlServlet. (Which throws an XML Parser Exception) I think the XMLReaderServlet is bust.
+
 Revision 1.3  2003/11/21 04:43:04  pelle
 EncryptedFileStore now works. It uses the PBECipher with DES3 afair.
 Otherwise You will Finaliate.
@@ -62,8 +70,12 @@ public final class AssetControllerServlet extends ReceiverServlet {
         super.init(config);
         serviceid = config.getInitParameter("serviceid");
         datasource = config.getInitParameter("datasource");
+        AssetGlobals.registerReaders();
+        TransferGlobals.registerReaders();
+        INSTANCE = this;
         try {
             asset = (Asset) NSResolver.resolveIdentity(serviceid);
+            signer = new TestCaseSigner();
             final AssetControllerReceiver receiver = new AssetControllerReceiver(
                     new CurrencyController(
                             new SQLLedger(
@@ -72,7 +84,8 @@ public final class AssetControllerServlet extends ReceiverServlet {
                             ),
                             serviceid
                     ),
-                    new TestCaseSigner()
+                    signer
+
             );
             setReceiver(receiver);
 
@@ -88,6 +101,10 @@ public final class AssetControllerServlet extends ReceiverServlet {
         return asset;
     }
 
+    public TestCaseSigner getSigner() {
+        return signer;
+    }
+
     public final String getServiceid() {
         return serviceid;
     }
@@ -96,7 +113,13 @@ public final class AssetControllerServlet extends ReceiverServlet {
         return datasource;
     }
 
+    public static AssetControllerServlet getInstance() {
+        return INSTANCE;
+    }
+
     private Asset asset;
     private String serviceid;
     private String datasource;
+    private static AssetControllerServlet INSTANCE;
+    private TestCaseSigner signer;
 }

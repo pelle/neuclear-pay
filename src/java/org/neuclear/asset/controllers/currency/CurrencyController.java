@@ -41,7 +41,7 @@ public final class CurrencyController extends AssetController {
         return this.asset.getName().equals(asset.getName());
     }
 
-    public final TransferReceiptBuilder processTransfer(final TransferRequest req) throws InvalidTransferException, LowLevelPaymentException, TransferDeniedException, NeuClearException {
+    public final TransferReceiptBuilder process(final TransferRequest req) throws InvalidTransferException, LowLevelPaymentException, TransferDeniedException, NeuClearException {
         try {
             if (!req.getSignatory().equals(req.getFrom()))
                 throw new TransferDeniedException(req);
@@ -89,7 +89,7 @@ public final class CurrencyController extends AssetController {
         }
     }
 
-    public final HeldTransferReceiptBuilder processHeldTransfer(final HeldTransferRequest req) throws InvalidTransferException, LowLevelPaymentException, TransferDeniedException, NeuClearException {
+    public final HeldTransferReceiptBuilder process(final HeldTransferRequest req) throws InvalidTransferException, LowLevelPaymentException, TransferDeniedException, NeuClearException {
         try {
             if (!req.getSignatory().equals(req.getFrom()))
                 throw new TransferDeniedException(req);
@@ -113,7 +113,7 @@ public final class CurrencyController extends AssetController {
         }
     }
 
-    public final TransferReceiptBuilder processCompleteHold(final CompleteHeldTransferRequest complete) throws LowLevelPaymentException, InvalidTransferException, TransferDeniedException, NeuClearException {
+    public final TransferReceiptBuilder process(final CompleteHeldTransferRequest complete) throws LowLevelPaymentException, InvalidTransferException, TransferDeniedException, NeuClearException {
         try {
             if (!complete.getSignatory().equals(complete.getTo()))
                 throw new TransferDeniedException(complete);
@@ -142,7 +142,7 @@ public final class CurrencyController extends AssetController {
         }
     }
 
-    public final CancelHeldTransferReceiptBuilder processCancelHold(final CancelHeldTransferRequest cancel) throws InvalidTransferException, LowLevelPaymentException, TransferDeniedException, NeuClearException {
+    public final CancelHeldTransferReceiptBuilder process(final CancelHeldTransferRequest cancel) throws InvalidTransferException, LowLevelPaymentException, TransferDeniedException, NeuClearException {
         try {
             final PostedHeldTransaction heldTran = ledger.findHeldTransaction(cancel.getHoldId());
             if (!isRecipient(cancel.getSignatory(), heldTran))
