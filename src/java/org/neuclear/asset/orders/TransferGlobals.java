@@ -2,6 +2,7 @@ package org.neuclear.asset.orders;
 
 import org.dom4j.*;
 import org.neuclear.asset.contracts.Asset;
+import org.neuclear.asset.InvalidTransferException;
 import org.neuclear.commons.Utility;
 import org.neuclear.commons.time.TimeTools;
 import org.neuclear.id.Identity;
@@ -13,6 +14,7 @@ import org.neuclear.id.verifier.VerifyingReader;
 
 import java.sql.Timestamp;
 import java.text.ParseException;
+import java.util.StringTokenizer;
 
 /*
 NeuClear Distributed Transaction Clearing Platform
@@ -32,8 +34,13 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: TransferGlobals.java,v 1.4 2004/01/11 00:39:06 pelle Exp $
+$Id: TransferGlobals.java,v 1.5 2004/01/12 22:39:14 pelle Exp $
 $Log: TransferGlobals.java,v $
+Revision 1.5  2004/01/12 22:39:14  pelle
+Completed all the builders and contracts.
+Added a new abstract Value class to contain either an amount or a list of serial numbers.
+Now ready to finish off the AssetControllers.
+
 Revision 1.4  2004/01/11 00:39:06  pelle
 Cleaned up the schemas even more they now all verifiy.
 The Order/Receipt pairs for neuclear pay, should now work. They all have Readers using the latest
@@ -214,13 +221,42 @@ public final class TransferGlobals {
 
     }
 
-    public static final double parseAmountTag(Element elem) throws InvalidNamedObjectException {
+    public static final Value parseValueTag(Element elem) throws InvalidNamedObjectException {
+        if (elem.elements(createQName(AMOUNT_TAG))!=null)
+            return parseAmountTag(elem);
+        else
+            return parseSerialNumbers(elem);
+
+    }
+
+    private static SerialNumbers parseSerialNumbers(Element elem) throws InvalidNamedObjectException {
+        final String numbers=getElementValue(elem,SERIAL_NOS_TAG);
+        return new SerialNumbers(numbers.split("\\s*"));
+    }
+
+    private static Amount parseAmountTag(Element elem) throws InvalidNamedObjectException {
         final String amount=getElementValue(elem,AMOUNT_TAG);
+
         try {
-            return Double.parseDouble(amount);
+            return new Amount(Double.parseDouble(amount));
         } catch (NumberFormatException e) {
             throw new InvalidNamedObjectException("Badly formatted number",e);
         }
+    }
+
+    public  static Element createValueTag(Value value) throws InvalidTransferException {
+        if (value instanceof Amount){
+            return createElement(TransferGlobals.AMOUNT_TAG,Double.toString(value.getAmount()));
+        }
+        SerialNumbers nos=((SerialNumbers)value);
+        if (value.getAmount()>0) {
+            final StringBuffer buf=new StringBuffer((int) (nos.getAmount()*(nos.getNumber(0).length())+1));
+            for (int i=0;i<nos.getAmount();i++)
+                buf.append(nos.getNumber(i));
+                buf.append("\n");
+            return createElement(TransferGlobals.SERIAL_NOS_TAG,buf.toString());
+        }
+        throw new InvalidTransferException("Cant have an empty list");
     }
     public static final SignedNamedObject parseEmbedded(Element elem,QName name) throws InvalidNamedObjectException {
         Element embedded=elem.element(name);
@@ -244,5 +280,6 @@ public final class TransferGlobals {
     public static final String COMMENT_TAG="Comment";
     public static final String ASSET_TAG="Asset";
     public static final String AMOUNT_TAG="Amount";
+    public static final String SERIAL_NOS_TAG="SerialNumbers";
     public static final String RECIPIENT_TAG = "Recipient";
 }

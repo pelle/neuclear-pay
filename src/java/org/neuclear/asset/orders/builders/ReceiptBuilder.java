@@ -1,11 +1,10 @@
 package org.neuclear.asset.orders.builders;
 
-import org.neuclear.id.builders.EmbeddedSignedObjectBuilder;
-import org.neuclear.id.SignedNamedObject;
-import org.neuclear.commons.time.TimeTools;
-import org.neuclear.asset.orders.TransferGlobals;
 import org.dom4j.QName;
-import org.dom4j.DocumentException;
+import org.neuclear.asset.orders.TransferGlobals;
+import org.neuclear.commons.time.TimeTools;
+import org.neuclear.id.SignedNamedObject;
+import org.neuclear.id.builders.EmbeddedSignedObjectBuilder;
 
 import java.util.Date;
 

@@ -21,6 +21,7 @@ public final class ExchangeCompletionOrder extends ExchangeTransactionContract {
         this.exchangetime = exchangetime.getTime();
         this.amount = amount;
         this.counterparty=counterparty;
+        this.receipt=receipt;
     }
 
     public final Timestamp getExchangeTime() {
@@ -35,9 +36,14 @@ public final class ExchangeCompletionOrder extends ExchangeTransactionContract {
         return counterparty;
     }
 
+    public ExchangeOrderReceipt getReceipt() {
+        return receipt;
+    }
+
     private final long exchangetime;
     private final double amount;
     private final Identity counterparty;
+    private final ExchangeOrderReceipt receipt;
 
     public static final class Reader implements NamedObjectReader {
         /**
@@ -54,7 +60,7 @@ public final class ExchangeCompletionOrder extends ExchangeTransactionContract {
                 return new ExchangeCompletionOrder(core,
                         (ExchangeOrderReceipt)TransferGlobals.parseEmbedded(elem,ExchangeGlobals.createQName(ExchangeGlobals.EXCHANGE_RCPT_TAGNAME)),
                         TransferGlobals.parseRecipientTag(elem),
-                        TransferGlobals.parseAmountTag(elem),
+                        TransferGlobals.parseValueTag(elem),
                         TransferGlobals.parseTimeStampElement(elem,ExchangeGlobals.createQName(ExchangeGlobals.EXCHANGE_TIME_TAGNAME))
                         );
             }

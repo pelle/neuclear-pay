@@ -12,7 +12,7 @@ import org.neuclear.id.*;
  */
 public final class TransferOrder extends AssetTransactionContract {
 
-    private TransferOrder(final SignedNamedCore core, final Asset asset, final Identity recipient, final double amount, final String comment)  {
+    private TransferOrder(final SignedNamedCore core, final Asset asset, final Identity recipient, final Value amount, final String comment)  {
         super(core, asset);
         this.amount = amount;
         this.comment = comment;
@@ -22,7 +22,7 @@ public final class TransferOrder extends AssetTransactionContract {
     public final Identity getRecipient() {
         return recipient;
     }
-    public final double getAmount() {
+    public final Value getAmount() {
             return amount;
         }
 
@@ -32,7 +32,7 @@ public final class TransferOrder extends AssetTransactionContract {
 
     private final Identity recipient;
 
-    private final double amount;
+    private final Value amount;
     private final String comment;
 
     public static final class Reader implements NamedObjectReader {
@@ -51,7 +51,7 @@ public final class TransferOrder extends AssetTransactionContract {
             return new TransferOrder(core,
                     TransferGlobals.parseAssetTag(elem),
                     TransferGlobals.parseRecipientTag(elem),
-                    TransferGlobals.parseAmountTag(elem),
+                    TransferGlobals.parseValueTag(elem),
                     TransferGlobals.getCommentElement(elem)
                     );
         }

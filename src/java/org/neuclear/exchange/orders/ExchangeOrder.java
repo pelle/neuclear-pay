@@ -4,6 +4,7 @@ import org.dom4j.Element;
 import org.neuclear.asset.contracts.Asset;
 import org.neuclear.asset.contracts.AssetGlobals;
 import org.neuclear.asset.orders.TransferGlobals;
+import org.neuclear.asset.orders.Value;
 import org.neuclear.exchange.contracts.ExchangeAgent;
 import org.neuclear.id.*;
 
@@ -20,11 +21,11 @@ import java.util.List;
  */
 public final class ExchangeOrder extends ExchangeTransactionContract {
     private ExchangeOrder(final SignedNamedCore core,
-                    final Asset bidAsset, final ExchangeAgent agent, final double bid,
+                    final Asset bidAsset, final ExchangeAgent agent, final Value amount,
                     BidItem items[],  final String comment, final Date expires)  {
         super(core, bidAsset,agent);
         this.items =makeSafeCopy(items);
-        this.bidAmount = bid;
+        this.amount = amount;
         this.comment = (comment != null) ? comment : "";
         this.expires = expires.getTime();
     }
@@ -44,8 +45,8 @@ public final class ExchangeOrder extends ExchangeTransactionContract {
     }
 
 
-    public final double getBidAmount() {
-        return bidAmount;
+    public final Value getAmount() {
+        return amount;
     }
 
     public final String getComment() {
@@ -67,28 +68,11 @@ public final class ExchangeOrder extends ExchangeTransactionContract {
             }
         };
     }
-    private final double bidAmount;
+    private final Value amount;
     private final String comment;
     private final long expires;
     private final BidItem items[];
 
-    public static  class BidItem {
-        private BidItem(Asset asset, double amount) {
-            this.asset = asset;
-            this.amount = amount;
-        }
-
-        public final Asset getAsset() {
-            return asset;
-        }
-
-        public final double getAmount() {
-            return amount;
-        }
-
-        private final Asset asset;
-        private final double amount;
-    }
     public static final class Reader implements NamedObjectReader {
         /**
          * Read object from Element and fill in its details
@@ -104,7 +88,7 @@ public final class ExchangeOrder extends ExchangeTransactionContract {
                 return new ExchangeOrder(core,
                         TransferGlobals.parseAssetTag(elem),
                         ExchangeGlobals.parseAgentTag(elem),
-                        TransferGlobals.parseAmountTag(elem),
+                        TransferGlobals.parseValueTag(elem),
                         parseBidItems(elem),
                         TransferGlobals.getCommentElement(elem),
                         TransferGlobals.parseTimeStampElement(elem,ExchangeGlobals.createQName(ExchangeGlobals.EXPIRY_TAG))
@@ -123,7 +107,7 @@ public final class ExchangeOrder extends ExchangeTransactionContract {
         private BidItem parseBidItem(Element element) throws InvalidNamedObjectException {
             return new BidItem(
                     TransferGlobals.parseAssetTag(element),
-                    TransferGlobals.parseAmountTag(element));
+                    TransferGlobals.parseValueTag(element));
 
         }
 

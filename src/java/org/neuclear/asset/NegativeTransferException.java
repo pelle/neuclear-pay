@@ -1,5 +1,7 @@
 package org.neuclear.asset;
 
+import org.neuclear.asset.orders.Value;
+
 
 /**
  * User: pelleb
@@ -7,15 +9,15 @@ package org.neuclear.asset;
  * Time: 11:38:10 AM
  */
 public final class NegativeTransferException extends InvalidTransferException {
-    public NegativeTransferException(final double amount) {
+    public NegativeTransferException(final Value amount) {
         super("negative amount");
         this.amount = amount;
     }
 
-    private final double amount;
+    private final Value amount;
 
 
-    public final double getAmount() {
+    public final Value getAmount() {
         return amount;
     }
 

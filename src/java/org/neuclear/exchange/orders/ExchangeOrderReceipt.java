@@ -23,7 +23,7 @@ public final class ExchangeOrderReceipt extends ExchangeTransactionContract {
         this.valuetime = valuetime.getTime();
         this.order=order;
     }
-    public ExchangeOrder getExchangeOrder(){
+    public ExchangeOrder getOrder(){
         return order;
     }
 

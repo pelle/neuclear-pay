@@ -7,7 +7,7 @@ import org.neuclear.commons.Utility;
 import org.neuclear.commons.time.TimeTools;
 import org.neuclear.id.Identity;
 import org.neuclear.id.InvalidNamedObjectException;
-import org.neuclear.id.builders.NamedObjectBuilder;
+import org.neuclear.id.builders.Builder;
 import org.neuclear.id.resolver.NSResolver;
 import org.neuclear.signers.servlet.SignatureRequestServlet;
 
@@ -31,8 +31,13 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: TransferRequestServlet.java,v 1.4 2004/01/11 00:39:06 pelle Exp $
+$Id: TransferRequestServlet.java,v 1.5 2004/01/12 22:39:14 pelle Exp $
 $Log: TransferRequestServlet.java,v $
+Revision 1.5  2004/01/12 22:39:14  pelle
+Completed all the builders and contracts.
+Added a new abstract Value class to contain either an amount or a list of serial numbers.
+Now ready to finish off the AssetControllers.
+
 Revision 1.4  2004/01/11 00:39:06  pelle
 Cleaned up the schemas even more they now all verifiy.
 The Order/Receipt pairs for neuclear pay, should now work. They all have Readers using the latest
@@ -69,7 +74,7 @@ Added cactus tests to pay
  * Time: 6:37:19 PM
  */
 public class TransferRequestServlet extends SignatureRequestServlet{
-    protected NamedObjectBuilder createBuilder(HttpServletRequest request) throws NeuClearException {
+    protected Builder createBuilder(HttpServletRequest request) throws NeuClearException {
         Asset asset=(Asset) NSResolver.resolveIdentity(getServiceid());
         Identity user=(Identity) request.getUserPrincipal();
         if (user==null)

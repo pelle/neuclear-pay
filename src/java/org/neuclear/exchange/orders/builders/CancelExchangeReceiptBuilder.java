@@ -3,6 +3,7 @@ package org.neuclear.exchange.orders.builders;
 import org.neuclear.asset.InvalidTransferException;
 import org.neuclear.asset.NegativeTransferException;
 import org.neuclear.asset.orders.TransferGlobals;
+import org.neuclear.asset.orders.builders.ReceiptBuilder;
 import org.neuclear.commons.NeuClearException;
 import org.neuclear.exchange.orders.CancelExchangeOrder;
 import org.neuclear.id.NSTools;
@@ -12,8 +13,13 @@ import org.neuclear.id.NSTools;
  * User: pelleb
  * Date: Nov 10, 2003
  * Time: 10:46:12 AM
- * $Id: CancelExchangeReceiptBuilder.java,v 1.2 2004/01/10 00:00:46 pelle Exp $
+ * $Id: CancelExchangeReceiptBuilder.java,v 1.3 2004/01/12 22:39:14 pelle Exp $
  * $Log: CancelExchangeReceiptBuilder.java,v $
+ * Revision 1.3  2004/01/12 22:39:14  pelle
+ * Completed all the builders and contracts.
+ * Added a new abstract Value class to contain either an amount or a list of serial numbers.
+ * Now ready to finish off the AssetControllers.
+ *
  * Revision 1.2  2004/01/10 00:00:46  pelle
  * Implemented new Schema for Transfer*
  * Working on it for Exchange*, so far all Receipts are implemented.
@@ -49,7 +55,7 @@ import org.neuclear.id.NSTools;
  * CurrencyController fully implemented
  * AssetControlClient implementes a remote client for communicating with AssetControllers
  */
-public final class CancelExchangeReceiptBuilder extends CancelExchangeBuilder {
+public final class CancelExchangeReceiptBuilder extends ReceiptBuilder {
     public CancelExchangeReceiptBuilder(final CancelExchangeOrder req) throws InvalidTransferException, NegativeTransferException, NeuClearException {
         super(NSTools.createUniqueTransactionID(req.getAsset().getName(), req.getSignatory().getName()), TransferGlobals.CANCEL_RCPT_TAGNAME, req.getAsset(), req.getHoldId());
     }

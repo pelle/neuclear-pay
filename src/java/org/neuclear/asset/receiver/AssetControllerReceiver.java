@@ -11,7 +11,7 @@ import org.neuclear.asset.orders.transfers.TransferGlobals;
 import org.neuclear.commons.NeuClearException;
 import org.neuclear.commons.crypto.signers.Signer;
 import org.neuclear.id.SignedNamedObject;
-import org.neuclear.id.builders.NamedObjectBuilder;
+import org.neuclear.id.builders.Builder;
 import org.neuclear.id.verifier.VerifyingReader;
 import org.neuclear.receiver.Receiver;
 import org.neuclear.receiver.UnsupportedTransaction;
@@ -66,7 +66,7 @@ public final class AssetControllerReceiver implements Receiver {
 
             try {
                 System.out.println("Processing: "+transfer.getName());
-                final NamedObjectBuilder sigReceipt = proc.process(transfer);
+                final Builder sigReceipt = proc.process(transfer);
                 sigReceipt.sign(transfer.getAsset().getName(), signer);
                 return sigReceipt;
 

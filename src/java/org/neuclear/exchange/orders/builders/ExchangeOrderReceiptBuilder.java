@@ -1,18 +1,12 @@
 package org.neuclear.exchange.orders.builders;
 
-import org.dom4j.Element;
 import org.neuclear.asset.InvalidTransferException;
 import org.neuclear.asset.NegativeTransferException;
-import org.neuclear.asset.orders.builders.TransferOrderBuilder;
 import org.neuclear.asset.orders.builders.ReceiptBuilder;
-import org.neuclear.asset.orders.exchanges.ExchangeOrder;
-import org.neuclear.asset.orders.transfers.TransferGlobals;
 import org.neuclear.commons.NeuClearException;
-import org.neuclear.commons.time.TimeTools;
-import org.neuclear.exchange.orders.ExchangeOrder;
 import org.neuclear.exchange.orders.ExchangeGlobals;
+import org.neuclear.exchange.orders.ExchangeOrder;
 
-import java.sql.Timestamp;
 import java.util.Date;
 
 /*
@@ -33,8 +27,13 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: ExchangeReceiptBuilder.java,v 1.3 2004/01/11 00:39:06 pelle Exp $
-$Log: ExchangeReceiptBuilder.java,v $
+$Id: ExchangeOrderReceiptBuilder.java,v 1.1 2004/01/12 22:39:15 pelle Exp $
+$Log: ExchangeOrderReceiptBuilder.java,v $
+Revision 1.1  2004/01/12 22:39:15  pelle
+Completed all the builders and contracts.
+Added a new abstract Value class to contain either an amount or a list of serial numbers.
+Now ready to finish off the AssetControllers.
+
 Revision 1.3  2004/01/11 00:39:06  pelle
 Cleaned up the schemas even more they now all verifiy.
 The Order/Receipt pairs for neuclear pay, should now work. They all have Readers using the latest
@@ -93,8 +92,8 @@ which will handle all neuclear-ledger based AssetControllers.
  * Date: Nov 7, 2003
  * Time: 8:05:15 PM
  */
-public final class ExchangeReceiptBuilder extends ReceiptBuilder {
-    public ExchangeReceiptBuilder(final ExchangeOrder order,Date valuetime) throws InvalidTransferException, NegativeTransferException, NeuClearException {
+public final class ExchangeOrderReceiptBuilder extends ReceiptBuilder {
+    public ExchangeOrderReceiptBuilder(final ExchangeOrder order,Date valuetime) throws InvalidTransferException, NegativeTransferException, NeuClearException {
         super(ExchangeGlobals.createQName(ExchangeGlobals.EXCHANGE_RCPT_TAGNAME), order,valuetime);
     }
 }

@@ -1,17 +1,14 @@
 package org.neuclear.asset.orders.builders;
 
 import org.dom4j.Element;
-import org.dom4j.QName;
 import org.neuclear.asset.InvalidTransferException;
 import org.neuclear.asset.NegativeTransferException;
 import org.neuclear.asset.contracts.Asset;
-import org.neuclear.asset.orders.transfers.TransferGlobals;
 import org.neuclear.asset.orders.TransferGlobals;
+import org.neuclear.asset.orders.Value;
 import org.neuclear.commons.NeuClearException;
 import org.neuclear.commons.Utility;
 import org.neuclear.id.Identity;
-import org.neuclear.id.NSTools;
-import org.neuclear.id.builders.NamedObjectBuilder;
 import org.neuclear.xml.xmlsec.SignedElement;
 
 /*
@@ -32,8 +29,13 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: TransferOrderBuilder.java,v 1.1 2004/01/11 00:39:06 pelle Exp $
+$Id: TransferOrderBuilder.java,v 1.2 2004/01/12 22:39:14 pelle Exp $
 $Log: TransferOrderBuilder.java,v $
+Revision 1.2  2004/01/12 22:39:14  pelle
+Completed all the builders and contracts.
+Added a new abstract Value class to contain either an amount or a list of serial numbers.
+Now ready to finish off the AssetControllers.
+
 Revision 1.1  2004/01/11 00:39:06  pelle
 Cleaned up the schemas even more they now all verifiy.
 The Order/Receipt pairs for neuclear pay, should now work. They all have Readers using the latest
@@ -122,9 +124,9 @@ TransferReceiptBuilder has been created for use by Transfer processors. It is us
  * Time: 3:13:27 PM
  */
 public class TransferOrderBuilder extends SignedElement {
-    protected TransferOrderBuilder(final Asset asset, final Identity recipient, final double amount, final String comment) throws InvalidTransferException, NegativeTransferException, NeuClearException {
+    protected TransferOrderBuilder(final Asset asset, final Identity recipient, final Value amount, final String comment) throws InvalidTransferException, NegativeTransferException, NeuClearException {
         super(TransferGlobals.createQName(TransferGlobals.XFER_TAGNAME));
-        if (amount < 0)
+        if (amount.getAmount() < 0)
             throw new NegativeTransferException(amount);
         if (asset==null)
             throw new InvalidTransferException("assetName");
@@ -134,7 +136,7 @@ public class TransferOrderBuilder extends SignedElement {
         final Element element = getElement();
         element.add(TransferGlobals.createElement(TransferGlobals.RECIPIENT_TAG, recipient.getName()));
         element.add(TransferGlobals.createElement(TransferGlobals.ASSET_TAG, asset.getName()));
-        element.add(TransferGlobals.createElement(TransferGlobals.AMOUNT_TAG,Double.toString(amount)));
+        element.add(TransferGlobals.createValueTag(amount));
 
         if (!Utility.isEmpty(comment))
             element.add(TransferGlobals.createElement(TransferGlobals.COMMENT_TAG, comment));

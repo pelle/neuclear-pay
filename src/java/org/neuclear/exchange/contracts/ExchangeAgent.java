@@ -23,8 +23,13 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: ExchangeAgent.java,v 1.1 2004/01/05 23:47:10 pelle Exp $
+$Id: ExchangeAgent.java,v 1.2 2004/01/12 22:39:14 pelle Exp $
 $Log: ExchangeAgent.java,v $
+Revision 1.2  2004/01/12 22:39:14  pelle
+Completed all the builders and contracts.
+Added a new abstract Value class to contain either an amount or a list of serial numbers.
+Now ready to finish off the AssetControllers.
+
 Revision 1.1  2004/01/05 23:47:10  pelle
 Create new Document classification "order", which is really just inherint in the new
 package layout.
@@ -38,8 +43,8 @@ Got rid of much of the inheritance that was lying around and thought a bit furth
  * Time: 11:04:32 PM
  */
 public class ExchangeAgent extends Identity{
-    public ExchangeAgent(SignedNamedCore core, String repository, String signer, String logger, String receiver, PublicKey pub) {
-        super(core, repository, signer, logger, receiver, pub);
+    public ExchangeAgent(SignedNamedCore core, PublicKey pub) {
+        super(core, pub);
     }
 
 }

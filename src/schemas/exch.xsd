@@ -1,7 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-$Id: exch.xsd,v 1.4 2004/01/11 00:39:06 pelle Exp $
+$Id: exch.xsd,v 1.5 2004/01/12 22:39:15 pelle Exp $
 $Log: exch.xsd,v $
+Revision 1.5  2004/01/12 22:39:15  pelle
+Completed all the builders and contracts.
+Added a new abstract Value class to contain either an amount or a list of serial numbers.
+Now ready to finish off the AssetControllers.
+
 Revision 1.4  2004/01/11 00:39:06  pelle
 Cleaned up the schemas even more they now all verifiy.
 The Order/Receipt pairs for neuclear pay, should now work. They all have Readers using the latest
@@ -88,8 +93,8 @@ the xfer and exch schemas.
     <xs:element name="ExchangeCompletionOrder" nillable="false">
         <xs:complexType>
             <xs:sequence>
-                <xs:element ref="xfer:Value" minOccurs="1" maxOccurs="1"/>
                 <xs:element ref="ExchangeTime" minOccurs="1" maxOccurs="1"/>
+                <xs:element ref="xfer:Value" minOccurs="1" maxOccurs="1"/>
                 <xs:element ref="ExchangeOrderReceipt" minOccurs="1" maxOccurs="1"/>
                 <xs:element ref="xfer:Comment"  minOccurs="0" maxOccurs="1" />
                 <xs:group ref="id:SignedObjectGroup" minOccurs="0" maxOccurs="1"/>
@@ -100,7 +105,6 @@ the xfer and exch schemas.
     <xs:element name="ExchangeOrderReceipt" nillable="false">
         <xs:complexType>
             <xs:sequence>
-                <xs:element ref="xfer:Value" minOccurs="0" maxOccurs="1"/>
                 <xs:element ref="xfer:ValueTime"  minOccurs="1" maxOccurs="1" />
                 <xs:element ref="ExchangeOrder" minOccurs="1" maxOccurs="1"/>
                 <xs:group ref="id:SignedObjectGroup" minOccurs="0" maxOccurs="1"/>
