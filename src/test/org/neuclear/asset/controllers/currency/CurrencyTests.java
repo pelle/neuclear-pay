@@ -27,6 +27,7 @@ import org.neuclear.ledger.LowlevelLedgerException;
 import org.neuclear.ledger.simple.SimpleLedger;
 import org.neuclear.tests.AbstractSigningTest;
 
+import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.util.Date;
 
@@ -36,19 +37,44 @@ import java.util.Date;
  * Time: 6:05:04 PM
  */
 public class CurrencyTests extends AbstractSigningTest {
-    public CurrencyTests(final String s) throws GeneralSecurityException, LowlevelLedgerException, NeuClearException {
-        this(s, new SimpleLedger("asset"), new SimpleLedger("test"));
-    }
 
-    public CurrencyTests(final String s, final Ledger assetLedger, final Ledger auditLedger) throws LowlevelLedgerException, GeneralSecurityException, NeuClearException {
+    public CurrencyTests(final String s) throws LowlevelLedgerException, GeneralSecurityException, NeuClearException {
         super(s);
         asset = createTestAsset();
         shoes = createShoeAsset();
         agent = createTestExchangeAgent();
-        ledger = assetLedger;
+    }
+
+    /**
+     * Sets up the fixture, for example, open a network connection.
+     * This method is called before a test is executed.
+     */
+    protected void setUp() throws Exception {
+        ledger = createControllerLedger();
+        auditLedger = createAuditLedger();
         proc = new CurrencyController(ledger, asset, getSigner(), "neu://test/bux");
-        this.auditLedger = auditLedger;
         auditor = new Auditor(asset, auditLedger);
+    }
+
+    protected Ledger createControllerLedger() throws IOException, ClassNotFoundException, LowlevelLedgerException {
+        return new SimpleLedger("asset");
+    }
+
+    protected Ledger createAuditLedger() {
+        return new SimpleLedger("audit");
+    }
+
+    /**
+     * Tears down the fixture, for example, close a network connection.
+     * This method is called after a test is executed.
+     */
+    protected void tearDown() throws Exception {
+        proc = null;
+        auditor = null;
+        ledger.close();
+        auditLedger.close();
+        ledger = null;
+        auditLedger = null;
     }
 
     public void testTransfer() throws InvalidTransferException, NeuClearException, InvalidTransactionException, LowlevelLedgerException {

@@ -1,9 +1,9 @@
 package org.neuclear.asset.controllers.currency;
 
 import org.neuclear.commons.NeuClearException;
+import org.neuclear.ledger.Ledger;
 import org.neuclear.ledger.LowlevelLedgerException;
-import org.neuclear.ledger.prevalent.PrevalentLedger;
-import org.neuclear.ledger.simple.SimpleLedger;
+import org.neuclear.ledger.hibernate.HibernateLedger;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
@@ -26,10 +26,13 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: PersistentCurrencyTests.java,v 1.1 2004/04/06 23:01:01 pelle Exp $
-$Log: PersistentCurrencyTests.java,v $
+$Id: HibernateCurrencyTests.java,v 1.1 2004/04/12 15:27:52 pelle Exp $
+$Log: HibernateCurrencyTests.java,v $
+Revision 1.1  2004/04/12 15:27:52  pelle
+Added Hibernate and Prevalent tests for Currency Controllers
+
 Revision 1.1  2004/04/06 23:01:01  pelle
-Create new PersistentCurrencyTests TestCase for doing integration testing with various persistent ledgers.
+Create new PrevalentCurrencyTests TestCase for doing integration testing with various persistent ledgers.
 
 */
 
@@ -38,9 +41,15 @@ Create new PersistentCurrencyTests TestCase for doing integration testing with v
  * Date: Apr 6, 2004
  * Time: 8:11:02 PM
  */
-public class PersistentCurrencyTests extends CurrencyTests {
+public class HibernateCurrencyTests extends CurrencyTests {
 
-    public PersistentCurrencyTests(String s) throws GeneralSecurityException, LowlevelLedgerException, NeuClearException, IOException, ClassNotFoundException {
-        super(s, new PrevalentLedger("asset", "target/test-data/pl"), new SimpleLedger("audit"));
+    public HibernateCurrencyTests(String s) throws GeneralSecurityException, LowlevelLedgerException, NeuClearException, IOException, ClassNotFoundException {
+        super(s);
     }
+
+    protected Ledger createControllerLedger() throws IOException, ClassNotFoundException, LowlevelLedgerException {
+        return new HibernateLedger("test");
+    }
+
+
 }
