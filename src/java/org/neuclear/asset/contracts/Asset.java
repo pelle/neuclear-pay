@@ -2,6 +2,8 @@ package org.neuclear.asset.contracts;
 
 import org.dom4j.Attribute;
 import org.dom4j.Element;
+import org.neuclear.asset.fees.FeeStructure;
+import org.neuclear.asset.fees.FeeStructureReader;
 import org.neuclear.commons.Utility;
 import org.neuclear.id.*;
 import org.neuclear.id.targets.Targets;
@@ -31,8 +33,11 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: Asset.java,v 1.21 2004/06/19 21:20:03 pelle Exp $
+$Id: Asset.java,v 1.22 2004/09/06 22:24:24 pelle Exp $
 $Log: Asset.java,v $
+Revision 1.22  2004/09/06 22:24:24  pelle
+Added a package for calculating fees. This has been integrated into the Asset contract.
+
 Revision 1.21  2004/06/19 21:20:03  pelle
 Added TransferOrderServlet which is fully localized to Spanish and English
 Asset now has a getFormatter() method which returns a localized currency formatter for amounts of Asset.
@@ -146,17 +151,18 @@ SOAPTools was changed to return a stream. This is required by the VerifyingReade
  * <tt>(Asset)NSResolver.resolveIdentity("neu://assetname");</tt><p>
  * To create your own assets use AssetBuilder sign it using a valid NeuClear signer and post its description
  * to your default online repository. Then anyone can access your Assets through the above interface.
- * 
+ *
  * @see org.neuclear.asset.contracts.builders.AssetBuilder
  */
 public final class Asset extends Service {
-    protected Asset(final SignedNamedCore core, final String nickname, final String original, final String serviceUrl, final PublicKey servicekey, final PublicKey issuerKey, final Targets targets, final int decimal, final double minimumTransaction, final String units) {
+    protected Asset(final SignedNamedCore core, final String nickname, final String original, final String serviceUrl, final PublicKey servicekey, final PublicKey issuerKey, final Targets targets, final int decimal, final double minimumTransaction, final String units, final FeeStructure fees) {
         super(core, nickname, original, serviceUrl, servicekey, targets);
         this.issuer = new Signatory(issuerKey);
         this.decimal = decimal;
         this.multiplier = (int) Math.round(Math.pow(10, -decimal));
         this.minimumTransaction = minimumTransaction;
         this.units = units;
+        this.fees = fees;
     }
 
 /*
@@ -172,9 +178,9 @@ public final class Asset extends Service {
 
     /**
      * Checks if an amount is valid within the boundaries of the assetName.
-     * 
-     * @param amount 
-     * @return 
+     *
+     * @param amount
+     * @return
      */
     public final boolean isValidAmount(final double amount) {
         return amount >= minimumTransaction;
@@ -182,9 +188,9 @@ public final class Asset extends Service {
 
     /**
      * Rounds a given value to fit within the valid numbers of the
-     * 
-     * @param amount 
-     * @return 
+     *
+     * @param amount
+     * @return
      */
     public final double round(final double amount) {
         if (amount < minimumTransaction)
@@ -232,12 +238,16 @@ public final class Asset extends Service {
         return format;
     }
 
+    public FeeStructure getFeeStructure() {
+        return fees;
+    }
+
     public static final class Reader implements NamedObjectReader {
         /**
          * Read object from Element and fill in its details
-         * 
-         * @param elem 
-         * @return 
+         *
+         * @param elem
+         * @return
          */
         public final SignedNamedObject read(final SignedNamedCore core, final Element elem) throws InvalidNamedObjectException {
             final Element issuerElement = InvalidNamedObjectException.assertContainsElementId(core, elem, "asset.issuer.publickey");
@@ -255,7 +265,8 @@ public final class Asset extends Service {
                 final String original = extractOrginalUrl(elem);
                 final Element unitselem = XMLTools.getByID(elem, "asset.units");
                 final String units = (unitselem == null) ? "units" : unitselem.getTextTrim();
-                return new Asset(core, nickname, original, url.getValue(), sPub, iPub, targets, decimal, minimum, units);
+                final FeeStructure fees = FeeStructureReader.readFeeStructure(units, elem);
+                return new Asset(core, nickname, original, url.getValue(), sPub, iPub, targets, decimal, minimum, units, fees);
             } catch (XMLSecurityException e) {
                 throw new InvalidNamedObjectException("invalid asset xml");
             }
@@ -285,4 +296,5 @@ public final class Asset extends Service {
     private final int multiplier;
     private final double minimumTransaction;
     private final String units;
+    private final FeeStructure fees;
 }

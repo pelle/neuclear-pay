@@ -2,6 +2,8 @@ package org.neuclear.asset.contracts.builders;
 
 import org.neuclear.asset.contracts.Asset;
 import org.neuclear.asset.contracts.AssetGlobals;
+import org.neuclear.asset.fees.FeeStructureBuilder;
+import org.neuclear.asset.fees.MinimumFeeStructure;
 import org.neuclear.commons.NeuClearException;
 import org.neuclear.id.SignedNamedObject;
 import org.neuclear.id.builders.Builder;
@@ -10,8 +12,11 @@ import org.neuclear.tests.AbstractObjectCreationTest;
 import java.security.GeneralSecurityException;
 
 /*
-$Id: AssetBuilderTest.java,v 1.5 2004/05/01 00:23:12 pelle Exp $
+$Id: AssetBuilderTest.java,v 1.6 2004/09/06 22:24:24 pelle Exp $
 $Log: AssetBuilderTest.java,v $
+Revision 1.6  2004/09/06 22:24:24  pelle
+Added a package for calculating fees. This has been integrated into the Asset contract.
+
 Revision 1.5  2004/05/01 00:23:12  pelle
 Added Ledger field to Transaction as well as to getBalance() and friends.
 
@@ -55,6 +60,7 @@ public class AssetBuilderTest extends AbstractObjectCreationTest {
         assertEquals(getAlice().getName(), asset.getIssuer().getName());
         assertEquals(DECIMAL, asset.getDecimal());
         assertEquals(MINIMUM, asset.getMinimumTransaction(), 0);
+        assertEquals(MinimumFeeStructure.class, asset.getFeeStructure().getClass());
     }
 
     protected Class getRequiredClass() {
@@ -62,10 +68,12 @@ public class AssetBuilderTest extends AbstractObjectCreationTest {
     }
 
     protected Builder createBuilder() throws Exception {
-        return new AssetBuilder("bux", "http://bux.neuclear.org/bux.html", "http://bux.neuclear.org/Asset",
+        AssetBuilder assetBuilder = new AssetBuilder("bux", "http://bux.neuclear.org/bux.html", "http://bux.neuclear.org/Asset",
                 getSigner().getPublicKey("bux"),
                 getAlice().getPublicKey(),
                 DECIMAL, MINIMUM, "bux");
+        assetBuilder.addFeeStructure(new FeeStructureBuilder("bux", 0.1, 0.01));
+        return assetBuilder;
     }
 
     private static final String URL = "http://bux.neuclear.org/Asset";

@@ -1,6 +1,7 @@
 package org.neuclear.asset.contracts.builders;
 
 import org.neuclear.asset.contracts.AssetGlobals;
+import org.neuclear.asset.fees.FeeStructureBuilder;
 import org.neuclear.commons.NeuClearException;
 import org.neuclear.commons.crypto.signers.JCESigner;
 import org.neuclear.commons.crypto.signers.TestCaseSigner;
@@ -33,8 +34,11 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: AssetBuilder.java,v 1.19 2004/04/27 15:24:54 pelle Exp $
+$Id: AssetBuilder.java,v 1.20 2004/09/06 22:24:23 pelle Exp $
 $Log: AssetBuilder.java,v $
+Revision 1.20  2004/09/06 22:24:23  pelle
+Added a package for calculating fees. This has been integrated into the Asset contract.
+
 Revision 1.19  2004/04/27 15:24:54  pelle
 Due to a new API change in 0.5 I have changed the name of Ledger and it's implementers to LedgerController.
 
@@ -175,6 +179,10 @@ public final class AssetBuilder extends ServiceBuilder {
 
     }
 
+    public void addFeeStructure(FeeStructureBuilder feeBuilder) {
+        fees.add(feeBuilder.getElement());
+    }
+
     public static void main(final String[] args) {
         try {
             final JCESigner signer = new TestCaseSigner();
@@ -191,7 +199,7 @@ public final class AssetBuilder extends ServiceBuilder {
             assetraw.getDescription().setText("NeuClear Test Currency of no value.");
             assetraw.getRules().setText("You know the rules, there are no rules!!! No, really this is for testing purposes only. There" +
                     "are no implied rights or promises involved in this asset.");
-
+            assetraw.addFeeStructure(new FeeStructureBuilder("Bux", 0.1, 0.01));
             assetraw.sign("ivan", signer);
             File out = new File("src/webapp/bux.html");
             out.getParentFile().mkdirs();
