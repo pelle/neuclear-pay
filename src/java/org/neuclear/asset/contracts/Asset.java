@@ -1,10 +1,11 @@
 package org.neuclear.asset.contracts;
 
+import org.dom4j.Attribute;
 import org.dom4j.Element;
 import org.neuclear.commons.Utility;
 import org.neuclear.id.*;
 import org.neuclear.id.targets.Targets;
-import org.neuclear.xml.xmlsec.XMLSecTools;
+import org.neuclear.xml.XMLTools;
 import org.neuclear.xml.xmlsec.XMLSecurityException;
 
 import java.security.PublicKey;
@@ -27,8 +28,11 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: Asset.java,v 1.17 2004/04/05 16:31:40 pelle Exp $
+$Id: Asset.java,v 1.18 2004/04/18 01:06:06 pelle Exp $
 $Log: Asset.java,v $
+Revision 1.18  2004/04/18 01:06:06  pelle
+Asset now parses the xhtml file for its details.
+
 Revision 1.17  2004/04/05 16:31:40  pelle
 Created new ServiceBuilder class for creating services. A service is an identity that has a seperate service URL and Service Public Key.
 
@@ -200,20 +204,18 @@ public final class Asset extends Service {
          * @return 
          */
         public final SignedNamedObject read(final SignedNamedCore core, final Element elem) throws InvalidNamedObjectException {
-            if (!elem.getNamespace().equals(AssetGlobals.NS_ASSET))
-                throw new InvalidNamedObjectException(core.getName(), "Not in XML NameSpace: " + AssetGlobals.NS_ASSET.getURI());
-            final Element issuerElement = InvalidNamedObjectException.assertContainsElementQName(core, elem, AssetGlobals.createQName("Issuer"));
-            final Element serviceElement = InvalidNamedObjectException.assertContainsElementQName(core, elem, SignedNamedObject.createNEUIDQName("Service"));
-            final Element serviceKeyElement = InvalidNamedObjectException.assertContainsElementQName(core, serviceElement, XMLSecTools.createQName("KeyInfo"));
-            final Element serviceUrlElement = InvalidNamedObjectException.assertContainsElementQName(core, serviceElement, SignedNamedObject.createNEUIDQName("Url"));
+            final Element issuerElement = InvalidNamedObjectException.assertContainsElementId(core, elem, "asset.issuer.publickey");
+            final Element serviceKeyElement = InvalidNamedObjectException.assertContainsElementId(core, elem, "controller.publickey");
+            final Attribute url = (Attribute) elem.selectSingleNode("//html/head/link[starts-with(@rel,'neu:controller')]/@href");
+            if (url == null || url.getValue() == null)
+                throw new InvalidNamedObjectException(core.getName(), "Asset didnt contain a controller");
             try {
                 final PublicKey sPub = extractPublicKey(serviceKeyElement);
-                final String serviceurl = serviceUrlElement.getTextTrim();
-                final PublicKey iPub = extractPublicKey(InvalidNamedObjectException.assertContainsElementQName(issuerElement, XMLSecTools.createQName("KeyInfo")));
+                final PublicKey iPub = extractPublicKey(issuerElement);
                 final int decimal = extractDecimalPoints(elem);
                 final double minimum = extractMinimumTransactionAmount(elem);
                 final Targets targets = Targets.parseList(elem);
-                return new Asset(core, serviceurl, sPub, iPub, targets, decimal, minimum);
+                return new Asset(core, url.getValue(), sPub, iPub, targets, decimal, minimum);
             } catch (XMLSecurityException e) {
                 throw new InvalidNamedObjectException("invalid asset xml");
             }
@@ -223,7 +225,7 @@ public final class Asset extends Service {
     }
 
     private static double extractMinimumTransactionAmount(Element elem) {
-        Element melem = elem.element(AssetGlobals.createQName(AssetGlobals.MINIMUM_TAGNAME));
+        Element melem = XMLTools.getByID(elem, "asset.minimum");
         if (melem == null || Utility.isEmpty(melem.getTextTrim()))
             return 0.0;
         return Double.parseDouble(melem.getTextTrim());
@@ -231,7 +233,7 @@ public final class Asset extends Service {
     }
 
     private static int extractDecimalPoints(Element elem) {
-        Element melem = elem.element(AssetGlobals.createQName(AssetGlobals.DECIMAL_POINT_TAGNAME));
+        Element melem = XMLTools.getByID(elem, "asset.decimalpoints");
         if (melem == null || Utility.isEmpty(melem.getTextTrim()))
             return 0;
         return Integer.parseInt(melem.getTextTrim());

@@ -1,6 +1,7 @@
 package org.neuclear.asset.contracts.builders;
 
 import org.neuclear.asset.contracts.Asset;
+import org.neuclear.asset.contracts.AssetGlobals;
 import org.neuclear.commons.NeuClearException;
 import org.neuclear.id.SignedNamedObject;
 import org.neuclear.id.builders.Builder;
@@ -9,8 +10,11 @@ import org.neuclear.tests.AbstractObjectCreationTest;
 import java.security.GeneralSecurityException;
 
 /*
-$Id: AssetBuilderTest.java,v 1.2 2004/04/17 19:28:00 pelle Exp $
+$Id: AssetBuilderTest.java,v 1.3 2004/04/18 01:06:06 pelle Exp $
 $Log: AssetBuilderTest.java,v $
+Revision 1.3  2004/04/18 01:06:06  pelle
+Asset now parses the xhtml file for its details.
+
 Revision 1.2  2004/04/17 19:28:00  pelle
 Identity is now fully html based as is the ServiceBuilder.
 VerifyingReader correctly identifies html files and parses them as such.
@@ -32,12 +36,13 @@ It now has Issuer, Service etc.
 public class AssetBuilderTest extends AbstractObjectCreationTest {
     public AssetBuilderTest(String string) throws NeuClearException, GeneralSecurityException {
         super(string);
+        AssetGlobals.registerReaders();
     }
 
     protected void verifyObject(SignedNamedObject obj) throws Exception {
         Asset asset = (Asset) obj;
         assertNotNull(asset.getServiceKey());
-        assertEqualPublicKeys(getSigner().getPublicKey("neu://test/bux"), asset.getServiceKey());
+        assertEqualPublicKeys(getSigner().getPublicKey("bux"), asset.getServiceKey());
         assertNotNull(asset.getServiceUrl());
         assertEquals(URL, asset.getServiceUrl());
         assertNotNull(asset.getIssuerKey());
@@ -51,7 +56,7 @@ public class AssetBuilderTest extends AbstractObjectCreationTest {
     }
 
     protected Builder createBuilder() throws Exception {
-        return new AssetBuilder(URL, "bux",
+        return new AssetBuilder("bux", URL,
                 getSigner().getPublicKey("bux"),
                 getAlice().getPublicKey(),
                 DECIMAL, MINIMUM);

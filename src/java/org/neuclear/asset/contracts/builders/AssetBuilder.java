@@ -4,10 +4,15 @@ import org.neuclear.asset.contracts.AssetGlobals;
 import org.neuclear.commons.NeuClearException;
 import org.neuclear.commons.crypto.signers.JCESigner;
 import org.neuclear.commons.crypto.signers.TestCaseSigner;
+import org.neuclear.id.Service;
 import org.neuclear.id.builders.ServiceBuilder;
+import org.neuclear.id.verifier.VerifyingReader;
 import org.neuclear.xml.XMLTools;
 
+import java.io.BufferedInputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
 import java.security.PublicKey;
 
 /*
@@ -28,8 +33,11 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: AssetBuilder.java,v 1.12 2004/04/17 19:27:59 pelle Exp $
+$Id: AssetBuilder.java,v 1.13 2004/04/18 01:06:05 pelle Exp $
 $Log: AssetBuilder.java,v $
+Revision 1.13  2004/04/18 01:06:05  pelle
+Asset now parses the xhtml file for its details.
+
 Revision 1.12  2004/04/17 19:27:59  pelle
 Identity is now fully html based as is the ServiceBuilder.
 VerifyingReader correctly identifies html files and parses them as such.
@@ -143,6 +151,8 @@ public final class AssetBuilder extends ServiceBuilder {
         try {
             final JCESigner signer = new TestCaseSigner();
 
+            AssetGlobals.registerReaders();
+
             final AssetBuilder assetraw = new AssetBuilder("Bux",
                     "http://bux.neuclear.org",
                     signer.getPublicKey("neu://test/bux"),
@@ -155,7 +165,8 @@ public final class AssetBuilder extends ServiceBuilder {
             File out = new File("target/testdata/assets/bux.html");
             out.getParentFile().mkdirs();
             XMLTools.writeFile(out, assetraw.getElement());
-//            final Service asset = (Service) assetraw.convert("neu://bob@test", signer);
+            final InputStream is = new BufferedInputStream(new FileInputStream(out));
+            final Service asset = (Service) VerifyingReader.getInstance().read(is);
 
 
         } catch (Exception e) {
