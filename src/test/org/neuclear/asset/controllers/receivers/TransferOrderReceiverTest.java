@@ -21,8 +21,11 @@ import java.security.GeneralSecurityException;
 import java.security.PublicKey;
 
 /*
-$Id: TransferOrderReceiverTest.java,v 1.3 2004/09/08 17:41:11 pelle Exp $
+$Id: TransferOrderReceiverTest.java,v 1.4 2004/09/08 20:08:00 pelle Exp $
 $Log: TransferOrderReceiverTest.java,v $
+Revision 1.4  2004/09/08 20:08:00  pelle
+Added support for fees to TransferOrderReceiver
+
 Revision 1.3  2004/09/08 17:41:11  pelle
 Changed these tests to use the SimpleLedgerController from the HibernateLedgerController.
 

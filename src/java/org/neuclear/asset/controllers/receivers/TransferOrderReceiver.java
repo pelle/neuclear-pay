@@ -2,6 +2,7 @@ package org.neuclear.asset.controllers.receivers;
 
 import org.neuclear.asset.InvalidTransferException;
 import org.neuclear.asset.NegativeTransferException;
+import org.neuclear.asset.contracts.Asset;
 import org.neuclear.asset.orders.TransferOrder;
 import org.neuclear.asset.orders.TransferReceipt;
 import org.neuclear.asset.orders.builders.TransferReceiptBuilder;
@@ -13,8 +14,11 @@ import org.neuclear.id.receiver.UnsupportedTransaction;
 import org.neuclear.ledger.*;
 
 /*
-$Id: TransferOrderReceiver.java,v 1.2 2004/07/22 21:48:42 pelle Exp $
+$Id: TransferOrderReceiver.java,v 1.3 2004/09/08 20:07:43 pelle Exp $
 $Log: TransferOrderReceiver.java,v $
+Revision 1.3  2004/09/08 20:07:43  pelle
+Added support for fees to TransferOrderReceiver
+
 Revision 1.2  2004/07/22 21:48:42  pelle
 Further receivers and unit tests for for Exchanges etc.
 I've also changed the internal asset to ledger id from being the pk of the contract signer, to being the pk of the service key.
@@ -37,12 +41,21 @@ public class TransferOrderReceiver extends SigningLedgerReceiver implements Hand
     public SignedNamedObject receive(SignedNamedObject obj) throws UnsupportedTransaction, NeuClearException {
         try {
             TransferOrder order = (TransferOrder) obj;
-            String name = order.getAsset().getServiceId();
+            Asset asset = order.getAsset();
+            String name = asset.getServiceId();
+            double amount = order.getAmount().getAmount();
+            UnPostedTransaction transaction = new UnPostedTransaction(name, order.getDigest(), order.getComment());
+            double fee = asset.getFeeStructure().calculateFee(amount);
+            transaction.addItem(ledger.getBook(order.getSignatory().getName()), -amount);
+            if (fee > 0) {
+                amount = -transaction.addItem(ledger.getBook(asset.getFeeAccount().getName()), fee);
+            }
+            transaction.addItem(ledger.getBook(order.getRecipient()), amount);
             if (!signer.canSignFor(name)) {
-                ledger.transfer(name, order.getDigest(), order.getSignatory().getName(), order.getRecipient(), order.getAmount().getAmount(), order.getComment());
+                ledger.performTransaction(transaction);
                 return null;
             } else {
-                final PostedTransaction posted = ledger.verifiedTransfer(name, order.getDigest(), order.getSignatory().getName(), order.getRecipient(), order.getAmount().getAmount(), order.getComment());
+                final PostedTransaction posted = ledger.performVerifiedTransfer(transaction);
                 final TransferReceipt receipt = (TransferReceipt) new TransferReceiptBuilder(order, posted.getTransactionTime()).convert(name, signer);
                 ledger.setReceiptId(order.getDigest(), receipt.getDigest());
                 receipt.log();

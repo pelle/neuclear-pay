@@ -1,4 +1,8 @@
-package org.neuclear.asset.fees;
+package org.neuclear.asset;
+
+import org.neuclear.asset.contracts.Asset;
+import org.neuclear.ledger.LedgerController;
+import org.neuclear.ledger.PostedTransaction;
 
 /*
  *  The NeuClear Project and it's libraries are
@@ -20,26 +24,16 @@ package org.neuclear.asset.fees;
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-
 /**
  * User: pelleb
- * Date: Sep 6, 2004
- * Time: 2:37:50 PM
+ * Date: Sep 8, 2004
+ * Time: 1:05:51 PM
  */
-public class FixedRateFeeStructureTest extends AbstractFeeStructureTest {
-    public static final double RATE = 0.01;
-
-    public FixedRateFeeStructureTest(String s) {
-        super(s);
+public class AssetLedgerHelper {
+    public static final PostedTransaction runTransaction(final LedgerController ledger, Asset asset) {
+        return null;
     }
 
-    protected FeeStructure createFeeStructure() {
-        return new FixedRateFeeStructure(RATE);
-    }
-
-    public void testFeeStructure() {
-        for (double i = 0; i < 100; i += 0.01) {
-            assertFee(i, i * RATE);
-        }
+    private AssetLedgerHelper() {
     }
 }

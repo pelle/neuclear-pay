@@ -27,23 +27,26 @@ package org.neuclear.asset.fees;
  * Time: 2:37:50 PM
  */
 public class CappedFeeStructureTest extends AbstractFeeStructureTest {
+    public static final double RATE = 0.01;
+    public static final double MIN = 0.10;
+    public static final int MAX = 1;
 
     public CappedFeeStructureTest(String s) {
         super(s);
     }
 
     protected FeeStructure createFeeStructure() {
-        return new CappedFeeStructure(0.10, 5, 0.01);
+        return new CappedFeeStructure(MIN, MAX, RATE);
     }
 
     public void testFeeStructure() {
-        assertFee(0, 0.1);
-        assertFee(1, 0.1);
-        assertFee(9, 0.1);
-        assertFee(10, 0.1);
-        assertFee(11, 0.11);
-        assertFee(-10, 0.1);
-        assertFee(100, 1);
-        assertFee(999, 5);
+        for (double i = 0; i < 1000; i += 0.01) {
+            if (i < 10)
+                assertFee(i, MIN);
+            else if (i >= 100)
+                assertFee(i, MAX);
+            else
+                assertFee(i, i * RATE);
+        }
     }
 }

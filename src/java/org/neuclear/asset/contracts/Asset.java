@@ -33,8 +33,11 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: Asset.java,v 1.23 2004/09/07 18:47:34 pelle Exp $
+$Id: Asset.java,v 1.24 2004/09/08 20:07:42 pelle Exp $
 $Log: Asset.java,v $
+Revision 1.24  2004/09/08 20:07:42  pelle
+Added support for fees to TransferOrderReceiver
+
 Revision 1.23  2004/09/07 18:47:34  pelle
 Added support for dom4j 1.5 and added a new XPP3Reader
 
@@ -166,7 +169,7 @@ public final class Asset extends Service {
         this.minimumTransaction = minimumTransaction;
         this.units = units;
         this.fees = fees;
-        this.feeAccount = feePub != null ? new Signatory(feePub) : null;
+        this.feeAccount = feePub != null ? new Signatory(feePub) : core.getSignatory();
     }
 
 /*

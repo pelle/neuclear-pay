@@ -4,7 +4,9 @@ import org.neuclear.asset.contracts.Asset;
 import org.neuclear.asset.contracts.AssetGlobals;
 import org.neuclear.asset.fees.FeeStructureBuilder;
 import org.neuclear.asset.fees.MinimumFeeStructure;
+import org.neuclear.asset.fees.ZeroFeeStructure;
 import org.neuclear.commons.NeuClearException;
+import org.neuclear.id.Signatory;
 import org.neuclear.id.SignedNamedObject;
 import org.neuclear.id.builders.Builder;
 import org.neuclear.tests.AbstractObjectCreationTest;
@@ -12,8 +14,11 @@ import org.neuclear.tests.AbstractObjectCreationTest;
 import java.security.GeneralSecurityException;
 
 /*
-$Id: AssetBuilderTest.java,v 1.6 2004/09/06 22:24:24 pelle Exp $
+$Id: AssetBuilderTest.java,v 1.7 2004/09/08 20:08:00 pelle Exp $
 $Log: AssetBuilderTest.java,v $
+Revision 1.7  2004/09/08 20:08:00  pelle
+Added support for fees to TransferOrderReceiver
+
 Revision 1.6  2004/09/06 22:24:24  pelle
 Added a package for calculating fees. This has been integrated into the Asset contract.
 
@@ -74,6 +79,42 @@ public class AssetBuilderTest extends AbstractObjectCreationTest {
                 DECIMAL, MINIMUM, "bux");
         assetBuilder.addFeeStructure(new FeeStructureBuilder("bux", 0.1, 0.01));
         return assetBuilder;
+    }
+
+    public void testAssetWithOutFeesAndWithoutFeesAccount() throws Exception {
+        AssetBuilder assetBuilder = new AssetBuilder("bux", "http://bux.neuclear.org/bux.html", "http://bux.neuclear.org/Asset",
+                getSigner().getPublicKey("bux"),
+                getAlice().getPublicKey(),
+                DECIMAL, MINIMUM, "bux");
+        Asset asset = (Asset) assetBuilder.convert("eve", signer);
+        assertNotNull(asset.getFeeStructure());
+        assertEquals(ZeroFeeStructure.class, asset.getFeeStructure().getClass());
+        assertEquals(asset.getSignatory(), asset.getFeeAccount());
+    }
+
+    public void testAssetWithFeesAndWithoutFeesAccount() throws Exception {
+        AssetBuilder assetBuilder = new AssetBuilder("bux", "http://bux.neuclear.org/bux.html", "http://bux.neuclear.org/Asset",
+                getSigner().getPublicKey("bux"),
+                getAlice().getPublicKey(),
+                DECIMAL, MINIMUM, "bux");
+        assetBuilder.addFeeStructure(new FeeStructureBuilder("bux", 0.1, 0.01));
+        Asset asset = (Asset) assetBuilder.convert("eve", signer);
+        assertNotNull(asset.getFeeStructure());
+        assertEquals(MinimumFeeStructure.class, asset.getFeeStructure().getClass());
+        assertEquals(asset.getSignatory(), asset.getFeeAccount());
+    }
+
+    public void testAssetWithFeesAndWithFeesAccount() throws Exception {
+        AssetBuilder assetBuilder = new AssetBuilder("bux", "http://bux.neuclear.org/bux.html", "http://bux.neuclear.org/Asset",
+                getSigner().getPublicKey("bux"),
+                getAlice().getPublicKey(),
+                DECIMAL, MINIMUM, "bux");
+        assetBuilder.addFeeStructure(new FeeStructureBuilder("bux", 0.1, 0.01));
+        assetBuilder.addFeeAccount(signer.getPublicKey("bob"));
+        Asset asset = (Asset) assetBuilder.convert("eve", signer);
+        assertNotNull(asset.getFeeStructure());
+        assertEquals(MinimumFeeStructure.class, asset.getFeeStructure().getClass());
+        assertEquals(new Signatory(signer.getPublicKey("bob")), asset.getFeeAccount());
     }
 
     private static final String URL = "http://bux.neuclear.org/Asset";
