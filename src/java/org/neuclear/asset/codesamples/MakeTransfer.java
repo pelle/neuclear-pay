@@ -12,6 +12,7 @@ import org.neuclear.commons.NeuClearException;
 import org.neuclear.commons.crypto.passphraseagents.UserCancellationException;
 import org.neuclear.commons.crypto.passphraseagents.swing.SwingAgent;
 import org.neuclear.commons.crypto.signers.DefaultSigner;
+import org.neuclear.id.Identity;
 import org.neuclear.id.InvalidNamedObjectException;
 import org.neuclear.id.NameResolutionException;
 import org.neuclear.id.SignedNamedObject;
@@ -60,8 +61,8 @@ public class MakeTransfer {
         try {
             Asset asset = (Asset) Resolver.resolveIdentity(assetname);
             DefaultSigner signer = new DefaultSigner(new SwingAgent());
-
-            Builder builder = new TransferOrderBuilder(asset.getName(), payee, new Amount(amount), "transfer via commandline");
+            Identity payeeid = Resolver.resolveIdentity(payee);
+            Builder builder = new TransferOrderBuilder(asset, payeeid.getSignatory(), new Amount(amount), "transfer via commandline");
             SignedNamedObject obj = builder.convert(signer);
             TransferReceipt receipt = (TransferReceipt) asset.service(obj);
             System.out.println("Transfer Made, ID: " + receipt.getDigest());
