@@ -1,19 +1,17 @@
 package org.neuclear.asset.contracts.builders;
 
 import org.dom4j.Element;
-import org.neuclear.id.builders.NamedObjectBuilder;
-import org.neuclear.id.builders.IdentityBuilder;
-import org.neuclear.id.Identity;
-import org.neuclear.id.NSTools;
-import org.neuclear.asset.contracts.TransferGlobals;
 import org.neuclear.asset.contracts.Asset;
 import org.neuclear.asset.contracts.AssetGlobals;
-import org.neuclear.asset.NegativeTransferException;
-import org.neuclear.asset.InvalidTransferException;
-import org.neuclear.commons.time.TimeTools;
-import org.neuclear.commons.Utility;
+import org.neuclear.commons.NeuClearException;
+import org.neuclear.commons.crypto.signers.JCESigner;
+import org.neuclear.commons.crypto.signers.TestCaseSigner;
+import org.neuclear.id.builders.IdentityBuilder;
+import org.neuclear.store.FileStore;
+import org.neuclear.store.Store;
+import org.neuclear.xml.XMLException;
 
-import java.util.Date;
+import java.security.GeneralSecurityException;
 import java.security.PublicKey;
 
 /*
@@ -34,8 +32,14 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: AssetBuilder.java,v 1.2 2003/11/11 21:17:19 pelle Exp $
+$Id: AssetBuilder.java,v 1.3 2003/11/20 23:40:50 pelle Exp $
 $Log: AssetBuilder.java,v $
+Revision 1.3  2003/11/20 23:40:50  pelle
+Getting all the tests to work in id
+Removing usage of BC in CryptoTools as it was causing issues.
+First version of EntityLedger that will use OFB's EntityEngine. This will allow us to support a vast amount databases without
+writing SQL. (Yipee)
+
 Revision 1.2  2003/11/11 21:17:19  pelle
 Further vital reshuffling.
 org.neudist.crypto.* and org.neudist.utils.* have been moved to respective areas under org.neuclear.commons
@@ -79,25 +83,54 @@ TransferReceiptBuilder has been created for use by Transfer processors. It is us
  * Date: Oct 3, 2003
  * Time: 3:13:27 PM
  */
-public abstract class AssetBuilder extends IdentityBuilder {
+public class AssetBuilder extends IdentityBuilder {
     /**
      * Used to create new Assets
-     *
+     * 
      * @param name       The Name of Identity
      * @param allow      PublicKey allowed to sign in here
      * @param repository URL of Default Store for NameSpace. (Note. A NameSpace object is stored in the default repository of it's parent namespace)
      * @param signer     URL of default interactive signing service for namespace. If null it doesnt allow interactive signing
      * @param receiver   URL of default receiver for namespace
      * @param controller URL of AssetController This should be a http web url
-     * @param decimal The amount of decimal points.
-     * @param minimum Minimum transaction size
+     * @param decimal    The amount of decimal points.
+     * @param minimum    Minimum transaction size
      */
-    public AssetBuilder(String name, PublicKey allow, String repository, String signer, String logger, String receiver,String controller, int decimal, double minimum) {
+    public AssetBuilder(String name, PublicKey allow, String repository, String signer, String logger, String receiver, String controller, int decimal, double minimum) {
         super(AssetGlobals.createQName(AssetGlobals.ASSET_TAGNAME), name, allow, repository, signer, logger, receiver);
-        Element elem=getElement();
-        AssetGlobals.createAttribute(elem,"controller",controller);
-        AssetGlobals.createAttribute(elem,"decimalpoints",Integer.toString(decimal));
-        AssetGlobals.createAttribute(elem,"minimumxact",Double.toString(minimum));
+        Element elem = getElement();
+        AssetGlobals.createAttribute(elem, "controller", controller);
+        AssetGlobals.createAttribute(elem, "decimalpoints", Integer.toString(decimal));
+        AssetGlobals.createAttribute(elem, "minimumxact", Double.toString(minimum));
 
+    }
+
+    public static void main(String args[]) {
+        try {
+            JCESigner signer = new TestCaseSigner();
+            String assetname = "neu://test/bux";
+            if (args.length > 0)
+                assetname = args[0];
+
+            AssetBuilder assetraw = new AssetBuilder(assetname,
+                    signer.getPublicKey(assetname),
+                    "http://repository.neuclear.org/",
+                    "http://bux.neuclear.org:8080",
+                    "http://logger.neuclear.org",
+                    "http://bux.neuclear.org:8080",
+                    "http://bux.neuclear.org:8080",
+                    2,
+                    0.01
+            );
+            Asset asset = (Asset) assetraw.sign(signer);
+            Store store = new FileStore("target/testdata/assets");
+            store.receive(asset);
+        } catch (GeneralSecurityException e) {
+            e.printStackTrace();
+        } catch (NeuClearException e) {
+            e.printStackTrace();
+        } catch (XMLException e) {
+            e.printStackTrace();
+        }
     }
 }
