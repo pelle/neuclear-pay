@@ -1,6 +1,7 @@
 package org.neuclear.asset.orders.builders;
 
 import org.neuclear.asset.InvalidTransferException;
+import org.neuclear.asset.contracts.Asset;
 import org.neuclear.asset.contracts.AssetGlobals;
 import org.neuclear.asset.contracts.builders.AssetBuilder;
 import org.neuclear.asset.orders.Amount;
@@ -8,7 +9,6 @@ import org.neuclear.asset.orders.TransferGlobals;
 import org.neuclear.asset.orders.TransferOrder;
 import org.neuclear.commons.NeuClearException;
 import org.neuclear.commons.crypto.signers.NonExistingSignerException;
-import org.neuclear.id.Service;
 import org.neuclear.id.SignedNamedObject;
 import org.neuclear.id.builders.Builder;
 import org.neuclear.tests.AbstractObjectCreationTest;
@@ -34,8 +34,12 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: TransferOrderBuilderTest.java,v 1.10 2004/04/28 00:22:29 pelle Exp $
+$Id: TransferOrderBuilderTest.java,v 1.11 2004/05/24 18:31:32 pelle Exp $
 $Log: TransferOrderBuilderTest.java,v $
+Revision 1.11  2004/05/24 18:31:32  pelle
+Changed asset id in ledger to be asset.getSignatory().getName().
+Made SigningRequestServlet and SigningServlet a bit clearer.
+
 Revision 1.10  2004/04/28 00:22:29  pelle
 Fixed the strange verification error
 Added bunch of new unit tests to support this.
@@ -114,14 +118,14 @@ public class TransferOrderBuilderTest extends AbstractObjectCreationTest {
         return builder;
     }
 
-    public Service createTestAsset() throws NeuClearException {
+    public Asset createTestAsset() throws NeuClearException {
         AssetBuilder builder = new AssetBuilder("bux", "http://bux.neuclear.org", "http://bux.neuclear.org",
                 getSigner().getPublicKey("neu://test/bux"),
                 getAlice().getPublicKey(),
                 2, 0, "bux");
-        return (Service) builder.convert(NAME, getSigner());
+        return (Asset) builder.convert(NAME, getSigner());
 
     }
 
-    private Service asset;
+    private Asset asset;
 }

@@ -75,7 +75,14 @@ if (!success){
     boolean error=(submit&&Utility.isEmpty(url))||resolution||invalid;
 %>
 <p>
-       Use this screen to register your NeuClear Identity with us. This is absolutely optional on the Beta Bux site.
+       In NeuClear your account id is the same across all Asset types. Therefore it makes more sense if the control
+       of your account details are in your hands and not with some central authority. Your account id
+       is a 32 character id, which frankly does look ugly. Therefore you have the option of creating an
+       Account web page on the internet, where you can tell people about yourself. Once you have that page up on your web site,
+       you can tell people to pay you at for example <tt>http://yoursite.com/myaccountpage.html</tt>. Your friends,
+       family or business partners can also add that page as a contact from within the NeuClear Personal Trader.
+       </p><p>
+        Use this screen to register your or some one elses NeuClear Account Page with us. This is absolutely optional on the Beta Bux site.
        Some asset controllers may require that you register to use their assets.
 </p>
 <p>
@@ -88,19 +95,22 @@ if (!success){
 </p>
 <p>
        If you havent already registered. Follow these simple steps:
-       <ul>
-       <li>Create a simple html page writing as much or as little about your self as you want.</li>
+       <ol>
+       <li>Create a simple html page writing as much or as little about your self as you want.
+        If you wish you may <a href="sampleaccountpage.html">download this sample page to use as a template</a></li>
        <li>Decide on your nick name. This doesnt have to be unique. Just a short name that will replace your
        account id on the screens of this site.</li>
        <li>Add it to your html and mark it with the <tt>id</tt> named <tt>nickname</tt>. One way to do this is like this:
-        <tt>&lt;div id="nickname">Bobbie&lt/div></tt> or in a headline <tt>&lt;h1 id="nickname">Bobbie&lt/h1></tt>.
+        <tt><span style="color:blue">&lt;div id="nickname">Bobbie&lt/div></span></tt> or in a headline <tt><span style="color:blue">&lt;h1 id="nickname">Bobbie&lt/h1></span></tt>.
     </li>
+        <li>Decide on where you want to put it on your website. Say for example <tt>http://yoursite.com/myname.html</tt></li>
+        <li>Put that url in a link tag in your html header: eg. <tt><span style="color:grey">&lt;/title><span style="color:blue">&lt;link href="http://talk.org/pelletest.html" rel="original"/></span>&lt;/head>&lt;body></span></tt></li>
         <li>Save your html file</li>
-        <li>Now Sign it using your NeuClear Signer which you can start by clicking <a href="http://dist.neuclear.org/app/neuclear-signer.jnlp">here</a>.
-        From the file menu pick "Sign File...". This lets you pick a file. Sign it with your selected personality and save it.</li>
+        <li>Now Sign it using your NeuClear Personal Trader which you can start by clicking <a href="http://dist.neuclear.org/app/neuclear-signer.jnlp">here</a>.
+        From the file menu pick "Sign File...". This lets you pick a file. Sign it with your selected account and save it.</li>
         <li>Upload the file to your webserver. eg. http://bobsmith.com/bob.html</li>
         <li>Enter the address of your uploaded file below</li>
-        </ul>
+        </ol>
 
 </p>
 <p>

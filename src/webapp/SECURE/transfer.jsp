@@ -58,7 +58,7 @@
             }
         }
     }
-    final double balance = ledger.getAvailableBalance(asset.getDigest(), userns.getName());
+    final double balance = ledger.getAvailableBalance(asset.getSignatory().getName(), userns.getName());
     if (submit&&(amount>balance||amount<0))
         submit=false;
 %>
@@ -113,7 +113,7 @@ if (!submit){
 
 
     TransferOrderBuilder transfer=new TransferOrderBuilder(
-            asset.getURL(),
+            asset,
             recpbook.getId(),//new Signatory(signer.getPublicKey(recipient)),
             new Amount(amount),
             comment

@@ -3,6 +3,7 @@ package org.neuclear.exchange.orders;
 import org.dom4j.*;
 import org.neuclear.asset.contracts.Asset;
 import org.neuclear.asset.orders.TransferGlobals;
+import org.neuclear.commons.Utility;
 import org.neuclear.exchange.contracts.ExchangeAgent;
 import org.neuclear.id.InvalidNamedObjectException;
 import org.neuclear.id.NameResolutionException;
@@ -27,8 +28,12 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: ExchangeOrderGlobals.java,v 1.2 2004/04/28 00:22:29 pelle Exp $
+$Id: ExchangeOrderGlobals.java,v 1.3 2004/05/24 18:31:31 pelle Exp $
 $Log: ExchangeOrderGlobals.java,v $
+Revision 1.3  2004/05/24 18:31:31  pelle
+Changed asset id in ledger to be asset.getSignatory().getName().
+Made SigningRequestServlet and SigningServlet a bit clearer.
+
 Revision 1.2  2004/04/28 00:22:29  pelle
 Fixed the strange verification error
 Added bunch of new unit tests to support this.
@@ -163,7 +168,16 @@ public final class ExchangeOrderGlobals {
     }
 
     public static final ExchangeAgent parseAgentTag(Element elem) throws InvalidNamedObjectException {
-        final String name = getElementValue(elem, AGENT_TAG);
+        final Element agentElement = elem.element(createQName(AGENT_TAG));
+        final String name = TransferGlobals.getElementValue(agentElement);
+        final String digest = agentElement.attributeValue(createQName("digest"));
+        if (!Utility.isEmpty(digest)) {
+            ExchangeAgent agent = (ExchangeAgent) Resolver.resolveFromCache(digest);
+            if (agent != null && agent.getURL().equals(name)) {
+                return agent;
+            }
+        }
+
         try {
             return (ExchangeAgent) Resolver.resolveIdentity(name);
         } catch (ClassCastException e) {

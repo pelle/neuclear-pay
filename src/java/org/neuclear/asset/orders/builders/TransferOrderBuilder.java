@@ -3,11 +3,11 @@ package org.neuclear.asset.orders.builders;
 import org.dom4j.Element;
 import org.neuclear.asset.InvalidTransferException;
 import org.neuclear.asset.NegativeTransferException;
+import org.neuclear.asset.contracts.Asset;
 import org.neuclear.asset.orders.TransferGlobals;
 import org.neuclear.asset.orders.Value;
 import org.neuclear.commons.NeuClearException;
 import org.neuclear.commons.Utility;
-import org.neuclear.id.Service;
 import org.neuclear.id.Signatory;
 import org.neuclear.id.builders.Builder;
 
@@ -29,8 +29,12 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: TransferOrderBuilder.java,v 1.9 2004/05/11 22:52:52 pelle Exp $
+$Id: TransferOrderBuilder.java,v 1.10 2004/05/24 18:31:30 pelle Exp $
 $Log: TransferOrderBuilder.java,v $
+Revision 1.10  2004/05/24 18:31:30  pelle
+Changed asset id in ledger to be asset.getSignatory().getName().
+Made SigningRequestServlet and SigningServlet a bit clearer.
+
 Revision 1.9  2004/05/11 22:52:52  pelle
 The update to ledger expectedly broke a few things around CurrencyController and friends. Most but not all is now fixed.
 
@@ -156,22 +160,26 @@ TransferReceiptBuilder has been created for use by Transfer processors. It is us
  * Time: 3:13:27 PM
  */
 public class TransferOrderBuilder extends Builder {
-    public TransferOrderBuilder(final Service asset, final Signatory recipient, final Value amount, final String comment) throws InvalidTransferException, NegativeTransferException, NeuClearException {
-        this(asset.getDigest(), recipient.getName(), amount, comment);
+    public TransferOrderBuilder(final Asset asset, final Signatory recipient, final Value amount, final String comment) throws InvalidTransferException, NegativeTransferException, NeuClearException {
+        this(asset, recipient.getName(), amount, comment);
     }
 
-    public TransferOrderBuilder(final String assetname, final String recipient, final Value amount, final String comment) throws InvalidTransferException, NegativeTransferException, NeuClearException {
+    public TransferOrderBuilder(final Asset asset, final String recipient, final Value amount, final String comment) throws InvalidTransferException, NegativeTransferException, NeuClearException {
         super(TransferGlobals.createQName(TransferGlobals.XFER_TAGNAME));
         if (amount.getAmount() < 0)
             throw new NegativeTransferException(amount);
-        if (assetname == null)
+        if (asset == null)
             throw new InvalidTransferException("assetName");
         if (recipient == null)
             throw new InvalidTransferException("to");
 
         final Element element = getElement();
         element.add(TransferGlobals.createElement(TransferGlobals.RECIPIENT_TAG, recipient));
-        element.add(TransferGlobals.createElement(TransferGlobals.ASSET_TAG, assetname));
+        final Element assetElem = TransferGlobals.createElement(TransferGlobals.ASSET_TAG, asset.getURL());
+        assetElem.addAttribute(TransferGlobals.createQName("digest"), asset.getDigest());
+
+        element.add(assetElem);
+
         element.add(TransferGlobals.createValueTag(amount));
 
         if (!Utility.isEmpty(comment))

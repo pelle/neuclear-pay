@@ -1,16 +1,20 @@
 package org.neuclear.asset.servlet;
 
 import org.neuclear.asset.InvalidTransferException;
+import org.neuclear.asset.contracts.Asset;
 import org.neuclear.asset.orders.Amount;
 import org.neuclear.asset.orders.builders.TransferOrderBuilder;
 import org.neuclear.commons.NeuClearException;
 import org.neuclear.commons.Utility;
 import org.neuclear.id.Identity;
 import org.neuclear.id.InvalidNamedObjectException;
+import org.neuclear.id.NameResolutionException;
 import org.neuclear.id.builders.Builder;
 import org.neuclear.id.resolver.Resolver;
 import org.neuclear.id.signers.SignatureRequestServlet;
 
+import javax.servlet.ServletConfig;
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 
 /*
@@ -31,8 +35,12 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: TransferRequestServlet.java,v 1.4 2004/04/02 23:04:36 pelle Exp $
+$Id: TransferRequestServlet.java,v 1.5 2004/05/24 18:31:30 pelle Exp $
 $Log: TransferRequestServlet.java,v $
+Revision 1.5  2004/05/24 18:31:30  pelle
+Changed asset id in ledger to be asset.getSignatory().getName().
+Made SigningRequestServlet and SigningServlet a bit clearer.
+
 Revision 1.4  2004/04/02 23:04:36  pelle
 Got TransferOrder and Builder working with their test cases.
 Working on TransferReceipt which is the first embedded receipt. This is causing some problems at the moment.
@@ -90,6 +98,18 @@ Added cactus tests to pay
  * Time: 6:37:19 PM
  */
 public class TransferRequestServlet extends SignatureRequestServlet {
+
+    public void init(ServletConfig servletConfig) throws ServletException {
+        super.init(servletConfig);
+        try {
+            asset = (Asset) Resolver.resolveIdentity(getServiceid());
+        } catch (NameResolutionException e) {
+            e.printStackTrace();
+        } catch (InvalidNamedObjectException e) {
+            e.printStackTrace();
+        }
+    }
+
     protected Builder createBuilder(HttpServletRequest request) throws NeuClearException {
         Identity user = (Identity) request.getUserPrincipal();
         if (user == null)
@@ -98,9 +118,15 @@ public class TransferRequestServlet extends SignatureRequestServlet {
         double amount = Double.parseDouble(Utility.denullString(request.getParameter("amount"), "0"));
         String comment = Utility.denullString(request.getParameter("comment"));
         try {
-            return new TransferOrderBuilder(getServiceid(), to, new Amount(amount), comment);
+            return new TransferOrderBuilder(asset, to, new Amount(amount), comment);
         } catch (InvalidTransferException e) {
             throw new InvalidNamedObjectException(user.getName(), e);
         }
     }
+
+    protected String getRequestType() {
+        return "Transfer Order";
+    }
+
+    private Asset asset;
 }

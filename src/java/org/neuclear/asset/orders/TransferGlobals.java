@@ -32,8 +32,12 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: TransferGlobals.java,v 1.11 2004/04/06 16:24:34 pelle Exp $
+$Id: TransferGlobals.java,v 1.12 2004/05/24 18:31:30 pelle Exp $
 $Log: TransferGlobals.java,v $
+Revision 1.12  2004/05/24 18:31:30  pelle
+Changed asset id in ledger to be asset.getSignatory().getName().
+Made SigningRequestServlet and SigningServlet a bit clearer.
+
 Revision 1.11  2004/04/06 16:24:34  pelle
 Added two new Data Objects IssuerOrder and IssueReceipt for managing the issuance process.
 Added Issuance support to the Asset and Audit Controllers.
@@ -177,9 +181,13 @@ public final class TransferGlobals {
         final Element value = element.element(name);
         if (value == null)
             throw new InvalidNamedObjectException("Missing required element: " + name);
+        return getElementValue(value);
+    }
+
+    public static String getElementValue(final Element value) throws InvalidNamedObjectException {
         final String text = value.getTextTrim();
         if (Utility.isEmpty(text))
-            throw new InvalidNamedObjectException("Required element: " + name + " is empty");
+            throw new InvalidNamedObjectException("Required element is empty");
         return text;
     }
 
@@ -227,7 +235,15 @@ public final class TransferGlobals {
     }
 
     public static final Asset parseAssetTag(Element elem) throws InvalidNamedObjectException {
-        final String name = getElementValue(elem, ASSET_TAG);
+        final Element assetElem = elem.element(createQName(ASSET_TAG));
+        final String name = getElementValue(assetElem);
+        final String digest = assetElem.attributeValue(createQName("digest"));
+        if (!Utility.isEmpty(digest)) {
+            Asset asset = (Asset) Resolver.resolveFromCache(digest);
+            if (asset != null && asset.getURL().equals(name)) {
+                return asset;
+            }
+        }
         try {
             return (Asset) Resolver.resolveIdentity(name);
         } catch (ClassCastException e) {

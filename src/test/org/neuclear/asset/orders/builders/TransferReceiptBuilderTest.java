@@ -1,13 +1,13 @@
 package org.neuclear.asset.orders.builders;
 
 import org.neuclear.asset.InvalidTransferException;
+import org.neuclear.asset.contracts.Asset;
 import org.neuclear.asset.contracts.builders.AssetBuilder;
 import org.neuclear.asset.orders.Amount;
 import org.neuclear.asset.orders.TransferOrder;
 import org.neuclear.asset.orders.TransferReceipt;
 import org.neuclear.commons.NeuClearException;
 import org.neuclear.commons.crypto.signers.NonExistingSignerException;
-import org.neuclear.id.Service;
 import org.neuclear.id.SignedNamedObject;
 import org.neuclear.id.builders.Builder;
 import org.neuclear.tests.AbstractObjectCreationTest;
@@ -34,8 +34,12 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: TransferReceiptBuilderTest.java,v 1.4 2004/04/23 23:33:15 pelle Exp $
+$Id: TransferReceiptBuilderTest.java,v 1.5 2004/05/24 18:31:32 pelle Exp $
 $Log: TransferReceiptBuilderTest.java,v $
+Revision 1.5  2004/05/24 18:31:32  pelle
+Changed asset id in ledger to be asset.getSignatory().getName().
+Made SigningRequestServlet and SigningServlet a bit clearer.
+
 Revision 1.4  2004/04/23 23:33:15  pelle
 Major update. Added an original url and nickname to Identity and friends.
 
@@ -111,14 +115,14 @@ public class TransferReceiptBuilderTest extends AbstractObjectCreationTest {
         return new TransferReceiptBuilder((TransferOrder) builder.convert(NAME, getSigner()), new Date());
     }
 
-    public Service createTestAsset() throws NeuClearException {
+    public Asset createTestAsset() throws NeuClearException {
         AssetBuilder builder = new AssetBuilder("bux", "http://bux.neuclear.org", "http://bux.neuclear.org",
                 getSigner().getPublicKey("neu://test/bux"),
                 getAlice().getPublicKey(),
                 2, 0, "bux");
-        return (Service) builder.convert(NAME, getSigner());
+        return (Asset) builder.convert(NAME, getSigner());
 
     }
 
-    private Service asset;
+    private Asset asset;
 }

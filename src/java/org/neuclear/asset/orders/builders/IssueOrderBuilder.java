@@ -29,8 +29,12 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: IssueOrderBuilder.java,v 1.4 2004/05/12 18:07:52 pelle Exp $
+$Id: IssueOrderBuilder.java,v 1.5 2004/05/24 18:31:30 pelle Exp $
 $Log: IssueOrderBuilder.java,v $
+Revision 1.5  2004/05/24 18:31:30  pelle
+Changed asset id in ledger to be asset.getSignatory().getName().
+Made SigningRequestServlet and SigningServlet a bit clearer.
+
 Revision 1.4  2004/05/12 18:07:52  pelle
 Fixed lotsof problems found in the unit tests.
 
@@ -162,21 +166,19 @@ TransferReceiptBuilder has been created for use by Transfer processors. It is us
  */
 public class IssueOrderBuilder extends Builder {
     public IssueOrderBuilder(final Asset asset, final Signatory recipient, final Value amount, final String comment) throws InvalidTransferException, NegativeTransferException, NeuClearException {
-        this(asset.getDigest(), recipient.getName(), amount, comment);
-    }
-
-    public IssueOrderBuilder(final String assetname, final String recipient, final Value amount, final String comment) throws InvalidTransferException, NegativeTransferException, NeuClearException {
         super(TransferGlobals.createQName(TransferGlobals.ISSUE_TAGNAME));
         if (amount.getAmount() < 0)
             throw new NegativeTransferException(amount);
-        if (assetname == null)
+        if (asset == null)
             throw new InvalidTransferException("assetName");
         if (recipient == null)
             throw new InvalidTransferException("to");
 
         final Element element = getElement();
-        element.add(TransferGlobals.createElement(TransferGlobals.RECIPIENT_TAG, recipient));
-        element.add(TransferGlobals.createElement(TransferGlobals.ASSET_TAG, assetname));
+        element.add(TransferGlobals.createElement(TransferGlobals.RECIPIENT_TAG, recipient.getName()));
+        final Element assetElem = TransferGlobals.createElement(TransferGlobals.ASSET_TAG, asset.getURL());
+        assetElem.addAttribute(TransferGlobals.createQName("digest"), asset.getDigest());
+        element.add(assetElem);
         element.add(TransferGlobals.createValueTag(amount));
 
         if (!Utility.isEmpty(comment))

@@ -51,25 +51,36 @@ NeuClear Bux
 <%
     if(!loggedin){
 %>
-<p>You need to be running the NeuClear Personal Signer to log in.
+<a href="http://dist.neuclear.org/app/neuclear-signer.jnlp"><img src="images/neucleartrader_tasks_small.jpg" border="0"/></a>
+<p>You need to be running the NeuClear Personal Trader to log in.
 <a href="http://dist.neuclear.org/app/neuclear-signer.jnlp">Start with Java Web Start</a>. Note on first run this
 will download about 4MB.</p>
-<p>Click here for more information about the <a href="http://neuclear.org/display/neu/Personal+Signer">Personal Signer</a></p>
+<p>Click here for more information about using the <a href="http://neuclear.org/display/neu/Personal+Trader">Personal Trader</a></p>
 <%
     } else {
         %>
+        <p>If this is your first time here. Now would be a good idea to <a href="SECURE/issue.jsp">request some bux</a>.</p>
         <ul>
             <li><a href="SECURE/transfer.jsp">Transfer Funds</a></li>
             <li><a href="SECURE/browse/">Browse Transactions</a></li>
             <li><a href="SECURE/issue.jsp">Request Funds</a></li>
-            <li><a href="register.jsp">Register Identity Page</a></li>
+            <li><a href="register.jsp">Register Account Contact Page</a></li>
 
+        </ul>
+        <p>If you closed your Personal Trader you can restart it below:</p>
+        <ul><li><a href="http://dist.neuclear.org/app/neuclear-signer.jnlp">Start NeuClear Personal Trader</a></li>
         </ul>
         <%
     }
 %>
-<hr/><a href="bux.html">NeuClear Bux Rules</a><hr>
-For more information about what this is visit <a href="http://neuclear.org">NeuClear.org</a>
+<hr/>
+<p>NeuClear Bux is a NeuClear Asset governed by the following rules:</p>
+<ul><li><a href="bux.html">NeuClear Bux Rules</a></li></ul>
+<p>You can tell your Personal Trader about a new asset by clicking "Add asset.." and entering the URL (the web address) of the rules.
+The URL to add for NeuClear bux is <tt>http://bux.neuclear.org/bux.html</tt>.
+</p>
+<hr>
+<p>For more information about the goals of the NeuClear project visit <a href="http://neuclear.org">NeuClear.org</a></p>
 </div>
 <table style="float:right">
 <tr><th colspan=2>Asset Statistics</th></tr>
@@ -78,14 +89,13 @@ For more information about what this is visit <a href="http://neuclear.org">NeuC
 <tr class="even"><td>Amount of Transactions</td><td align="right"><%=stats.getTransactionCount()%></td></tr>
 <%if(!loggedin){ %>
 <tr><td colspan="2">
-<form action="Authorize" method="POST">
-    <input type="submit" name="submit" value="Login" style="font-size:small">
-</form></td></tr>
+<a href="Authorize"><img src="images/neuclearlogin.jpg" border="0"/></a>
+</td></tr>
 
 <%}else{
         Book book=(Book) session.getAttribute("book");
-        double balance=ledger.getBalance(asset.getDigest(), userns.getName());
-        double available=ledger.getAvailableBalance(asset.getDigest(), userns.getName());
+        double balance=ledger.getBalance(asset.getSignatory().getName(), userns.getName());
+        double available=ledger.getAvailableBalance(asset.getSignatory().getName(), userns.getName());
 %>
     <tr><th>Account</th><th  title="<%=book.getId()%>" ><%=book.getNickname()%></th></tr>
 <tr class="even"><td>Balance</td><td align="right"><%=balance%> <%=asset.getUnits()%></td></tr>

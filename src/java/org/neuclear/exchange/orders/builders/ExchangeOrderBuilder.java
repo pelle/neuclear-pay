@@ -3,6 +3,7 @@ package org.neuclear.exchange.orders.builders;
 import org.dom4j.Element;
 import org.neuclear.asset.InvalidTransferException;
 import org.neuclear.asset.NegativeTransferException;
+import org.neuclear.asset.contracts.Asset;
 import org.neuclear.asset.orders.TransferGlobals;
 import org.neuclear.asset.orders.Value;
 import org.neuclear.commons.NeuClearException;
@@ -11,7 +12,6 @@ import org.neuclear.commons.time.TimeTools;
 import org.neuclear.exchange.contracts.ExchangeAgent;
 import org.neuclear.exchange.orders.BidItem;
 import org.neuclear.exchange.orders.ExchangeOrderGlobals;
-import org.neuclear.id.Service;
 import org.neuclear.id.builders.Builder;
 
 import java.util.Date;
@@ -34,8 +34,12 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: ExchangeOrderBuilder.java,v 1.7 2004/05/12 18:07:52 pelle Exp $
+$Id: ExchangeOrderBuilder.java,v 1.8 2004/05/24 18:31:31 pelle Exp $
 $Log: ExchangeOrderBuilder.java,v $
+Revision 1.8  2004/05/24 18:31:31  pelle
+Changed asset id in ledger to be asset.getSignatory().getName().
+Made SigningRequestServlet and SigningServlet a bit clearer.
+
 Revision 1.7  2004/05/12 18:07:52  pelle
 Fixed lotsof problems found in the unit tests.
 
@@ -148,7 +152,7 @@ TransferReceiptBuilder has been created for use by Transfer processors. It is us
  * Time: 3:13:27 PM
  */
 public class ExchangeOrderBuilder extends Builder {
-    public ExchangeOrderBuilder(final Service asset, final ExchangeAgent agent, final Value amount, final Date expiry, final BidItem items[], final String comment) throws InvalidTransferException, NegativeTransferException, NeuClearException {
+    public ExchangeOrderBuilder(final Asset asset, final ExchangeAgent agent, final Value amount, final Date expiry, final BidItem items[], final String comment) throws InvalidTransferException, NegativeTransferException, NeuClearException {
         super(ExchangeOrderGlobals.createQName(ExchangeOrderGlobals.EXCHANGE_TAGNAME));
         if (amount.getAmount() < 0)
             throw new NegativeTransferException(amount);
@@ -158,15 +162,23 @@ public class ExchangeOrderBuilder extends Builder {
             throw new InvalidTransferException("agent");
 
         final Element element = getElement();
-        element.add(ExchangeOrderGlobals.createElement(ExchangeOrderGlobals.AGENT_TAG, agent.getName()));
-        element.add(TransferGlobals.createElement(TransferGlobals.ASSET_TAG, asset.getDigest()));
+        final Element agentElement = ExchangeOrderGlobals.createElement(ExchangeOrderGlobals.AGENT_TAG, agent.getName());
+        agentElement.addAttribute(TransferGlobals.createQName("digest"), agent.getDigest());
+        element.add(agentElement);
+
+        final Element assetElem = TransferGlobals.createElement(TransferGlobals.ASSET_TAG, asset.getURL());
+        assetElem.addAttribute(TransferGlobals.createQName("digest"), asset.getDigest());
+        element.add(assetElem);
         element.add(TransferGlobals.createValueTag(amount));
         element.add(ExchangeOrderGlobals.createElement(ExchangeOrderGlobals.EXPIRY_TAG, TimeTools.formatTimeStamp(expiry)));
 
         for (int i = 0; i < items.length; i++) {
             BidItem item = items[i];
             Element bidelem = element.addElement(ExchangeOrderGlobals.BID_ITEM_TAG);
-            bidelem.addElement(TransferGlobals.createQName(TransferGlobals.ASSET_TAG)).setText(item.getAsset().getDigest());
+            final Element bidAssetElem = bidelem.addElement(TransferGlobals.createQName(TransferGlobals.ASSET_TAG));
+            bidAssetElem.setText(item.getAsset().getURL());
+            bidAssetElem.addAttribute(TransferGlobals.createQName("digest"), item.getAsset().getDigest());
+
             bidelem.add(TransferGlobals.createValueTag(item.getAmount()));
         }
 

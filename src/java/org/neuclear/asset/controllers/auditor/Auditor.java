@@ -3,7 +3,6 @@ package org.neuclear.asset.controllers.auditor;
 import org.neuclear.asset.InvalidTransferException;
 import org.neuclear.asset.LowLevelPaymentException;
 import org.neuclear.asset.TransferDeniedException;
-import org.neuclear.asset.contracts.Asset;
 import org.neuclear.asset.orders.IssueOrder;
 import org.neuclear.asset.orders.IssueReceipt;
 import org.neuclear.asset.orders.TransferOrder;
@@ -34,8 +33,12 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: Auditor.java,v 1.3 2004/05/14 16:24:07 pelle Exp $
+$Id: Auditor.java,v 1.4 2004/05/24 18:31:29 pelle Exp $
 $Log: Auditor.java,v $
+Revision 1.4  2004/05/24 18:31:29  pelle
+Changed asset id in ledger to be asset.getSignatory().getName().
+Made SigningRequestServlet and SigningServlet a bit clearer.
+
 Revision 1.3  2004/05/14 16:24:07  pelle
 Added PortfolioBrowser to LedgerController and it's implementations.
 
@@ -156,9 +159,8 @@ SOAPTools was changed to return a stream. This is required by the VerifyingReade
  * Time: 3:53:17 PM
  */
 public class Auditor implements Receiver {
-    public Auditor(Asset asset, LedgerController ledger) {
+    public Auditor(LedgerController ledger) {
         this.ledger = ledger;
-        this.asset = asset;
     }
 
     /**
@@ -217,7 +219,7 @@ public class Auditor implements Receiver {
 
     public final void process(final TransferOrder req) throws InvalidTransferException, LowLevelPaymentException {
         try {
-            ledger.transfer(req.getAsset().getDigest(), req.getDigest(), req.getSignatory().getName(), req.getRecipient(), req.getAmount().getAmount(), req.getComment());
+            ledger.transfer(req.getAsset().getSignatory().getName(), req.getDigest(), req.getSignatory().getName(), req.getRecipient(), req.getAmount().getAmount(), req.getComment());
         } catch (LowlevelLedgerException e) {
             throw new LowLevelPaymentException(e);
         } catch (InvalidTransactionException e) {
@@ -230,7 +232,7 @@ public class Auditor implements Receiver {
     public final void process(final IssueReceipt receipt) throws InvalidTransferException, LowLevelPaymentException, TransferDeniedException, NeuClearException {
         try {
             final IssueOrder req = receipt.getOrder();
-            if (req.getSignatory().getPublicKey().equals(asset.getIssuer())) {
+            if (req.getSignatory().equals(req.getAsset().getIssuer())) {
                 if (!ledger.transactionExists(req.getDigest()))
                     process(req);
                 ledger.setReceiptId(req.getDigest(), receipt.getDigest());
@@ -244,8 +246,8 @@ public class Auditor implements Receiver {
 
     public final void process(final IssueOrder req) throws InvalidTransferException, LowLevelPaymentException {
         try {
-            if (req.getSignatory().getPublicKey().equals(asset.getIssuer()))
-                ledger.transfer(req.getAsset().getDigest(), req.getDigest(), req.getSignatory().getName(), req.getRecipient(), req.getAmount().getAmount(), req.getComment());
+            if (req.getSignatory().equals(req.getAsset().getIssuer()))
+                ledger.transfer(req.getAsset().getSignatory().getName(), req.getDigest(), req.getSignatory().getName(), req.getRecipient(), req.getAmount().getAmount(), req.getComment());
         } catch (LowlevelLedgerException e) {
             throw new LowLevelPaymentException(e);
         } catch (InvalidTransactionException e) {
@@ -270,7 +272,7 @@ public class Auditor implements Receiver {
 
     public final void process(final ExchangeOrder req) throws InvalidTransferException, LowLevelPaymentException {
         try {
-            ledger.hold(req.getAsset().getDigest(), req.getDigest(), req.getSignatory().getName(), req.getAgent().getSignatory().getName(), req.getExpiry(), req.getAmount().getAmount(), req.getComment());
+            ledger.hold(req.getAsset().getSignatory().getName(), req.getDigest(), req.getSignatory().getName(), req.getAgent().getSignatory().getName(), req.getExpiry(), req.getAmount().getAmount(), req.getComment());
         } catch (LowlevelLedgerException e) {
             throw new LowLevelPaymentException(e);
         } catch (InvalidTransactionException e) {
@@ -320,6 +322,5 @@ public class Auditor implements Receiver {
     }
 
     private final LedgerController ledger;
-    private final Asset asset;
 
 }

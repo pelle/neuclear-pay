@@ -77,8 +77,8 @@ if (!submit){
 </p>
 <% } else {
     IssueOrderBuilder transfer=new IssueOrderBuilder(
-            asset.getURL(),
-            userns.getName(),//new Signatory(signer.getPublicKey(recipient)),
+            asset,
+            userns,//new Signatory(signer.getPublicKey(recipient)),
             new Amount(amount),
             "Present"
     ) ;

@@ -48,16 +48,18 @@ public final class CurrencyController extends AssetController {
     }
 
     public boolean canProcess(final Service asset) {
-        return this.asset.getName().equals(asset.getName());
+        return this.asset.equals(asset);
     }
 
     public final TransferReceipt process(final TransferOrder req) throws InvalidTransferException, LowLevelPaymentException, TransferDeniedException, NeuClearException {
 
         try {
+            if (!req.getAsset().equals(asset))
+                throw new InvalidTransferException("We do not support this asset");
             if (req.getSignatory().getName().equals(req.getAsset().getIssuer().getName()))
                 throw new InvalidTransferException("Issuer is not allowed to transfer");
 
-            final PostedTransaction posted = ledger.verifiedTransfer(req.getAsset().getDigest(), req.getDigest(), req.getSignatory().getName(), req.getRecipient(), req.getAmount().getAmount(), req.getComment());
+            final PostedTransaction posted = ledger.verifiedTransfer(req.getAsset().getSignatory().getName(), req.getDigest(), req.getSignatory().getName(), req.getRecipient(), req.getAmount().getAmount(), req.getComment());
             final TransferReceipt receipt = (TransferReceipt) new TransferReceiptBuilder(req, posted.getTransactionTime()).convert(alias, signer);
             ledger.setReceiptId(req.getDigest(), receipt.getDigest());
             receipt.log();
@@ -89,9 +91,11 @@ public final class CurrencyController extends AssetController {
      */
     public IssueReceipt process(IssueOrder req) throws LowLevelPaymentException, TransferDeniedException, InvalidTransferException, NeuClearException {
         try {
+            if (!req.getAsset().equals(asset))
+                throw new InvalidTransferException("We do not support this asset");
             if (!req.getSignatory().getName().equals(req.getAsset().getIssuer().getName()))
                 throw new InvalidTransferException("Only Issuer is allowed to issue");
-            final PostedTransaction posted = ledger.transfer(req.getAsset().getDigest(), req.getDigest(), req.getSignatory().getName(), req.getRecipient(), req.getAmount().getAmount(), req.getComment());
+            final PostedTransaction posted = ledger.transfer(req.getAsset().getSignatory().getName(), req.getDigest(), req.getSignatory().getName(), req.getRecipient(), req.getAmount().getAmount(), req.getComment());
             final IssueReceipt receipt = (IssueReceipt) new IssueReceiptBuilder(req, posted.getTransactionTime()).convert(alias, signer);
             ledger.setReceiptId(req.getDigest(), receipt.getDigest());
             return receipt;
@@ -111,10 +115,12 @@ public final class CurrencyController extends AssetController {
 
     public final ExchangeOrderReceipt process(final ExchangeOrder req) throws InvalidTransferException, LowLevelPaymentException, TransferDeniedException, NeuClearException {
         try {
+            if (!req.getAsset().equals(asset))
+                throw new InvalidTransferException("We do not support this asset");
             if (req.getSignatory().getName().equals(req.getAsset().getIssuer().getName()))
                 throw new InvalidTransferException("Issuer is not allowed to Exchange");
 
-            final PostedHeldTransaction posted = ledger.hold(req.getAsset().getDigest(), req.getDigest(), req.getSignatory().getName(), req.getAgent().getSignatory().getName(), req.getExpiry(), req.getAmount().getAmount(), req.getComment());
+            final PostedHeldTransaction posted = ledger.hold(req.getAsset().getSignatory().getName(), req.getDigest(), req.getSignatory().getName(), req.getAgent().getSignatory().getName(), req.getExpiry(), req.getAmount().getAmount(), req.getComment());
             final ExchangeOrderReceipt receipt = (ExchangeOrderReceipt) new ExchangeOrderReceiptBuilder(req, posted.getTransactionTime()).convert(alias, signer);
             ledger.setHeldReceiptId(req.getDigest(), receipt.getDigest());
             return receipt;
@@ -133,6 +139,8 @@ public final class CurrencyController extends AssetController {
 
     public final ExchangeCompletedReceipt process(final ExchangeCompletionOrder complete) throws LowLevelPaymentException, InvalidTransferException, TransferDeniedException, NeuClearException {
         try {
+            if (!complete.getReceipt().getAsset().equals(asset))
+                throw new InvalidTransferException("We do not support this asset");
             if (!complete.getSignatory().getPublicKey().equals(complete.getReceipt().getOrder().getAgent().getServiceKey()))
                 throw new InvalidTransferException("Only Agent is allowed to Sign Completion Order");
             PostedTransaction tran = ledger.complete(complete.getReceipt().getOrder().getDigest(), complete.getAmount().getAmount(), complete.getComment());
@@ -151,6 +159,8 @@ public final class CurrencyController extends AssetController {
     }
 
     public final CancelExchangeReceipt process(final CancelExchangeOrder cancel) throws InvalidTransferException, LowLevelPaymentException, TransferDeniedException, NeuClearException {
+        if (!cancel.getAsset().equals(asset))
+            throw new InvalidTransferException("We do not support this asset");
         if (!(cancel.getSignatory().getName().equals(cancel.getReceipt().getOrder().getSignatory().getName())
                 || cancel.getSignatory().getPublicKey().equals(cancel.getReceipt().getOrder().getAgent().getServiceKey())))
             throw new InvalidTransferException("Only Agent is allowed to Sign Completion Order");
@@ -169,9 +179,9 @@ public final class CurrencyController extends AssetController {
     }
 
     public AssetStatistics getStats() throws LowlevelLedgerException {
-        final double circulation = -ledger.getBalance(asset.getDigest(), asset.getIssuer().getName());
-        final long accounts = ledger.getBookCount(asset.getDigest());
-        final long xcount = ledger.getTransactionCount(asset.getDigest());
+        final double circulation = -ledger.getBalance(asset.getSignatory().getName(), asset.getIssuer().getName());
+        final long accounts = ledger.getBookCount(asset.getSignatory().getName());
+        final long xcount = ledger.getTransactionCount(asset.getSignatory().getName());
         return new AssetStatistics() {
             public double getCirculation() {
                 return circulation;
