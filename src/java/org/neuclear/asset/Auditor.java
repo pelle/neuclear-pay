@@ -1,14 +1,15 @@
 package org.neuclear.asset;
 
+import org.neuclear.asset.contracts.Asset;
 import org.neuclear.asset.orders.TransferOrder;
+import org.neuclear.asset.orders.TransferReceipt;
 import org.neuclear.commons.NeuClearException;
-import org.neuclear.exchange.orders.CancelExchangeOrder;
-import org.neuclear.exchange.orders.ExchangeCompletionOrder;
-import org.neuclear.exchange.orders.ExchangeOrder;
+import org.neuclear.exchange.orders.*;
+import org.neuclear.id.Service;
 import org.neuclear.id.SignedNamedObject;
 import org.neuclear.id.receiver.Receiver;
 import org.neuclear.id.receiver.UnsupportedTransaction;
-import org.neuclear.ledger.Ledger;
+import org.neuclear.ledger.*;
 
 /*
 NeuClear Distributed Transaction Clearing Platform
@@ -28,8 +29,11 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: Auditor.java,v 1.1 2004/04/01 23:18:33 pelle Exp $
+$Id: Auditor.java,v 1.2 2004/04/05 22:08:23 pelle Exp $
 $Log: Auditor.java,v $
+Revision 1.2  2004/04/05 22:08:23  pelle
+CurrencyController and AuditController now now pass all unit tests in CurrencyTests.
+
 Revision 1.1  2004/04/01 23:18:33  pelle
 Split Identity into Signatory and Identity class.
 Identity remains a signed named object and will in the future just be used for self declared information.
@@ -121,8 +125,9 @@ SOAPTools was changed to return a stream. This is required by the VerifyingReade
  * Time: 3:53:17 PM
  */
 public class Auditor implements Receiver {
-    public Auditor(Ledger ledger) {
+    public Auditor(Asset asset, Ledger ledger) {
         this.ledger = ledger;
+        this.asset = asset;
     }
 
     /**
@@ -132,18 +137,90 @@ public class Auditor implements Receiver {
      * @return 
      */
     public final SignedNamedObject receive(final SignedNamedObject contract) throws UnsupportedTransaction, NeuClearException {
-        if (contract instanceof TransferOrder) {
-            TransferOrder order = (TransferOrder) contract;
-        } else if (contract instanceof ExchangeOrder)
+        try {
+            if (contract instanceof TransferReceipt)
+                process((TransferReceipt) contract);
+            if (contract instanceof ExchangeOrderReceipt)
+                process((ExchangeOrderReceipt) contract);
+            if (contract instanceof ExchangeCompletedReceipt)
+                process((ExchangeCompletedReceipt) contract);
+            if (contract instanceof CancelExchangeReceipt)
+                process((CancelExchangeReceipt) contract);
+        } catch (LowLevelPaymentException e) {
+            throw new NeuClearException(e);
+        } catch (TransferDeniedException e) {
+            throw new NeuClearException(e);
+        } catch (InvalidTransferException e) {
+            throw new NeuClearException(e);
+        }
 
-            if (contract instanceof ExchangeCompletionOrder)
-
-                if (contract instanceof CancelExchangeOrder) ;
-
-
-        return null;
+        return contract;
     }
 
+    public boolean canProcess(final Service asset) {
+        return this.asset.getName().equals(asset.getName());
+    }
+
+    public final void process(final TransferReceipt receipt) throws InvalidTransferException, LowLevelPaymentException, TransferDeniedException, NeuClearException {
+
+        try {
+            final TransferOrder req = receipt.getOrder();
+            final PostedTransaction posted = ledger.verifiedTransfer(req.getDigest(), req.getSignatory().getName(), req.getRecipient(), req.getAmount().getAmount(), req.getComment());
+            ledger.setReceiptId(req.getDigest(), receipt.getDigest());
+        } catch (LowlevelLedgerException e) {
+            throw new LowLevelPaymentException(e);
+        } catch (InvalidTransactionException e) {
+            throw new InvalidTransferException(e.getSubMessage());
+        } catch (UnknownTransactionException e) {
+            throw new LowLevelPaymentException(e);
+        }
+    }
+
+
+    public final void process(final ExchangeOrderReceipt receipt) throws InvalidTransferException, LowLevelPaymentException, TransferDeniedException, NeuClearException {
+        try {
+            final ExchangeOrder req = receipt.getOrder();
+            final PostedHeldTransaction posted = ledger.hold(req.getDigest(), req.getSignatory().getName(), req.getAgent().getSignatory().getName(), req.getExpiry(), req.getAmount().getAmount(), req.getComment());
+            ledger.setHeldReceiptId(req.getDigest(), receipt.getDigest());
+        } catch (LowlevelLedgerException e) {
+            throw new LowLevelPaymentException(e);
+        } catch (InvalidTransactionException e) {
+            throw new InvalidTransferException(e.getSubMessage());
+        } catch (UnknownTransactionException e) {
+            throw new LowLevelPaymentException(e);
+        }
+    }
+
+    public final void process(final ExchangeCompletedReceipt receipt) throws LowLevelPaymentException, InvalidTransferException, TransferDeniedException, NeuClearException {
+        try {
+            ExchangeCompletionOrder complete = receipt.getOrder();
+            PostedTransaction tran = ledger.complete(complete.getReceipt().getOrder().getDigest(), complete.getAmount().getAmount(), complete.getComment());
+            ledger.setReceiptId(complete.getReceipt().getOrder().getDigest(), receipt.getDigest());
+        } catch (LowlevelLedgerException e) {
+            throw new LowLevelPaymentException(e);
+        } catch (UnknownTransactionException e) {
+            throw new InvalidTransferException(e.getLocalizedMessage());
+        } catch (TransactionExpiredException e) {
+            throw new InvalidTransferException(e.getLocalizedMessage());
+        } catch (InvalidTransactionException e) {
+            throw new InvalidTransferException(e.getLocalizedMessage());
+        }
+    }
+
+    public final void process(final CancelExchangeReceipt receipt) throws InvalidTransferException, LowLevelPaymentException, TransferDeniedException, NeuClearException {
+        try {
+            CancelExchangeOrder cancel = receipt.getOrder();
+            ledger.cancel(cancel.getReceipt().getOrder().getDigest());
+
+        } catch (LowlevelLedgerException e) {
+            throw new LowLevelPaymentException(e);
+        } catch (UnknownTransactionException e) {
+            throw new InvalidTransferException(e.getLocalizedMessage());
+        }
+    }
+
+
     private final Ledger ledger;
+    private final Service asset;
 
 }

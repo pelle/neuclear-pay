@@ -18,8 +18,11 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: InvalidTransferException.java,v 1.4 2004/01/05 23:47:10 pelle Exp $
+$Id: InvalidTransferException.java,v 1.5 2004/04/05 22:08:23 pelle Exp $
 $Log: InvalidTransferException.java,v $
+Revision 1.5  2004/04/05 22:08:23  pelle
+CurrencyController and AuditController now now pass all unit tests in CurrencyTests.
+
 Revision 1.4  2004/01/05 23:47:10  pelle
 Create new Document classification "order", which is really just inherint in the new
 package layout.
@@ -56,13 +59,19 @@ which will handle all neuclear-ledger based AssetControllers.
  * Time: 3:53:03 PM
  */
 public class InvalidTransferException extends TransferException {
+    public InvalidTransferException(final Throwable e) {
+        super(e);
+        this.missing = "";
+
+    }
+
     public InvalidTransferException(final String missing) {
         super();
-        this.missing = missing;
+        this.missing = missing + " was empty";
     }
 
     public String getSubMessage() {
-        return missing + " was empty";
+        return missing;
     }
 
     private final String missing;

@@ -1,170 +1,179 @@
 package org.neuclear.asset.controllers.currency;
 
-import junit.framework.TestCase;
-import org.neuclear.commons.configuration.ConfigurationException;
-import org.neuclear.ledger.LedgerCreationException;
+import org.neuclear.asset.Auditor;
+import org.neuclear.asset.InvalidTransferException;
+import org.neuclear.asset.contracts.Asset;
+import org.neuclear.asset.contracts.builders.AssetBuilder;
+import org.neuclear.asset.orders.Amount;
+import org.neuclear.asset.orders.TransferReceipt;
+import org.neuclear.asset.orders.builders.TransferOrderBuilder;
+import org.neuclear.commons.NeuClearException;
+import org.neuclear.exchange.contracts.ExchangeAgent;
+import org.neuclear.exchange.contracts.builders.ExchangeAgentBuilder;
+import org.neuclear.exchange.orders.BidItem;
+import org.neuclear.exchange.orders.CancelExchangeReceipt;
+import org.neuclear.exchange.orders.ExchangeCompletedReceipt;
+import org.neuclear.exchange.orders.ExchangeOrderReceipt;
+import org.neuclear.exchange.orders.builders.CancelExchangeOrderBuilder;
+import org.neuclear.exchange.orders.builders.ExchangeCompletionOrderBuilder;
+import org.neuclear.exchange.orders.builders.ExchangeOrderBuilder;
+import org.neuclear.id.SignedNamedObject;
+import org.neuclear.id.builders.Builder;
+import org.neuclear.id.receiver.Receiver;
+import org.neuclear.ledger.InvalidTransactionException;
+import org.neuclear.ledger.Ledger;
 import org.neuclear.ledger.LowlevelLedgerException;
+import org.neuclear.ledger.simple.SimpleLedger;
+import org.neuclear.tests.AbstractSigningTest;
 
-import java.io.IOException;
-import java.sql.SQLException;
+import java.security.GeneralSecurityException;
+import java.util.Date;
 
 /**
  * User: pelleb
  * Date: Jul 21, 2003
  * Time: 6:05:04 PM
  */
-public final class CurrencyTests extends TestCase {
-    public CurrencyTests(final String s) throws SQLException, IOException, LowlevelLedgerException, LedgerCreationException, ConfigurationException {
+public final class CurrencyTests extends AbstractSigningTest {
+    public CurrencyTests(final String s) throws LowlevelLedgerException, GeneralSecurityException, NeuClearException {
         super(s);
-//        proc = CurrencyController.getInstance();
-    }
-/*
-    public void testFundAccount() throws LowlevelLedgerException, BookExistsException, UnknownBookException, UnBalancedTransactionException, InvalidTransactionException, NegativeTransferException, AssetMismatchException {
-        Account bob = createBobAccount();
-        assertNotNull(bob);
-        assertEquals(bob.getBalance(), 0.0, 0);
-        proc.getIssuer().issue(bob, 100, new Date());
-        assertEquals(bob.getBalance(), 100.0, 0);
+        asset = createTestAsset();
+        shoes = createShoeAsset();
+        agent = createTestExchangeAgent();
+        ledger = new SimpleLedger("test");
+        proc = new CurrencyController(ledger, asset, getSigner(), "neu://test/bux");
+        auditLedger = new SimpleLedger("auditor");
+        auditor = new Auditor(asset, auditLedger);
     }
 
-    public void testValidPayment() throws LowlevelLedgerException, BookExistsException, UnknownBookException, UnBalancedTransactionException, InvalidTransactionException, InsufficientFundsException, NegativeTransferException, AssetMismatchException {
-        double initial = 100;
-        double payment = 75;
-        Account bob = createBobAccount();
-        Account alice = createAliceAccount();
-        assertNotNull(bob);
-        assertNotNull(alice);
-        assertEquals(bob.getBalance(), 0.0, 0);
-        assertEquals(alice.getBalance(), 0.0, 0);
-        proc.getIssuer().issue(bob, initial, new Date());
-        assertEquals(bob.getBalance(), initial, 0);
-        bob.pay(alice, payment, new Date(), "Test Valid Transfer");
-        assertEquals(bob.getBalance(), initial - payment, 0);
-        assertEquals(alice.getBalance(), payment, 0);
+    public void testTransfer() throws InvalidTransferException, NeuClearException, InvalidTransactionException, LowlevelLedgerException {
+        fundAccount();
+        double alicebalance = ledger.getBalance(getAlice().getName());
+        assertAudit(getAlice().getName());
+        assertEquals(alicebalance, ledger.getAvailableBalance(getAlice().getName()), 0);
+        Builder builder = new TransferOrderBuilder(asset, getBob(), new Amount(25), "test");
+        SignedNamedObject receipt = process(builder);
+        assertNotNull(receipt);
+        assertTrue(receipt instanceof TransferReceipt);
+        assertEquals(alicebalance - 25, ledger.getAvailableBalance(getAlice().getName()), 0);
+        assertEquals(alicebalance - 25, ledger.getBalance(getAlice().getName()), 0);
+        assertAudit(getAlice().getName());
     }
 
-    public void testInValidPayment() throws LowlevelLedgerException, BookExistsException, UnknownBookException, UnBalancedTransactionException, InvalidTransactionException, InsufficientFundsException, NegativeTransferException, AssetMismatchException {
-        double initial = 75;
-        double payment = 100;
-        Account bob = createBobAccount();
-        Account alice = createAliceAccount();
-        assertNotNull(bob);
-        assertNotNull(alice);
-        assertEquals(bob.getBalance(), 0.0, 0);
-        assertEquals(alice.getBalance(), 0.0, 0);
-        proc.getIssuer().issue(bob, initial, new Date());
-        assertEquals(bob.getBalance(), initial, 0);
-
-        // check for insufficient funds
-        try {
-            bob.pay(alice, payment, new Date(), "Test for Insufficient Funds");
-            assertTrue("Didnt get Insufficient Funds Exception", false);
-        } catch (InsufficientFundsException e) {
-            assertTrue("Got Insufficient Funds Exception", true);
-        }
-        assertEquals(bob.getBalance(), initial, 0);
-        assertEquals(alice.getBalance(), 0, 0);
-        // Check for negative payments
-        try {
-            bob.pay(alice, -payment, new Date(), "Attempted negative payment");
-            assertTrue("Performed Negative Transfer", false);
-        } catch (NegativeTransferException e) {
-            assertTrue("Couldnt perform Negative Transfer", true);
-        }
-        assertEquals(bob.getBalance(), initial, 0);
-        assertEquals(alice.getBalance(), 0, 0);
-
+    private void fundAccount() throws InvalidTransactionException, LowlevelLedgerException {
+        ledger.transfer("test", getAlice().getName(), 50, "fund");
+        auditLedger.transfer("test", getAlice().getName(), 50, "fund");
     }
 
-    public void testHeldPayment() throws LowlevelLedgerException, BookExistsException, UnknownBookException, UnBalancedTransactionException, InvalidTransactionException, InsufficientFundsException, NegativeTransferException, TransferNotStartedException, TransferLargerThanHeldException, ExpiredHeldTransferException, AssetMismatchException {
-        double initial = 100;
-        double payment = 75;
-        Account bob = createBobAccount();
-        Account alice = createAliceAccount();
-        assertNotNull(bob);
-        assertNotNull(alice);
-        Calendar cal = Calendar.getInstance();
-        Date t1 = cal.getTime();
-        cal.add(Calendar.DAY_OF_YEAR, 1);
-        Date t2 = cal.getTime();
-        cal.add(Calendar.DAY_OF_YEAR, 1);
-        Date t3 = cal.getTime();
-        cal.add(Calendar.DAY_OF_YEAR, 1);
-        Date t4 = cal.getTime();
-        cal.add(Calendar.DAY_OF_YEAR, 1);
-        Date t5 = cal.getTime();
+    public void assertAudit(String name) throws LowlevelLedgerException {
+        assertEquals(auditLedger.getBalance(name), ledger.getBalance(name), 0);
+        assertEquals(auditLedger.getAvailableBalance(name), ledger.getAvailableBalance(name), 0);
+    }
 
+    public void testExchangeOrderAndExpire() throws InvalidTransferException, NeuClearException, InvalidTransactionException, LowlevelLedgerException {
+        fundAccount();
+        double alicebalance = ledger.getBalance(getAlice().getName());
+        assertEquals(alicebalance, ledger.getAvailableBalance(getAlice().getName()), 0);
+        assertAudit(getAlice().getName());
 
-        assertEquals(bob.getBalance(), 0.0, 0);
-        assertEquals(alice.getBalance(), 0.0, 0);
-        proc.getIssuer().issue(bob, initial, t1);
-        assertEquals(bob.getBalance(t1), initial, 0);
-
-        ExchangeOrderReceipt hold = bob.hold(alice, payment, t2, t4, "Test Hold");
-        assertEquals(bob.getBalance(t2), initial, 0);
-        assertEquals(bob.getBalance(t3), initial, 0);
-        assertEquals(bob.getBalance(t4), initial, 0);
-        assertEquals(bob.getAvailableBalance(t1), initial, 0);
-        assertEquals(bob.getAvailableBalance(t2), initial - payment, 0);
-        assertEquals(bob.getAvailableBalance(t3), initial - payment, 0);
-        assertEquals(bob.getAvailableBalance(t4), initial - payment, 0);
-        assertEquals(bob.getAvailableBalance(t5), initial, 0);
-
-        // check for insufficient funds
+        Builder builder = new ExchangeOrderBuilder(asset, agent, new Amount(20), new Date(System.currentTimeMillis() + 5000), new BidItem[]{new BidItem(shoes, new Amount(10))}, "give me shoes");
+        SignedNamedObject receipt = process(builder);
+        assertNotNull(receipt);
+        assertTrue(receipt instanceof ExchangeOrderReceipt);
+        assertEquals(alicebalance, ledger.getBalance(getAlice().getName()), 0);
+        assertEquals(alicebalance - 20, ledger.getAvailableBalance(getAlice().getName()), 0);
+        assertAudit(getAlice().getName());
         try {
-            bob.pay(alice, payment, t3, "Test for Insufficient Funds");
-            assertTrue("Didnt get Insufficient Funds Exception", false);
-        } catch (InsufficientFundsException e) {
-            assertTrue("Got Insufficient Funds Exception", true);
+            Thread.currentThread().sleep(5000);
+        } catch (InterruptedException e) {
+            ;
         }
+        assertEquals(alicebalance, ledger.getBalance(getAlice().getName()), 0);
+        assertEquals(alicebalance, ledger.getAvailableBalance(getAlice().getName()), 0);
+        assertAudit(getAlice().getName());
+    }
 
-        try {
-            hold.complete(t3, payment + 20, "attempt at completing with higher amount");
-            assertTrue("Should throw TransferLargerThanHeldException", false);
-        } catch (TransferLargerThanHeldException e) {
-            assertTrue("Got Transfer Larger Than Exchange Exception", true);
+    public void testExchangeOrderAndCancel() throws InvalidTransferException, NeuClearException, InvalidTransactionException, LowlevelLedgerException {
+        fundAccount();
+        double alicebalance = ledger.getBalance(getAlice().getName());
+        assertEquals(alicebalance, ledger.getAvailableBalance(getAlice().getName()), 0);
+        assertAudit(getAlice().getName());
 
-        } catch (TransferNotStartedException e) {
-            e.printStackTrace();  //To change body of catch statement use Options | File Templates.
-        }
+        Builder builder = new ExchangeOrderBuilder(asset, agent, new Amount(20), new Date(System.currentTimeMillis() + 5000), new BidItem[]{new BidItem(shoes, new Amount(10))}, "give me shoes");
+        SignedNamedObject receipt = process(builder);
+        assertNotNull(receipt);
+        assertTrue(receipt instanceof ExchangeOrderReceipt);
+        assertEquals(alicebalance, ledger.getBalance(getAlice().getName()), 0);
+        assertEquals(alicebalance - 20, ledger.getAvailableBalance(getAlice().getName()), 0);
+        assertAudit(getAlice().getName());
+        SignedNamedObject cr = process(new CancelExchangeOrderBuilder((ExchangeOrderReceipt) receipt));
+        assertNotNull(cr);
+        assertTrue(cr instanceof CancelExchangeReceipt);
+        assertEquals(alicebalance, ledger.getBalance(getAlice().getName()), 0);
+        assertEquals(alicebalance, ledger.getAvailableBalance(getAlice().getName()), 0);
+        assertAudit(getAlice().getName());
+    }
 
-        try {
-            hold.complete(t3, -payment, "attempt at completing with negative amount");
-            assertTrue("Should throw NegativeTransferException", false);
-        } catch (NegativeTransferException e) {
-            assertTrue("Got Negative Transfer Exception", true);
+    public void testExchangeOrderAndComplete() throws InvalidTransferException, NeuClearException, InvalidTransactionException, LowlevelLedgerException {
+        fundAccount();
+        double alicebalance = ledger.getBalance(getAlice().getName());
+        assertEquals(alicebalance, ledger.getAvailableBalance(getAlice().getName()), 0);
+        assertAudit(getAlice().getName());
 
-        }
+        Builder builder = new ExchangeOrderBuilder(asset, agent, new Amount(20), new Date(System.currentTimeMillis() + 20000), new BidItem[]{new BidItem(shoes, new Amount(10))}, "give me shoes");
+        SignedNamedObject receipt = process(builder);
+        assertNotNull(receipt);
+        assertTrue(receipt instanceof ExchangeOrderReceipt);
+        assertEquals(alicebalance, ledger.getBalance(getAlice().getName()), 0);
+        assertEquals(alicebalance - 20, ledger.getAvailableBalance(getAlice().getName()), 0);
+        assertAudit(getAlice().getName());
 
-        try {
-            hold.complete(t5, payment, "attempt at completing payment at past date");
-            assertTrue("Should throw ExpiredHeldTransferException", false);
-        } catch (ExpiredHeldTransferException e) {
-            assertTrue("Threw ExpiredHeldTransferException", true);
-        }
+        SignedNamedObject cr = process(new ExchangeCompletionOrderBuilder((ExchangeOrderReceipt) receipt, new Date(), getBob().getName(), new Amount(18), "done"));
+        assertNotNull(cr);
+        assertTrue(cr instanceof ExchangeCompletedReceipt);
+        assertEquals(alicebalance - 18, ledger.getBalance(getAlice().getName()), 0);
+        assertEquals(alicebalance - 18, ledger.getAvailableBalance(getAlice().getName()), 0);
+        assertAudit(getAlice().getName());
+    }
 
-        try {
-            hold.complete(t1, payment, "attempt at completing payment early");
-            assertTrue("Should throw ExpiredHeldTransferException", false);
-        } catch (ExpiredHeldTransferException e) {
-            assertTrue("Threw ExpiredHeldTransferException", true);
-        }
+    private SignedNamedObject process(Builder builder) throws NeuClearException {
+        final SignedNamedObject obj = builder.convert("neu://alice@test", getSigner());
 
-        TransferReceipt receipt = hold.complete(t3, payment, "valid completion of held payment");
-        System.out.println("Completed held: " + hold.getRequestId() + " complete= " + receipt.getRequestId());
-        assertEquals(bob.getBalance(t2), initial, 0);
-        assertEquals(bob.getBalance(t3), initial - payment, 0);
-        assertEquals(bob.getBalance(t4), initial - payment, 0);
-        assertEquals(bob.getBalance(t5), initial - payment, 0);
-        assertEquals(bob.getAvailableBalance(t1), initial, 0);
-        assertEquals(bob.getAvailableBalance(t2), initial, 0);
-        assertEquals(bob.getAvailableBalance(t3), initial - payment, 0);
-        assertEquals(bob.getAvailableBalance(t4), initial - payment, 0);
-        assertEquals(bob.getAvailableBalance(t5), initial - payment, 0);
+        return auditor.receive(proc.receive(obj));
+    }
 
+    public Asset createTestAsset() throws NeuClearException {
+        AssetBuilder builder = new AssetBuilder("http://bux.neuclear.org",
+                getSigner().getPublicKey("neu://test/bux"),
+                getAlice().getPublicKey(),
+                2, 0);
+        return (Asset) builder.convert("neu://test/bux", getSigner());
 
     }
 
-*/
-    private CurrencyController proc;
+    public Asset createShoeAsset() throws NeuClearException {
+        AssetBuilder builder = new AssetBuilder("http://shoes.neuclear.org",
+                getSigner().getPublicKey("neu://test/bux"),
+                getAlice().getPublicKey(),
+                2, 0);
+        return (Asset) builder.convert("neu://test", getSigner());
+
+    }
+
+    public ExchangeAgent createTestExchangeAgent() throws NeuClearException {
+        ExchangeAgentBuilder builder = new ExchangeAgentBuilder("http://tradex.neuclear.org",
+                getSigner().getPublicKey("neu://bob@test"));
+        return (ExchangeAgent) builder.convert("neu://test", getSigner());
+
+    }
+
+    private Receiver proc;
+    private Ledger ledger;
+    private Ledger auditLedger;
+    private Auditor auditor;
+    private ExchangeAgent agent;
+    private Asset asset;
+    private Asset shoes;
+
+
 }

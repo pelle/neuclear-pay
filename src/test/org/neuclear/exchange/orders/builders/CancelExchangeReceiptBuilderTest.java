@@ -30,8 +30,11 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: CancelExchangeReceiptBuilderTest.java,v 1.1 2004/04/05 16:31:45 pelle Exp $
+$Id: CancelExchangeReceiptBuilderTest.java,v 1.2 2004/04/05 22:08:24 pelle Exp $
 $Log: CancelExchangeReceiptBuilderTest.java,v $
+Revision 1.2  2004/04/05 22:08:24  pelle
+CurrencyController and AuditController now now pass all unit tests in CurrencyTests.
+
 Revision 1.1  2004/04/05 16:31:45  pelle
 Created new ServiceBuilder class for creating services. A service is an identity that has a seperate service URL and Service Public Key.
 
@@ -101,7 +104,7 @@ public class CancelExchangeReceiptBuilderTest extends AbstractExchangeOrderTest 
         Builder ob = new ExchangeOrderBuilder(bux, agent, new Amount(20), new Date(System.currentTimeMillis() + 10000), bids, "Test");
         ExchangeOrderReceiptBuilder rb = new ExchangeOrderReceiptBuilder((ExchangeOrder) ob.convert("neu://test/bux", getSigner()), new Date());
         CancelExchangeOrderBuilder cb = new CancelExchangeOrderBuilder((ExchangeOrderReceipt) rb.convert("neu://test/bux", getSigner()));
-        System.out.println(cb.asXML());
+//        System.out.println(cb.asXML());
 
         final CancelExchangeOrder req = (CancelExchangeOrder) cb.convert("neu://test/bux", getSigner());
         CancelExchangeReceiptBuilder builder = new CancelExchangeReceiptBuilder(req, new Date());

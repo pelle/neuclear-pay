@@ -34,8 +34,11 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: ExchangeOrderBuilder.java,v 1.3 2004/04/05 16:31:43 pelle Exp $
+$Id: ExchangeOrderBuilder.java,v 1.4 2004/04/05 22:08:23 pelle Exp $
 $Log: ExchangeOrderBuilder.java,v $
+Revision 1.4  2004/04/05 22:08:23  pelle
+CurrencyController and AuditController now now pass all unit tests in CurrencyTests.
+
 Revision 1.3  2004/04/05 16:31:43  pelle
 Created new ServiceBuilder class for creating services. A service is an identity that has a seperate service URL and Service Public Key.
 
@@ -132,7 +135,7 @@ TransferReceiptBuilder has been created for use by Transfer processors. It is us
  * Time: 3:13:27 PM
  */
 public class ExchangeOrderBuilder extends Builder {
-    protected ExchangeOrderBuilder(final Service asset, final ExchangeAgent agent, final Value amount, final Date expiry, final BidItem items[], final String comment) throws InvalidTransferException, NegativeTransferException, NeuClearException {
+    public ExchangeOrderBuilder(final Service asset, final ExchangeAgent agent, final Value amount, final Date expiry, final BidItem items[], final String comment) throws InvalidTransferException, NegativeTransferException, NeuClearException {
         super(ExchangeOrderGlobals.createQName(ExchangeOrderGlobals.EXCHANGE_TAGNAME));
         if (amount.getAmount() < 0)
             throw new NegativeTransferException(amount);

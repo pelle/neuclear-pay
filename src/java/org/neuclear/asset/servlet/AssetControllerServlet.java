@@ -30,8 +30,11 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: AssetControllerServlet.java,v 1.5 2004/04/05 16:31:42 pelle Exp $
+$Id: AssetControllerServlet.java,v 1.6 2004/04/05 22:08:23 pelle Exp $
 $Log: AssetControllerServlet.java,v $
+Revision 1.6  2004/04/05 22:08:23  pelle
+CurrencyController and AuditController now now pass all unit tests in CurrencyTests.
+
 Revision 1.5  2004/04/05 16:31:42  pelle
 Created new ServiceBuilder class for creating services. A service is an identity that has a seperate service URL and Service Public Key.
 
@@ -119,7 +122,7 @@ public final class AssetControllerServlet extends ReceiverServlet {
         TransferGlobals.registerReaders();
         try {
             asset = (Service) Resolver.resolveIdentity(getServiceid());
-            final AssetController receiver = new CurrencyController(null,
+            final AssetController receiver = new CurrencyController(null, null,
                     getSigner(),
                     getServiceid());
             setReceiver(receiver);

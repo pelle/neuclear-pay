@@ -1,7 +1,5 @@
 package org.neuclear.asset;
 
-import org.neuclear.commons.Utility;
-
 
 /**
  * User: pelleb
@@ -26,7 +24,7 @@ public abstract class TransferException extends Exception {
     }
 
     public final String getMessage() {
-        return "NeuClear Transfer Exception: " + Utility.denullString(proc.toString()) + "\n" + getSubMessage();
+        return "NeuClear Transfer Exception: ";// + Utility.denullString(proc.toString()) + "\n" + getSubMessage();
     }
 
     abstract public String getSubMessage();
