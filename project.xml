@@ -3,7 +3,7 @@
 
     <name>NeuClear Pay</name>
     <id>neuclear-pay</id>
-    <currentVersion>0.3</currentVersion>
+    <currentVersion>1.0-beta1</currentVersion>
     <inceptionYear>2003</inceptionYear>
     <package>org.neuclear.asset</package>
     <logo>/images/logo.gif</logo>
@@ -75,7 +75,7 @@
         <dependency>
             <id>neuclear-commons</id>
             <name>neuclear-commons</name>
-            <version>0.7.1</version>
+            <version>1.0-beta1</version>
             <properties>
                 <war.bundle>true</war.bundle>
             </properties>
@@ -114,7 +114,7 @@
         <dependency>
             <id>neuclear-id</id>
             <name>neuclear-id</name>
-            <version>0.9.1-SNAPSHOT</version>
+            <version>1.0-beta1</version>
             <properties>
                 <war.bundle>true</war.bundle>
             </properties>
@@ -122,7 +122,7 @@
         <dependency>
             <id>neuclear-xmlsig</id>
             <name>neuclear-xmlsig</name>
-            <version>0.13.1-SNAPSHOT</version>
+            <version>0.13.1</version>
             <properties>
                 <war.bundle>true</war.bundle>
             </properties>
@@ -239,12 +239,16 @@
                   src/java
                 </directory>
                 <includes>
-                    <include>*.jks</include>
-                    <include>*.xml</include>
-                    <include>*.properties</include>
+                    <include>**/*.png</include>
+                    <include>**/*.gif</include>
+                    <include>**/*.jpg</include>
+                    <include>**/*.jks</include>
+                    <include>**/*.xml</include>
+                    <include>**/*.properties</include>
+                    <include>LICENSE.txt</include>
                 </includes>
                 <excludes>
-                    <exclude>*.java</exclude>
+                    <exclude>**/*.java</exclude>
                 </excludes>
             </resource>
         </resources>
