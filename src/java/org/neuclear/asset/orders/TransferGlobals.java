@@ -1,8 +1,8 @@
 package org.neuclear.asset.orders;
 
 import org.dom4j.*;
-import org.neuclear.asset.contracts.Asset;
 import org.neuclear.asset.InvalidTransferException;
+import org.neuclear.asset.contracts.Asset;
 import org.neuclear.commons.Utility;
 import org.neuclear.commons.time.TimeTools;
 import org.neuclear.id.Identity;
@@ -14,7 +14,6 @@ import org.neuclear.id.verifier.VerifyingReader;
 
 import java.sql.Timestamp;
 import java.text.ParseException;
-import java.util.StringTokenizer;
 
 /*
 NeuClear Distributed Transaction Clearing Platform
@@ -34,8 +33,11 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: TransferGlobals.java,v 1.6 2004/01/13 15:11:17 pelle Exp $
+$Id: TransferGlobals.java,v 1.7 2004/03/03 23:28:14 pelle Exp $
 $Log: TransferGlobals.java,v $
+Revision 1.7  2004/03/03 23:28:14  pelle
+Updated tests to use AbstractObjectCreationTest
+
 Revision 1.6  2004/01/13 15:11:17  pelle
 Now builds.
 Now need to do unit tests
@@ -150,25 +152,26 @@ public final class TransferGlobals {
         elem.setText(value);
         return elem;
     }
+
     public static String getElementValue(final Element element, final String name) throws InvalidNamedObjectException {
-        return getElementValue(element,createQName(name));
+        return getElementValue(element, createQName(name));
     }
 
     public static String getElementValue(final Element element, final QName name) throws InvalidNamedObjectException {
-        final Element value=element.element(name);
-        if (value==null)
-            throw new InvalidNamedObjectException("Missing required element: "+name);
-        final String text=value.getTextTrim();
+        final Element value = element.element(name);
+        if (value == null)
+            throw new InvalidNamedObjectException("Missing required element: " + name);
+        final String text = value.getTextTrim();
         if (Utility.isEmpty(text))
-            throw new InvalidNamedObjectException("Required element: "+name+" is empty");
+            throw new InvalidNamedObjectException("Required element: " + name + " is empty");
         return text;
     }
 
     public static String parseCommentElement(final Element element) {
-        final Element value=element.element(createQName(COMMENT_TAG));
-        if (value==null)
+        final Element value = element.element(createQName(COMMENT_TAG));
+        if (value == null)
             return "";
-        final String text=value.getTextTrim();
+        final String text = value.getTextTrim();
         return Utility.denullString(text);
     }
 
@@ -182,18 +185,19 @@ public final class TransferGlobals {
     }
 
     public static final Timestamp parseValueTimeElement(final Element elem) throws InvalidNamedObjectException {
-        return parseTimeStampElement(elem,createQName(VALUE_TIME_TAG));
+        return parseTimeStampElement(elem, createQName(VALUE_TIME_TAG));
     }
 
-    public static final Timestamp parseTimeStampElement(final Element elem,final String name) throws InvalidNamedObjectException {
-        return parseTimeStampElement(elem,createQName(name));
+    public static final Timestamp parseTimeStampElement(final Element elem, final String name) throws InvalidNamedObjectException {
+        return parseTimeStampElement(elem, createQName(name));
     }
-    public static final Timestamp parseTimeStampElement(final Element elem,final QName qn) throws InvalidNamedObjectException {
+
+    public static final Timestamp parseTimeStampElement(final Element elem, final QName qn) throws InvalidNamedObjectException {
         try {
-            final Element telem=elem.element(qn);
-            if (telem==null)
+            final Element telem = elem.element(qn);
+            if (telem == null)
                 throw new InvalidNamedObjectException("missing time stamp element");
-            final String value=telem.getTextTrim();
+            final String value = telem.getTextTrim();
             if (Utility.isEmpty(value))
                 throw new InvalidNamedObjectException("missing time stamp");
 
@@ -205,28 +209,29 @@ public final class TransferGlobals {
     }
 
     public static final Asset parseAssetTag(Element elem) throws InvalidNamedObjectException {
-        final String name = getElementValue(elem,ASSET_TAG);
+        final String name = getElementValue(elem, ASSET_TAG);
         try {
             return (Asset) NSResolver.resolveIdentity(name);
         } catch (ClassCastException e) {
-            throw new InvalidNamedObjectException(name,e);
+            throw new InvalidNamedObjectException(name, e);
         } catch (NameResolutionException e) {
-            throw new InvalidNamedObjectException(name,e);
+            throw new InvalidNamedObjectException(name, e);
         }
 
     }
+
     public static final Identity parseRecipientTag(Element elem) throws InvalidNamedObjectException {
-        final String name = getElementValue(elem,RECIPIENT_TAG);
+        final String name = getElementValue(elem, RECIPIENT_TAG);
         try {
-            return  NSResolver.resolveIdentity(name);
+            return NSResolver.resolveIdentity(name);
         } catch (NameResolutionException e) {
-            throw new InvalidNamedObjectException(name,e);
+            throw new InvalidNamedObjectException(name, e);
         }
 
     }
 
     public static final Value parseValueTag(Element elem) throws InvalidNamedObjectException {
-        if (elem.elements(createQName(AMOUNT_TAG))!=null)
+        if (elem.elements(createQName(AMOUNT_TAG)) != null)
             return parseAmountTag(elem);
         else
             return parseSerialNumbers(elem);
@@ -234,44 +239,42 @@ public final class TransferGlobals {
     }
 
     private static SerialNumbers parseSerialNumbers(Element elem) throws InvalidNamedObjectException {
-        final String numbers=getElementValue(elem,SERIAL_NOS_TAG);
+        final String numbers = getElementValue(elem, SERIAL_NOS_TAG);
         return new SerialNumbers(numbers.split("\\s*"));
     }
 
     private static Amount parseAmountTag(Element elem) throws InvalidNamedObjectException {
-        final String amount=getElementValue(elem,AMOUNT_TAG);
+        final String amount = getElementValue(elem, AMOUNT_TAG);
 
         try {
             return new Amount(Double.parseDouble(amount));
         } catch (NumberFormatException e) {
-            throw new InvalidNamedObjectException("Badly formatted number",e);
+            throw new InvalidNamedObjectException("Badly formatted number", e);
         }
     }
 
-    public  static Element createValueTag(Value value) throws InvalidTransferException {
-        if (value instanceof Amount){
-            return createElement(TransferGlobals.AMOUNT_TAG,Double.toString(value.getAmount()));
+    public static Element createValueTag(Value value) throws InvalidTransferException {
+        if (value instanceof Amount) {
+            return createElement(TransferGlobals.AMOUNT_TAG, Double.toString(value.getAmount()));
         }
-        SerialNumbers nos=((SerialNumbers)value);
-        if (value.getAmount()>0) {
-            final StringBuffer buf=new StringBuffer((int) (nos.getAmount()*(nos.getNumber(0).length())+1));
-            for (int i=0;i<nos.getAmount();i++)
+        SerialNumbers nos = ((SerialNumbers) value);
+        if (value.getAmount() > 0) {
+            final StringBuffer buf = new StringBuffer((int) (nos.getAmount() * (nos.getNumber(0).length()) + 1));
+            for (int i = 0; i < nos.getAmount(); i++)
                 buf.append(nos.getNumber(i));
-                buf.append("\n");
-            return createElement(TransferGlobals.SERIAL_NOS_TAG,buf.toString());
+            buf.append("\n");
+            return createElement(TransferGlobals.SERIAL_NOS_TAG, buf.toString());
         }
         throw new InvalidTransferException("Cant have an empty list");
     }
-    public static final SignedNamedObject parseEmbedded(Element elem,QName name) throws InvalidNamedObjectException {
-        Element embedded=elem.element(name);
-        if (embedded==null)
-            throw new InvalidNamedObjectException("Element: "+elem.getName()+" doesnt contain a "+name.getQualifiedName());
-        try {
-            return VerifyingReader.getInstance().read(embedded);
-        } catch (NameResolutionException e) {
-            throw new InvalidNamedObjectException("Element: "+elem.getName()+" had a problem identifying signer",e);
-        }
+
+    public static final SignedNamedObject parseEmbedded(Element elem, QName name) throws InvalidNamedObjectException {
+        Element embedded = elem.element(name);
+        if (embedded == null)
+            throw new InvalidNamedObjectException("Element: " + elem.getName() + " doesnt contain a " + name.getQualifiedName());
+        return VerifyingReader.getInstance().read(embedded);
     }
+
     static {
         registerReaders();
     }
@@ -280,10 +283,10 @@ public final class TransferGlobals {
     public static final String XFER_RCPT_TAGNAME = "TransferReceipt";
     public static final String XFER_NSPREFIX = "xfer";
     public static final String XFER_NSURI = "http://neuclear.org/neu/xfer.xsd";
-    public static final String VALUE_TIME_TAG="ValueTime";
-    public static final String COMMENT_TAG="Comment";
-    public static final String ASSET_TAG="Asset";
-    public static final String AMOUNT_TAG="Amount";
-    public static final String SERIAL_NOS_TAG="SerialNumbers";
+    public static final String VALUE_TIME_TAG = "ValueTime";
+    public static final String COMMENT_TAG = "Comment";
+    public static final String ASSET_TAG = "Asset";
+    public static final String AMOUNT_TAG = "Amount";
+    public static final String SERIAL_NOS_TAG = "SerialNumbers";
     public static final String RECIPIENT_TAG = "Recipient";
 }

@@ -31,8 +31,11 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: TransferOrderBuilderTest.java,v 1.2 2004/02/18 00:13:31 pelle Exp $
+$Id: TransferOrderBuilderTest.java,v 1.3 2004/03/03 23:28:14 pelle Exp $
 $Log: TransferOrderBuilderTest.java,v $
+Revision 1.3  2004/03/03 23:28:14  pelle
+Updated tests to use AbstractObjectCreationTest
+
 Revision 1.2  2004/02/18 00:13:31  pelle
 Many, many clean ups. I've readded Targets in a new method.
 Gotten rid of NamedObjectBuilder and revamped Identity and Resolvers
@@ -47,29 +50,34 @@ Started the unit tests for the new payment message format.
  * Date: Jan 21, 2004
  * Time: 9:11:44 PM
  */
-public class TransferOrderBuilderTest extends AbstractObjectCreationTest{
+public class TransferOrderBuilderTest extends AbstractObjectCreationTest {
     public TransferOrderBuilderTest(String string) throws NeuClearException, GeneralSecurityException {
         super(string);
-        asset=createTestAsset();
+        asset = createTestAsset();
     }
 
     protected void verifyObject(SignedNamedObject obj) throws NonExistingSignerException {
         assertNotNull(obj);
         assertTrue(obj instanceof TransferOrder);
-        TransferOrder order=(TransferOrder) obj;
-        assertEquals(asset.getDigest(),order.getAsset().getDigest());
-        assertEquals(getSigner().getPublicKey("neu://test").getEncoded(),order.getSignatory().getPublicKey().getEncoded());
-        assertEquals(getBob().getPublicKey().getEncoded(),order.getRecipient().getPublicKey().getEncoded());
-        assertEquals("Test",order.getComment());
-        assertEquals(20.0,order.getAmount().getAmount(),0);
+        TransferOrder order = (TransferOrder) obj;
+        assertEquals(asset.getDigest(), order.getAsset().getDigest());
+        assertEquals(getSigner().getPublicKey("neu://test").getEncoded(), order.getSignatory().getPublicKey().getEncoded());
+        assertEquals(getBob().getPublicKey().getEncoded(), order.getRecipient().getPublicKey().getEncoded());
+        assertEquals("Test", order.getComment());
+        assertEquals(20.0, order.getAmount().getAmount(), 0);
+    }
+
+    protected Class getRequiredClass() {
+        return TransferOrder.class;
     }
 
     protected Builder createBuilder() throws NeuClearException, InvalidTransferException, XMLException {
-        Builder builder=new TransferOrderBuilder("neu://test/bux","neu://bob@test",new Amount(20),"Test");
+        Builder builder = new TransferOrderBuilder("neu://test/bux", "neu://bob@test", new Amount(20), "Test");
         System.out.println(builder.asXML());
         return builder;
     }
-    public  Asset createTestAsset() throws NonExistingSignerException {
+
+    public Asset createTestAsset() throws NonExistingSignerException {
 //        return new Asset("http://localhost",getSigner().getPublicKey("neu://test/bux"),1,1);
         return null;//TODO FIX
     }
