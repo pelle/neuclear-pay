@@ -3,7 +3,6 @@ package org.neuclear.asset.receiver.servlet;
 import com.meterware.httpunit.WebForm;
 import org.apache.cactus.ServletTestCase;
 import org.apache.cactus.WebRequest;
-import org.neuclear.id.auth.AuthenticationServlet;
 import org.neuclear.commons.NeuClearException;
 import org.neuclear.commons.Utility;
 import org.neuclear.commons.crypto.Base64;
@@ -11,7 +10,8 @@ import org.neuclear.commons.crypto.signers.JCESigner;
 import org.neuclear.commons.crypto.signers.TestCaseSigner;
 import org.neuclear.id.SignatureRequest;
 import org.neuclear.id.SignedNamedObject;
-import org.neuclear.id.resolver.NSResolver;
+import org.neuclear.id.auth.AuthenticationServlet;
+import org.neuclear.id.resolver.Resolver;
 import org.neuclear.id.verifier.VerifyingReader;
 import org.neuclear.xml.XMLException;
 import org.xml.sax.SAXException;
@@ -39,8 +39,13 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: AssetControllerServletTest.java,v 1.3 2004/03/02 18:58:35 pelle Exp $
+$Id: AssetControllerServletTest.java,v 1.4 2004/04/01 23:18:34 pelle Exp $
 $Log: AssetControllerServletTest.java,v $
+Revision 1.4  2004/04/01 23:18:34  pelle
+Split Identity into Signatory and Identity class.
+Identity remains a signed named object and will in the future just be used for self declared information.
+Signatory now contains the PublicKey etc and is NOT a signed object.
+
 Revision 1.3  2004/03/02 18:58:35  pelle
 Further cleanups in neuclear-id. Moved everything under id.
 
@@ -60,7 +65,7 @@ Added cactus tests to pay
  * Date: Dec 19, 2003
  * Time: 6:52:08 PM
  */
-public class AssetControllerServletTest extends ServletTestCase{
+public class AssetControllerServletTest extends ServletTestCase {
     public AssetControllerServletTest(String string) throws NeuClearException {
         super(string);
         signer = new TestCaseSigner();
@@ -76,8 +81,8 @@ public class AssetControllerServletTest extends ServletTestCase{
     public void testAuthReq() throws ServletException, IOException {
         assertEquals(request.getContentType(), "application/x-www-form-urlencoded");
         assertEquals(request.getMethod(), "POST");
-        config.setInitParameter("serviceid","neu://test");
-        config.setInitParameter("title","cactustest");
+        config.setInitParameter("serviceid", "neu://test");
+        config.setInitParameter("title", "cactustest");
         AuthenticationServlet servlet = new AuthenticationServlet();
         servlet.init(config);
         servlet.service(request, response);
@@ -99,7 +104,8 @@ public class AssetControllerServletTest extends ServletTestCase{
         assertEquals(sigreq.getSignatory().getName(), "neu://test");
         assertEquals(sigreq.getUnsigned().getElement().getName(), "AuthenticationTicket");
         assertEquals(sigreq.getUserid(), "neu://bob@test");
-        assertEquals(NSResolver.resolveIdentity("neu://bob@test").getSigner(), forms[0].getAction());
+        assertEquals(Resolver.resolveIdentity("neu://bob@test").getSigner(), forms[0].getAction());
     }
+
     JCESigner signer;
 }

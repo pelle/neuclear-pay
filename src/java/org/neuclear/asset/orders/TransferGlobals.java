@@ -9,7 +9,7 @@ import org.neuclear.id.Identity;
 import org.neuclear.id.InvalidNamedObjectException;
 import org.neuclear.id.NameResolutionException;
 import org.neuclear.id.SignedNamedObject;
-import org.neuclear.id.resolver.NSResolver;
+import org.neuclear.id.resolver.Resolver;
 import org.neuclear.id.verifier.VerifyingReader;
 
 import java.sql.Timestamp;
@@ -33,8 +33,13 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: TransferGlobals.java,v 1.7 2004/03/03 23:28:14 pelle Exp $
+$Id: TransferGlobals.java,v 1.8 2004/04/01 23:18:32 pelle Exp $
 $Log: TransferGlobals.java,v $
+Revision 1.8  2004/04/01 23:18:32  pelle
+Split Identity into Signatory and Identity class.
+Identity remains a signed named object and will in the future just be used for self declared information.
+Signatory now contains the PublicKey etc and is NOT a signed object.
+
 Revision 1.7  2004/03/03 23:28:14  pelle
 Updated tests to use AbstractObjectCreationTest
 
@@ -211,7 +216,7 @@ public final class TransferGlobals {
     public static final Asset parseAssetTag(Element elem) throws InvalidNamedObjectException {
         final String name = getElementValue(elem, ASSET_TAG);
         try {
-            return (Asset) NSResolver.resolveIdentity(name);
+            return (Asset) Resolver.resolveIdentity(name);
         } catch (ClassCastException e) {
             throw new InvalidNamedObjectException(name, e);
         } catch (NameResolutionException e) {
@@ -223,7 +228,7 @@ public final class TransferGlobals {
     public static final Identity parseRecipientTag(Element elem) throws InvalidNamedObjectException {
         final String name = getElementValue(elem, RECIPIENT_TAG);
         try {
-            return NSResolver.resolveIdentity(name);
+            return Resolver.resolveIdentity(name);
         } catch (NameResolutionException e) {
             throw new InvalidNamedObjectException(name, e);
         }

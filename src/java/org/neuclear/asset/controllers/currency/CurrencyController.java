@@ -9,7 +9,7 @@ import org.neuclear.commons.NeuClearException;
 import org.neuclear.commons.crypto.signers.Signer;
 import org.neuclear.exchange.orders.*;
 import org.neuclear.id.Identity;
-import org.neuclear.id.resolver.NSResolver;
+import org.neuclear.id.resolver.Resolver;
 import org.neuclear.ledger.*;
 
 import java.util.Iterator;
@@ -28,7 +28,7 @@ public final class CurrencyController extends AssetController {
         super();
         this.ledger = ledger;
         this.signer = signer;
-        asset = (Asset) NSResolver.resolveIdentity(assetname);
+        asset = (Asset) Resolver.resolveIdentity(assetname);
         issuerBook = asset.getName();
     }
 

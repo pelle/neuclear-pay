@@ -11,7 +11,6 @@ import org.neuclear.id.*;
 import java.sql.Timestamp;
 import java.util.Date;
 import java.util.Iterator;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -21,18 +20,19 @@ import java.util.List;
  */
 public final class ExchangeOrder extends ExchangeTransactionContract {
     private ExchangeOrder(final SignedNamedCore core,
-                    final Asset bidAsset, final ExchangeAgent agent, final Value amount,
-                    BidItem items[],  final String comment, final Date expires)  {
-        super(core, bidAsset,agent);
-        this.items =makeSafeCopy(items);
+                          final Asset bidAsset, final ExchangeAgent agent, final Value amount,
+                          BidItem items[], final String comment, final Date expires) {
+        super(core, bidAsset, agent);
+        this.items = makeSafeCopy(items);
         this.amount = amount;
         this.comment = (comment != null) ? comment : "";
         this.expires = expires.getTime();
     }
+
     private static BidItem[] makeSafeCopy(final BidItem src[]) {
-        BidItem items[]= new BidItem[src.length];
-        for (int i=0;i<src.length;i++)
-            items[i]=src[i];
+        BidItem items[] = new BidItem[src.length];
+        for (int i = 0; i < src.length; i++)
+            items[i] = src[i];
         return items;
     }
 
@@ -40,7 +40,7 @@ public final class ExchangeOrder extends ExchangeTransactionContract {
         return new Timestamp(expires);
     }
 
-    public final Identity getBidder() {
+    public final Signatory getBidder() {
         return getSignatory();
     }
 
@@ -53,14 +53,15 @@ public final class ExchangeOrder extends ExchangeTransactionContract {
         return comment;
     }
 
-    public final Iterator iterateBidItems(){
-        return new Iterator(){
-            private int i=0;
+    public final Iterator iterateBidItems() {
+        return new Iterator() {
+            private int i = 0;
+
             public void remove() {
             }
 
             public boolean hasNext() {
-                return i<items.length;
+                return i < items.length;
             }
 
             public Object next() {
@@ -68,6 +69,7 @@ public final class ExchangeOrder extends ExchangeTransactionContract {
             }
         };
     }
+
     private final Value amount;
     private final String comment;
     private final long expires;
@@ -82,7 +84,7 @@ public final class ExchangeOrder extends ExchangeTransactionContract {
          */
         public final SignedNamedObject read(final SignedNamedCore core, final Element elem) throws InvalidNamedObjectException {
             if (!elem.getNamespace().equals(AssetGlobals.NS_ASSET))
-                throw new InvalidNamedObjectException(core.getName(),"Not in XML NameSpace: "+AssetGlobals.NS_ASSET.getURI());
+                throw new InvalidNamedObjectException(core.getName(), "Not in XML NameSpace: " + AssetGlobals.NS_ASSET.getURI());
 
             if (elem.getName().equals(ExchangeGlobals.EXCHANGE_TAGNAME))
                 return new ExchangeOrder(core,
@@ -91,22 +93,20 @@ public final class ExchangeOrder extends ExchangeTransactionContract {
                         TransferGlobals.parseValueTag(elem),
                         parseBidItems(elem),
                         TransferGlobals.parseCommentElement(elem),
-                        TransferGlobals.parseTimeStampElement(elem,ExchangeGlobals.createQName(ExchangeGlobals.EXPIRY_TAG))
-                        );
-            throw new InvalidNamedObjectException(core.getName(),"Not Matched");
+                        TransferGlobals.parseTimeStampElement(elem, ExchangeGlobals.createQName(ExchangeGlobals.EXPIRY_TAG)));
+            throw new InvalidNamedObjectException(core.getName(), "Not Matched");
         }
 
         private BidItem[] parseBidItems(Element elem) throws InvalidNamedObjectException {
-            List list=elem.elements(ExchangeGlobals.createQName(ExchangeGlobals.BID_ITEM_TAG));
-            BidItem items[]=new BidItem[list.size()];
+            List list = elem.elements(ExchangeGlobals.createQName(ExchangeGlobals.BID_ITEM_TAG));
+            BidItem items[] = new BidItem[list.size()];
             for (int i = 0; i < list.size(); i++)
-                items[i]= parseBidItem(elem);
+                items[i] = parseBidItem(elem);
             return items;
         }
 
         private BidItem parseBidItem(Element element) throws InvalidNamedObjectException {
-            return new BidItem(
-                    TransferGlobals.parseAssetTag(element),
+            return new BidItem(TransferGlobals.parseAssetTag(element),
                     TransferGlobals.parseValueTag(element));
 
         }

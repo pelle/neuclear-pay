@@ -4,11 +4,6 @@ import org.dom4j.Element;
 import org.neuclear.commons.Utility;
 import org.neuclear.id.*;
 import org.neuclear.id.targets.Targets;
-import org.neuclear.xml.xmlsec.KeyInfo;
-import org.neuclear.xml.xmlsec.XMLSecTools;
-import org.neuclear.xml.xmlsec.XMLSecurityException;
-
-import java.security.PublicKey;
 
 /*
 NeuClear Distributed Transaction Clearing Platform
@@ -28,8 +23,13 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: Asset.java,v 1.14 2004/02/18 00:13:30 pelle Exp $
+$Id: Asset.java,v 1.15 2004/04/01 23:18:32 pelle Exp $
 $Log: Asset.java,v $
+Revision 1.15  2004/04/01 23:18:32  pelle
+Split Identity into Signatory and Identity class.
+Identity remains a signed named object and will in the future just be used for self declared information.
+Signatory now contains the PublicKey etc and is NOT a signed object.
+
 Revision 1.14  2004/02/18 00:13:30  pelle
 Many, many clean ups. I've readded Targets in a new method.
 Gotten rid of NamedObjectBuilder and revamped Identity and Resolvers
@@ -122,8 +122,8 @@ SOAPTools was changed to return a stream. This is required by the VerifyingReade
  * @see org.neuclear.asset.contracts.builders.AssetBuilder
  */
 public final class Asset extends Identity {
-    protected Asset(final SignedNamedCore core, final Targets targets,final PublicKey pub, final int decimal, final double minimumTransaction) {
-        super(core, pub,null,targets); //Web services dont have signing urls
+    protected Asset(final SignedNamedCore core, final Targets targets, final int decimal, final double minimumTransaction) {
+        super(core, null, targets); //Web services dont have signing urls
         this.decimal = decimal;
         this.multiplier = (int) Math.round(Math.pow(10, -decimal));
         this.minimumTransaction = minimumTransaction;
@@ -174,21 +174,14 @@ public final class Asset extends Identity {
          */
         public final SignedNamedObject read(final SignedNamedCore core, final Element elem) throws InvalidNamedObjectException {
             if (!elem.getNamespace().equals(AssetGlobals.NS_ASSET))
-                throw new InvalidNamedObjectException(core.getName(),"Not in XML NameSpace: "+AssetGlobals.NS_ASSET.getURI());
+                throw new InvalidNamedObjectException(core.getName(), "Not in XML NameSpace: " + AssetGlobals.NS_ASSET.getURI());
 
-            final Element allowElement = InvalidNamedObjectException.assertContainsElementQName(core,elem,createNEUIDQName("allow"));
-            try {
-                final KeyInfo ki = new KeyInfo(InvalidNamedObjectException.assertContainsElementQName(allowElement, XMLSecTools.createQName("KeyInfo")));
-                final PublicKey pub = ki.getPublicKey();
-                final String dec = elem.attributeValue("decimalpoints");
-                final int decimal = (!Utility.isEmpty(dec)) ? Integer.parseInt(dec) : 0;
-                final String min = elem.attributeValue("minimumxact");
-                final double minimum = (!Utility.isEmpty(min)) ? Double.parseDouble(min) : 0;
-                final Targets targets=Targets.parseList(elem);
-                return new Asset(core, targets, pub, decimal, minimum);
-            } catch (XMLSecurityException e) {
-                throw new InvalidNamedObjectException(core.getName(),e);
-            }
+            final String dec = elem.attributeValue("decimalpoints");
+            final int decimal = (!Utility.isEmpty(dec)) ? Integer.parseInt(dec) : 0;
+            final String min = elem.attributeValue("minimumxact");
+            final double minimum = (!Utility.isEmpty(min)) ? Double.parseDouble(min) : 0;
+            final Targets targets = Targets.parseList(elem);
+            return new Asset(core, targets, decimal, minimum);
         }
 
 

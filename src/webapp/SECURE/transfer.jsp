@@ -1,7 +1,7 @@
 <%@ page import="org.neuclear.id.Identity,
                  org.neuclear.commons.Utility,
                  org.neuclear.asset.orders.builders.TransferRequestBuilder,
-                 org.neuclear.id.resolver.NSResolver,
+                 org.neuclear.id.resolver.Resolver,
                  org.neuclear.asset.contracts.Asset,
                  org.neuclear.commons.time.TimeTools,
                  org.neuclear.id.builders.SignatureRequestBuilder,
@@ -17,7 +17,7 @@
     TransferGlobals.registerReaders();
     Identity userns=(Identity) request.getUserPrincipal();
     String service=ServletTools.getInitParam("service",config);
-    Asset asset=(Asset)NSResolver.resolveIdentity(service);
+    Asset asset=(Asset)Resolver.resolveIdentity(service);
     String recipient=Utility.denullString(request.getParameter("recipient"));
     double amount=Double.parseDouble(Utility.denullString(request.getParameter("amount"),"0"));
     boolean submit=!Utility.isEmpty(request.getParameter("submit"));
@@ -50,7 +50,7 @@ if (!submit){
     TransferRequestBuilder transfer=new TransferRequestBuilder(
             asset,
             userns,
-            NSResolver.resolveIdentity(recipient),
+            Resolver.resolveIdentity(recipient),
             amount,
             TimeTools.now(),
             comment

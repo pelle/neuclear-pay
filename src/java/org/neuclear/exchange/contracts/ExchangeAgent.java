@@ -4,8 +4,6 @@ import org.neuclear.id.Identity;
 import org.neuclear.id.SignedNamedCore;
 import org.neuclear.id.targets.Targets;
 
-import java.security.PublicKey;
-
 /*
 NeuClear Distributed Transaction Clearing Platform
 (C) 2003 Pelle Braendgaard
@@ -24,8 +22,13 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: ExchangeAgent.java,v 1.3 2004/02/18 00:13:30 pelle Exp $
+$Id: ExchangeAgent.java,v 1.4 2004/04/01 23:18:33 pelle Exp $
 $Log: ExchangeAgent.java,v $
+Revision 1.4  2004/04/01 23:18:33  pelle
+Split Identity into Signatory and Identity class.
+Identity remains a signed named object and will in the future just be used for self declared information.
+Signatory now contains the PublicKey etc and is NOT a signed object.
+
 Revision 1.3  2004/02/18 00:13:30  pelle
 Many, many clean ups. I've readded Targets in a new method.
 Gotten rid of NamedObjectBuilder and revamped Identity and Resolvers
@@ -47,9 +50,9 @@ Got rid of much of the inheritance that was lying around and thought a bit furth
  * Date: Jan 5, 2004
  * Time: 11:04:32 PM
  */
-public class ExchangeAgent extends Identity{
-    public ExchangeAgent(SignedNamedCore core, PublicKey pub,String signer, Targets targets) {
-        super(core, pub,signer,targets);
+public class ExchangeAgent extends Identity {
+    public ExchangeAgent(SignedNamedCore core, String signer, Targets targets) {
+        super(core, signer, targets);
     }
 
 }

@@ -7,7 +7,7 @@ import org.neuclear.asset.controllers.currency.CurrencyController;
 import org.neuclear.asset.orders.TransferGlobals;
 import org.neuclear.commons.servlets.ServletTools;
 import org.neuclear.id.receiver.ReceiverServlet;
-import org.neuclear.id.resolver.NSResolver;
+import org.neuclear.id.resolver.Resolver;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -30,8 +30,13 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: AssetControllerServlet.java,v 1.3 2004/03/21 00:48:45 pelle Exp $
+$Id: AssetControllerServlet.java,v 1.4 2004/04/01 23:18:33 pelle Exp $
 $Log: AssetControllerServlet.java,v $
+Revision 1.4  2004/04/01 23:18:33  pelle
+Split Identity into Signatory and Identity class.
+Identity remains a signed named object and will in the future just be used for self declared information.
+Signatory now contains the PublicKey etc and is NOT a signed object.
+
 Revision 1.3  2004/03/21 00:48:45  pelle
 The problem with Enveloped signatures has now been fixed. It was a problem in the way transforms work. I have bandaided it, but in the future if better support for transforms need to be made, we need to rethink it a bit. Perhaps using the new crypto channel's in neuclear-commons.
 
@@ -110,7 +115,7 @@ public final class AssetControllerServlet extends ReceiverServlet {
         AssetGlobals.registerReaders();
         TransferGlobals.registerReaders();
         try {
-            asset = (Asset) NSResolver.resolveIdentity(getServiceid());
+            asset = (Asset) Resolver.resolveIdentity(getServiceid());
             final AssetController receiver = new CurrencyController(null,
                     getSigner(),
                     getServiceid());

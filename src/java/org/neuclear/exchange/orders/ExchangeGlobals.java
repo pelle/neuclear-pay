@@ -6,7 +6,7 @@ import org.neuclear.asset.orders.TransferGlobals;
 import org.neuclear.exchange.contracts.ExchangeAgent;
 import org.neuclear.id.InvalidNamedObjectException;
 import org.neuclear.id.NameResolutionException;
-import org.neuclear.id.resolver.NSResolver;
+import org.neuclear.id.resolver.Resolver;
 
 /*
 NeuClear Distributed Transaction Clearing Platform
@@ -26,8 +26,13 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: ExchangeGlobals.java,v 1.3 2004/01/11 00:39:06 pelle Exp $
+$Id: ExchangeGlobals.java,v 1.4 2004/04/01 23:18:33 pelle Exp $
 $Log: ExchangeGlobals.java,v $
+Revision 1.4  2004/04/01 23:18:33  pelle
+Split Identity into Signatory and Identity class.
+Identity remains a signed named object and will in the future just be used for self declared information.
+Signatory now contains the PublicKey etc and is NOT a signed object.
+
 Revision 1.3  2004/01/11 00:39:06  pelle
 Cleaned up the schemas even more they now all verifiy.
 The Order/Receipt pairs for neuclear pay, should now work. They all have Readers using the latest
@@ -139,38 +144,38 @@ public final class ExchangeGlobals {
     }
 
     public static String getElementValue(final Element element, final String name) throws InvalidNamedObjectException {
-           return TransferGlobals.getElementValue(element,createQName(name));
+        return TransferGlobals.getElementValue(element, createQName(name));
     }
+
     public static String parseExchangeOrderId(final Element element) throws InvalidNamedObjectException {
-        return getElementValue(element,EXCHANGE_REF_TAG);
+        return getElementValue(element, EXCHANGE_REF_TAG);
     }
 
     public static final ExchangeAgent parseAgentTag(Element elem) throws InvalidNamedObjectException {
-        final String name = getElementValue(elem,AGENT_TAG);
+        final String name = getElementValue(elem, AGENT_TAG);
         try {
-            return (ExchangeAgent) NSResolver.resolveIdentity(name);
+            return (ExchangeAgent) Resolver.resolveIdentity(name);
         } catch (ClassCastException e) {
-            throw new InvalidNamedObjectException(name,e);
+            throw new InvalidNamedObjectException(name, e);
         } catch (NameResolutionException e) {
-            throw new InvalidNamedObjectException(name,e);
+            throw new InvalidNamedObjectException(name, e);
         }
 
     }
 
-    public static final Asset parseAssetTag(final Element elem,final String tag) throws InvalidNamedObjectException {
-        final String name = getElementValue(elem,tag);
+    public static final Asset parseAssetTag(final Element elem, final String tag) throws InvalidNamedObjectException {
+        final String name = getElementValue(elem, tag);
         try {
-            return (Asset) NSResolver.resolveIdentity(name);
+            return (Asset) Resolver.resolveIdentity(name);
         } catch (ClassCastException e) {
-            throw new InvalidNamedObjectException(name,e);
+            throw new InvalidNamedObjectException(name, e);
         } catch (NameResolutionException e) {
-            throw new InvalidNamedObjectException(name,e);
+            throw new InvalidNamedObjectException(name, e);
         }
 
     }
 
 
-    
     public static void registerReaders() {
 //        VerifyingReader.getInstance().registerReader(ExchangeGlobals.CANCEL_TAGNAME, new AssetTransactionContract.Reader());
 //        VerifyingReader.getInstance().registerReader(ExchangeGlobals.CANCEL_RCPT_TAGNAME, new AssetTransactionContract.Reader());

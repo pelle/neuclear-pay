@@ -31,8 +31,13 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: TransferOrderBuilderTest.java,v 1.3 2004/03/03 23:28:14 pelle Exp $
+$Id: TransferOrderBuilderTest.java,v 1.4 2004/04/01 23:18:33 pelle Exp $
 $Log: TransferOrderBuilderTest.java,v $
+Revision 1.4  2004/04/01 23:18:33  pelle
+Split Identity into Signatory and Identity class.
+Identity remains a signed named object and will in the future just be used for self declared information.
+Signatory now contains the PublicKey etc and is NOT a signed object.
+
 Revision 1.3  2004/03/03 23:28:14  pelle
 Updated tests to use AbstractObjectCreationTest
 
@@ -62,7 +67,7 @@ public class TransferOrderBuilderTest extends AbstractObjectCreationTest {
         TransferOrder order = (TransferOrder) obj;
         assertEquals(asset.getDigest(), order.getAsset().getDigest());
         assertEquals(getSigner().getPublicKey("neu://test").getEncoded(), order.getSignatory().getPublicKey().getEncoded());
-        assertEquals(getBob().getPublicKey().getEncoded(), order.getRecipient().getPublicKey().getEncoded());
+        assertEquals(getBob().getPublicKey().getEncoded(), order.getRecipient().getSignatory().getPublicKey().getEncoded());
         assertEquals("Test", order.getComment());
         assertEquals(20.0, order.getAmount().getAmount(), 0);
     }

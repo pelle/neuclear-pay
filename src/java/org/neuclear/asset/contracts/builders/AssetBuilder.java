@@ -8,8 +8,6 @@ import org.neuclear.commons.crypto.signers.JCESigner;
 import org.neuclear.commons.crypto.signers.TestCaseSigner;
 import org.neuclear.id.builders.IdentityBuilder;
 
-import java.security.PublicKey;
-
 /*
 NeuClear Distributed Transaction Clearing Platform
 (C) 2003 Pelle Braendgaard
@@ -28,8 +26,13 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: AssetBuilder.java,v 1.8 2004/03/02 18:39:29 pelle Exp $
+$Id: AssetBuilder.java,v 1.9 2004/04/01 23:18:31 pelle Exp $
 $Log: AssetBuilder.java,v $
+Revision 1.9  2004/04/01 23:18:31  pelle
+Split Identity into Signatory and Identity class.
+Identity remains a signed named object and will in the future just be used for self declared information.
+Signatory now contains the PublicKey etc and is NOT a signed object.
+
 Revision 1.8  2004/03/02 18:39:29  pelle
 Done some more minor fixes within xmlsig, but mainly I've removed the old Source and Store patterns and sub packages. This is because
 they really are no longer necessary with the new non naming naming system.
@@ -107,16 +110,14 @@ public final class AssetBuilder extends IdentityBuilder {
     /**
      * Used to create new Assets
      * 
-     * @param allow      PublicKey allowed to sign in here
-     * @param repository URL of Default Store for NameSpace. (Note. A NameSpace object is stored in the default repository of it's parent namespace)
      * @param signer     URL of default interactive signing service for namespace. If null it doesnt allow interactive signing
      * @param receiver   URL of default receiver for namespace
      * @param controller URL of AssetController This should be a http web url
      * @param decimal    The amount of decimal points.
      * @param minimum    Minimum transaction size
      */
-    public AssetBuilder(final PublicKey allow, final String signer, final String logger, final String receiver, final String controller, final int decimal, final double minimum) throws NeuClearException {
-        super(AssetGlobals.createQName(AssetGlobals.ASSET_TAGNAME),  allow,  signer, logger, receiver);
+    public AssetBuilder(final String signer, final String logger, final String receiver, final String controller, final int decimal, final double minimum) throws NeuClearException {
+        super(AssetGlobals.createQName(AssetGlobals.ASSET_TAGNAME), signer, logger, receiver);
         final Element elem = getElement();
         AssetGlobals.createAttribute(elem, "controller", controller);
         AssetGlobals.createAttribute(elem, "decimalpoints", Integer.toString(decimal));
@@ -131,16 +132,13 @@ public final class AssetBuilder extends IdentityBuilder {
             if (args.length > 0)
                 assetname = args[0];
 
-            final AssetBuilder assetraw = new AssetBuilder(
-                    signer.getPublicKey(assetname),
-                    "http://bux.neuclear.org:8080",
+            final AssetBuilder assetraw = new AssetBuilder("http://bux.neuclear.org:8080",
                     "http://logger.neuclear.org",
                     "http://bux.neuclear.org:8080",
                     "http://bux.neuclear.org:8080",
                     2,
-                    0.01
-            );
-            final Asset asset= (Asset) assetraw.convert(assetname,signer);
+                    0.01);
+            final Asset asset = (Asset) assetraw.convert(assetname, signer);
 
         } catch (Exception e) {
             e.printStackTrace();
