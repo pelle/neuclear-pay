@@ -1,16 +1,17 @@
 package org.neuclear.pay.receiver;
 
 import org.neuclear.id.SignedNamedObject;
+import org.neuclear.id.verifier.VerifyingReader;
 import org.neuclear.ledger.InvalidTransactionException;
 import org.neuclear.ledger.LowlevelLedgerException;
 import org.neuclear.ledger.UnBalancedTransactionException;
 import org.neuclear.ledger.UnknownBookException;
 import org.neuclear.pay.*;
 import org.neuclear.pay.contracts.TransferContract;
+import org.neuclear.pay.contracts.TransferGlobals;
 import org.neuclear.pay.contracts.builders.TransferReceiptBuilder;
 import org.neuclear.receiver.Receiver;
 import org.neuclear.receiver.UnsupportedTransaction;
-import org.neuclear.commons.NeuClearException;
 import org.neudist.xml.ElementProxy;
 import org.neudist.xml.xmlsec.XMLSecurityException;
 
@@ -37,7 +38,6 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
 /**
- * 
  * User: pelleb
  * Date: Sep 23, 2003
  * Time: 3:03:03 PM
@@ -52,8 +52,9 @@ public class PaymentReceiver implements Receiver {
 
     /**
      * Add your main transaction processing logic within this method.
-     * @param obj
-     * @throws UnsupportedTransaction
+     * 
+     * @param obj 
+     * @throws UnsupportedTransaction 
      */
     public final ElementProxy receive(SignedNamedObject obj) throws UnsupportedTransaction {
         if (obj instanceof TransferContract) {
@@ -72,8 +73,6 @@ public class PaymentReceiver implements Receiver {
             } catch (UnknownBookException e) {
                 throw new UnsupportedTransaction(obj);
             } catch (LowlevelLedgerException e) {
-                e.printStackTrace();
-            } catch (NeuClearException e) {
                 e.printStackTrace();
             } catch (InsufficientFundsException e) {
                 e.printStackTrace();
@@ -95,4 +94,9 @@ public class PaymentReceiver implements Receiver {
     private final PaymentProcessor proc;
     private final String asset;
     private PrivateKey signer;
+
+    {
+        // Registers the readers for transfers
+        VerifyingReader.getInstance().registerReader(TransferGlobals.XFER_TAGNAME, new TransferContract.Reader());
+    }
 }

@@ -102,8 +102,8 @@ public class PaymentProcessor {
     }
 
     public static PaymentProcessor getInstance() throws LowlevelLedgerException, LedgerCreationException, ConfigurationException {
-        PicoContainer pico = Configuration.getContainer();
-        return (PaymentProcessor) pico.getComponent(PaymentProcessor.class);
+        PicoContainer pico = Configuration.getContainer(PaymentProcessor.class);
+        return (PaymentProcessor) pico.getComponentInstance(PaymentProcessor.class);
     }
 
 /*    public static PicoContainer getContainer() throws LedgerCreationException, LowlevelLedgerException {
