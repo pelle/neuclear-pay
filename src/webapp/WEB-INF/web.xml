@@ -9,6 +9,11 @@
         <description>NeuClear id of Service</description>
     </context-param>
     <context-param>
+        <param-name>ledgerid</param-name>
+        <param-value>33zz6ubwxuqpbtbslmuiuf7ofaqplmbg</param-value>
+        <description>Id of Ledger</description>
+    </context-param>
+    <context-param>
         <param-name>ledger</param-name>
         <param-value>hibernate</param-value>
     </context-param>
