@@ -1,7 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-$Id: xfer.xsd,v 1.6 2004/01/11 00:39:06 pelle Exp $
+$Id: xfer.xsd,v 1.7 2004/04/06 16:24:34 pelle Exp $
 $Log: xfer.xsd,v $
+Revision 1.7  2004/04/06 16:24:34  pelle
+Added two new Data Objects IssuerOrder and IssueReceipt for managing the issuance process.
+Added Issuance support to the Asset and Audit Controllers.
+Implemented access control for complete and cancel exchange orders.
+
 Revision 1.6  2004/01/11 00:39:06  pelle
 Cleaned up the schemas even more they now all verifiy.
 The Order/Receipt pairs for neuclear pay, should now work. They all have Readers using the latest
@@ -42,7 +47,7 @@ Updated the Exchange and transfer orders.
     xmlns="http://neuclear.org/neu/xfer.xsd"
     xmlns:id="http://neuclear.org/neu/neuid.xsd"
     elementFormDefault="qualified" version="0.3" id="xfer">
- 	<xs:import namespace="http://neuclear.org/neu/neuid.xsd" schemaLocation="../../../neuclear-id/src/schemas/neuid.xsd" />
+    <xs:import namespace="http://neuclear.org/neu/neuid.xsd" schemaLocation="../../../neuclear-id/src/schemas/neuid.xsd"/>
 
     <xs:element name="Asset" type="id:NamedObjectReference" nillable="false"/>
     <xs:element name="Recipient" type="id:NamedObjectReference" nillable="false"/>
@@ -67,18 +72,41 @@ Updated the Exchange and transfer orders.
                 <xs:element ref="Recipient" minOccurs="1" maxOccurs="1"/>
                 <xs:element ref="Asset" minOccurs="1" maxOccurs="1"/>
                 <xs:element ref="Value" minOccurs="1" maxOccurs="1"/>
-                <xs:element ref="Comment"  minOccurs="0" maxOccurs="1"/>
+                <xs:element ref="Comment" minOccurs="0" maxOccurs="1"/>
                 <xs:group ref="id:SignedObjectGroup" minOccurs="0" maxOccurs="1"/>
             </xs:sequence>
         </xs:complexType>
     </xs:element>
 
     <xs:element name="TransferReceipt" nillable="false">
-        <xs:complexType >
+        <xs:complexType>
             <xs:sequence>
                 <xs:element ref="ValueTime" minOccurs="1" maxOccurs="1"/>
                 <xs:element ref="Value" minOccurs="0" maxOccurs="1"/>
                 <xs:element ref="TransferOrder" minOccurs="1" maxOccurs="1"/>
+                <xs:group ref="id:SignedObjectGroup" minOccurs="0" maxOccurs="1"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="IssueOrder" nillable="false">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="Recipient" minOccurs="1" maxOccurs="1"/>
+                <xs:element ref="Asset" minOccurs="1" maxOccurs="1"/>
+                <xs:element ref="Value" minOccurs="1" maxOccurs="1"/>
+                <xs:element ref="Comment" minOccurs="0" maxOccurs="1"/>
+                <xs:group ref="id:SignedObjectGroup" minOccurs="0" maxOccurs="1"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="IssueReceipt" nillable="false">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="ValueTime" minOccurs="1" maxOccurs="1"/>
+                <xs:element ref="Value" minOccurs="0" maxOccurs="1"/>
+                <xs:element ref="IssueOrder" minOccurs="1" maxOccurs="1"/>
                 <xs:group ref="id:SignedObjectGroup" minOccurs="0" maxOccurs="1"/>
             </xs:sequence>
         </xs:complexType>

@@ -32,8 +32,13 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: TransferGlobals.java,v 1.10 2004/04/05 16:31:41 pelle Exp $
+$Id: TransferGlobals.java,v 1.11 2004/04/06 16:24:34 pelle Exp $
 $Log: TransferGlobals.java,v $
+Revision 1.11  2004/04/06 16:24:34  pelle
+Added two new Data Objects IssuerOrder and IssueReceipt for managing the issuance process.
+Added Issuance support to the Asset and Audit Controllers.
+Implemented access control for complete and cancel exchange orders.
+
 Revision 1.10  2004/04/05 16:31:41  pelle
 Created new ServiceBuilder class for creating services. A service is an identity that has a seperate service URL and Service Public Key.
 
@@ -193,6 +198,8 @@ public final class TransferGlobals {
     public static void registerReaders() {
         VerifyingReader.getInstance().registerReader(TransferGlobals.XFER_TAGNAME, new TransferOrder.Reader());
         VerifyingReader.getInstance().registerReader(TransferGlobals.XFER_RCPT_TAGNAME, new TransferReceipt.Reader());
+        VerifyingReader.getInstance().registerReader(TransferGlobals.ISSUE_TAGNAME, new IssueOrder.Reader());
+        VerifyingReader.getInstance().registerReader(TransferGlobals.ISSUE_RCPT_TAGNAME, new IssueReceipt.Reader());
     }
 
     public static final Timestamp parseValueTimeElement(final Element elem) throws InvalidNamedObjectException {
@@ -289,6 +296,8 @@ public final class TransferGlobals {
 
     public static final String XFER_TAGNAME = "TransferOrder";
     public static final String XFER_RCPT_TAGNAME = "TransferReceipt";
+    public static final String ISSUE_TAGNAME = "IssueOrder";
+    public static final String ISSUE_RCPT_TAGNAME = "IssueReceipt";
     public static final String XFER_NSPREFIX = "xfer";
     public static final String XFER_NSURI = "http://neuclear.org/neu/xfer.xsd";
     public static final String VALUE_TIME_TAG = "ValueTime";

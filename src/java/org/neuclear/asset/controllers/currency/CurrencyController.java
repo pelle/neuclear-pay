@@ -2,8 +2,11 @@ package org.neuclear.asset.controllers.currency;
 
 import org.neuclear.asset.*;
 import org.neuclear.asset.contracts.Asset;
+import org.neuclear.asset.orders.IssueOrder;
+import org.neuclear.asset.orders.IssueReceipt;
 import org.neuclear.asset.orders.TransferOrder;
 import org.neuclear.asset.orders.TransferReceipt;
+import org.neuclear.asset.orders.builders.IssueReceiptBuilder;
 import org.neuclear.asset.orders.builders.TransferReceiptBuilder;
 import org.neuclear.commons.NeuClearException;
 import org.neuclear.commons.crypto.signers.Signer;
@@ -59,6 +62,37 @@ public final class CurrencyController extends AssetController {
         }
     }
 
+    /**
+     * Issues an asset. Thus moving assets into circulation
+     *
+     * @param req IssueOrder
+     * @return Unsigned Receipt
+     * @throws org.neuclear.asset.LowLevelPaymentException
+     *
+     * @throws org.neuclear.asset.TransferDeniedException
+     *
+     * @throws org.neuclear.asset.InvalidTransferException
+     *
+     */
+    public IssueReceipt process(IssueOrder req) throws LowLevelPaymentException, TransferDeniedException, InvalidTransferException, NeuClearException {
+        try {
+            if (!req.getSignatory().getName().equals(issuerBook))
+                throw new InvalidTransferException("Only Issuer is allowed to issue");
+            final PostedTransaction posted = ledger.transfer(req.getDigest(), req.getSignatory().getName(), req.getRecipient(), req.getAmount().getAmount(), req.getComment());
+            final IssueReceipt receipt = (IssueReceipt) new IssueReceiptBuilder(req, posted.getTransactionTime()).convert(alias, signer);
+            ledger.setReceiptId(req.getDigest(), receipt.getDigest());
+            return receipt;
+        } catch (LowlevelLedgerException e) {
+            throw new LowLevelPaymentException(e);
+        } catch (InvalidTransactionException e) {
+            throw new InvalidTransferException(e);
+        } catch (NegativeTransferException e) {
+            throw new InvalidTransferException("postive amount");
+        } catch (UnknownTransactionException e) {
+            throw new LowLevelPaymentException(e);
+        }
+    }
+
 
     public final ExchangeOrderReceipt process(final ExchangeOrder req) throws InvalidTransferException, LowLevelPaymentException, TransferDeniedException, NeuClearException {
         try {
@@ -80,6 +114,8 @@ public final class CurrencyController extends AssetController {
 
     public final ExchangeCompletedReceipt process(final ExchangeCompletionOrder complete) throws LowLevelPaymentException, InvalidTransferException, TransferDeniedException, NeuClearException {
         try {
+            if (!complete.getSignatory().getPublicKey().equals(complete.getReceipt().getOrder().getAgent().getServiceKey()))
+                throw new InvalidTransferException("Only Agent is allowed to Sign Completion Order");
             PostedTransaction tran = ledger.complete(complete.getReceipt().getOrder().getDigest(), complete.getAmount().getAmount(), complete.getComment());
             ExchangeCompletedReceipt receipt = (ExchangeCompletedReceipt) new ExchangeCompletedReceiptBuilder(complete, tran.getTransactionTime()).convert(alias, signer);
             ledger.setReceiptId(complete.getReceipt().getOrder().getDigest(), receipt.getDigest());
@@ -96,9 +132,12 @@ public final class CurrencyController extends AssetController {
     }
 
     public final CancelExchangeReceipt process(final CancelExchangeOrder cancel) throws InvalidTransferException, LowLevelPaymentException, TransferDeniedException, NeuClearException {
+        if (!(cancel.getSignatory().getName().equals(cancel.getReceipt().getOrder().getSignatory().getName())
+                || cancel.getSignatory().getPublicKey().equals(cancel.getReceipt().getOrder().getAgent().getServiceKey())))
+            throw new InvalidTransferException("Only Agent is allowed to Sign Completion Order");
         try {
-            ledger.cancel(cancel.getReceipt().getOrder().getDigest());
-            return (CancelExchangeReceipt) new CancelExchangeReceiptBuilder(cancel, new Date()).convert(alias, signer);
+            final Date time = ledger.cancel(cancel.getReceipt().getOrder().getDigest());
+            return (CancelExchangeReceipt) new CancelExchangeReceiptBuilder(cancel, time).convert(alias, signer);
         } catch (LowlevelLedgerException e) {
             throw new LowLevelPaymentException(e);
         } catch (UnknownTransactionException e) {

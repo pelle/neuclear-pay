@@ -17,6 +17,7 @@ import org.neuclear.exchange.orders.ExchangeOrderReceipt;
 import org.neuclear.exchange.orders.builders.CancelExchangeOrderBuilder;
 import org.neuclear.exchange.orders.builders.ExchangeCompletionOrderBuilder;
 import org.neuclear.exchange.orders.builders.ExchangeOrderBuilder;
+import org.neuclear.id.InvalidNamedObjectException;
 import org.neuclear.id.SignedNamedObject;
 import org.neuclear.id.builders.Builder;
 import org.neuclear.id.receiver.Receiver;
@@ -93,7 +94,7 @@ public final class CurrencyTests extends AbstractSigningTest {
         assertAudit(getAlice().getName());
     }
 
-    public void testExchangeOrderAndCancel() throws InvalidTransferException, NeuClearException, InvalidTransactionException, LowlevelLedgerException {
+    public void testExchangeOrderAndCancelByOwner() throws InvalidTransferException, NeuClearException, InvalidTransactionException, LowlevelLedgerException {
         fundAccount();
         double alicebalance = ledger.getBalance(getAlice().getName());
         assertEquals(alicebalance, ledger.getAvailableBalance(getAlice().getName()), 0);
@@ -114,6 +115,51 @@ public final class CurrencyTests extends AbstractSigningTest {
         assertAudit(getAlice().getName());
     }
 
+    public void testExchangeOrderAndCancelByAgent() throws InvalidTransferException, NeuClearException, InvalidTransactionException, LowlevelLedgerException {
+        fundAccount();
+        double alicebalance = ledger.getBalance(getAlice().getName());
+        assertEquals(alicebalance, ledger.getAvailableBalance(getAlice().getName()), 0);
+        assertAudit(getAlice().getName());
+
+        Builder builder = new ExchangeOrderBuilder(asset, agent, new Amount(20), new Date(System.currentTimeMillis() + 5000), new BidItem[]{new BidItem(shoes, new Amount(10))}, "give me shoes");
+        SignedNamedObject receipt = process(builder);
+        assertNotNull(receipt);
+        assertTrue(receipt instanceof ExchangeOrderReceipt);
+        assertEquals(alicebalance, ledger.getBalance(getAlice().getName()), 0);
+        assertEquals(alicebalance - 20, ledger.getAvailableBalance(getAlice().getName()), 0);
+        assertAudit(getAlice().getName());
+        SignedNamedObject cr = processAgent(new CancelExchangeOrderBuilder((ExchangeOrderReceipt) receipt));
+        assertNotNull(cr);
+        assertTrue(cr instanceof CancelExchangeReceipt);
+        assertEquals(alicebalance, ledger.getBalance(getAlice().getName()), 0);
+        assertEquals(alicebalance, ledger.getAvailableBalance(getAlice().getName()), 0);
+        assertAudit(getAlice().getName());
+    }
+
+    public void testFailOnExchangeOrderAndCancelByBaddie() throws InvalidTransferException, NeuClearException, InvalidTransactionException, LowlevelLedgerException {
+        fundAccount();
+        double alicebalance = ledger.getBalance(getAlice().getName());
+        assertEquals(alicebalance, ledger.getAvailableBalance(getAlice().getName()), 0);
+        assertAudit(getAlice().getName());
+
+        Builder builder = new ExchangeOrderBuilder(asset, agent, new Amount(20), new Date(System.currentTimeMillis() + 8000), new BidItem[]{new BidItem(shoes, new Amount(10))}, "give me shoes");
+        SignedNamedObject receipt = process(builder);
+        assertNotNull(receipt);
+        assertTrue(receipt instanceof ExchangeOrderReceipt);
+        assertEquals(alicebalance, ledger.getBalance(getAlice().getName()), 0);
+        assertEquals(alicebalance - 20, ledger.getAvailableBalance(getAlice().getName()), 0);
+        assertAudit(getAlice().getName());
+        try {
+            SignedNamedObject cr = processHacker(new CancelExchangeOrderBuilder((ExchangeOrderReceipt) receipt));
+            assertTrue(false);
+        } catch (InvalidNamedObjectException e) {
+            assertTrue(true);
+        }
+        assertEquals(alicebalance, ledger.getBalance(getAlice().getName()), 0);
+        assertEquals(alicebalance - 20, ledger.getAvailableBalance(getAlice().getName()), 0);
+        assertAudit(getAlice().getName());
+    }
+
     public void testExchangeOrderAndComplete() throws InvalidTransferException, NeuClearException, InvalidTransactionException, LowlevelLedgerException {
         fundAccount();
         double alicebalance = ledger.getBalance(getAlice().getName());
@@ -128,11 +174,67 @@ public final class CurrencyTests extends AbstractSigningTest {
         assertEquals(alicebalance - 20, ledger.getAvailableBalance(getAlice().getName()), 0);
         assertAudit(getAlice().getName());
 
-        SignedNamedObject cr = process(new ExchangeCompletionOrderBuilder((ExchangeOrderReceipt) receipt, new Date(), getBob().getName(), new Amount(18), "done"));
+        SignedNamedObject cr = processAgent(new ExchangeCompletionOrderBuilder((ExchangeOrderReceipt) receipt, new Date(), getBob().getName(), new Amount(18), "done"));
         assertNotNull(cr);
         assertTrue(cr instanceof ExchangeCompletedReceipt);
         assertEquals(alicebalance - 18, ledger.getBalance(getAlice().getName()), 0);
         assertEquals(alicebalance - 18, ledger.getAvailableBalance(getAlice().getName()), 0);
+        assertAudit(getAlice().getName());
+    }
+
+    public void testFailOnExchangeOrderAndCompleteByOwner() throws InvalidTransferException, NeuClearException, InvalidTransactionException, LowlevelLedgerException {
+        fundAccount();
+        double alicebalance = ledger.getBalance(getAlice().getName());
+        assertEquals(alicebalance, ledger.getAvailableBalance(getAlice().getName()), 0);
+        assertAudit(getAlice().getName());
+
+        Builder builder = new ExchangeOrderBuilder(asset, agent, new Amount(20), new Date(System.currentTimeMillis() + 20000), new BidItem[]{new BidItem(shoes, new Amount(10))}, "give me shoes");
+        SignedNamedObject receipt = process(builder);
+        assertNotNull(receipt);
+        assertTrue(receipt instanceof ExchangeOrderReceipt);
+        assertEquals(alicebalance, ledger.getBalance(getAlice().getName()), 0);
+        assertEquals(alicebalance - 20, ledger.getAvailableBalance(getAlice().getName()), 0);
+        assertAudit(getAlice().getName());
+
+        try {
+            SignedNamedObject cr = process(new ExchangeCompletionOrderBuilder((ExchangeOrderReceipt) receipt, new Date(), getBob().getName(), new Amount(18), "done"));
+            assertTrue(false);
+        } catch (InvalidNamedObjectException e) {
+            assertTrue(true);
+        } catch (InvalidTransferException e) {
+            assertTrue(true);
+        }
+
+        assertEquals(alicebalance, ledger.getBalance(getAlice().getName()), 0);
+        assertEquals(alicebalance - 20, ledger.getAvailableBalance(getAlice().getName()), 0);
+        assertAudit(getAlice().getName());
+    }
+
+    public void testFailOnExchangeOrderAndCompleteByBaddie() throws InvalidTransferException, NeuClearException, InvalidTransactionException, LowlevelLedgerException {
+        fundAccount();
+        double alicebalance = ledger.getBalance(getAlice().getName());
+        assertEquals(alicebalance, ledger.getAvailableBalance(getAlice().getName()), 0);
+        assertAudit(getAlice().getName());
+
+        Builder builder = new ExchangeOrderBuilder(asset, agent, new Amount(20), new Date(System.currentTimeMillis() + 20000), new BidItem[]{new BidItem(shoes, new Amount(10))}, "give me shoes");
+        SignedNamedObject receipt = process(builder);
+        assertNotNull(receipt);
+        assertTrue(receipt instanceof ExchangeOrderReceipt);
+        assertEquals(alicebalance, ledger.getBalance(getAlice().getName()), 0);
+        assertEquals(alicebalance - 20, ledger.getAvailableBalance(getAlice().getName()), 0);
+        assertAudit(getAlice().getName());
+
+        try {
+            SignedNamedObject cr = processHacker(new ExchangeCompletionOrderBuilder((ExchangeOrderReceipt) receipt, new Date(), getBob().getName(), new Amount(18), "done"));
+            assertTrue(false);
+        } catch (InvalidNamedObjectException e) {
+            assertTrue(true);
+        } catch (InvalidTransferException e) {
+            assertTrue(true);
+        }
+
+        assertEquals(alicebalance, ledger.getBalance(getAlice().getName()), 0);
+        assertEquals(alicebalance - 20, ledger.getAvailableBalance(getAlice().getName()), 0);
         assertAudit(getAlice().getName());
     }
 
@@ -141,6 +243,19 @@ public final class CurrencyTests extends AbstractSigningTest {
 
         return auditor.receive(proc.receive(obj));
     }
+
+    private SignedNamedObject processAgent(Builder builder) throws NeuClearException {
+        final SignedNamedObject obj = builder.convert("neu://bob@test", getSigner());
+
+        return auditor.receive(proc.receive(obj));
+    }
+
+    private SignedNamedObject processHacker(Builder builder) throws NeuClearException {
+        final SignedNamedObject obj = builder.convert("neu://test", getSigner());
+
+        return auditor.receive(proc.receive(obj));
+    }
+
 
     public Asset createTestAsset() throws NeuClearException {
         AssetBuilder builder = new AssetBuilder("http://bux.neuclear.org",

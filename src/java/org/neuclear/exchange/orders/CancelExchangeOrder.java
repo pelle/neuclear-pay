@@ -37,10 +37,13 @@ public final class CancelExchangeOrder extends ExchangeTransactionContract {
             if (!elem.getNamespace().equals(ExchangeOrderGlobals.NS_EXCHANGE))
                 throw new InvalidNamedObjectException(core.getName(), "Not in XML NameSpace: " + ExchangeOrderGlobals.NS_EXCHANGE.getURI());
 
-            if (elem.getName().equals(ExchangeOrderGlobals.CANCEL_TAGNAME))
-                return new CancelExchangeOrder(core,
-                        (ExchangeOrderReceipt) TransferGlobals.parseEmbedded(elem, ExchangeOrderGlobals.createQName(ExchangeOrderGlobals.EXCHANGE_RCPT_TAGNAME)));
-
+            if (elem.getName().equals(ExchangeOrderGlobals.CANCEL_TAGNAME)) {
+                final ExchangeOrderReceipt receipt = (ExchangeOrderReceipt) TransferGlobals.parseEmbedded(elem, ExchangeOrderGlobals.createQName(ExchangeOrderGlobals.EXCHANGE_RCPT_TAGNAME));
+                if (core.getSignatory().getName().equals(receipt.getOrder().getSignatory().getName())
+                        || core.getSignatory().getPublicKey().equals(receipt.getOrder().getAgent().getServiceKey()))
+                    return new CancelExchangeOrder(core, receipt);
+                throw new InvalidNamedObjectException("Signer does not have permission to Cancel");
+            }
             throw new InvalidNamedObjectException(core.getName(), "Not Matched");
         }
     }

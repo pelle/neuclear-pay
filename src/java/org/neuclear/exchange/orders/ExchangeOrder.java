@@ -1,6 +1,7 @@
 package org.neuclear.exchange.orders;
 
 import org.dom4j.Element;
+import org.neuclear.asset.contracts.Asset;
 import org.neuclear.asset.orders.TransferGlobals;
 import org.neuclear.asset.orders.Value;
 import org.neuclear.exchange.contracts.ExchangeAgent;
@@ -18,7 +19,7 @@ import java.util.List;
  */
 public final class ExchangeOrder extends ExchangeTransactionContract {
     private ExchangeOrder(final SignedNamedCore core,
-                          final Service bidAsset, final ExchangeAgent agent, final Value amount,
+                          final Asset bidAsset, final ExchangeAgent agent, final Value amount,
                           BidItem items[], final String comment, final Date expires) {
         super(core, bidAsset, agent);
         this.items = makeSafeCopy(items);

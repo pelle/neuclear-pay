@@ -13,9 +13,9 @@ import org.neuclear.id.SignedNamedObject;
  * Date: Jul 21, 2003
  * Time: 5:35:26 PM
  */
-public final class TransferOrder extends AssetTransactionContract {
+public final class IssueOrder extends AssetTransactionContract {
 
-    private TransferOrder(final SignedNamedCore core, final Asset asset, final String recipient, final Value amount, final String comment) {
+    private IssueOrder(final SignedNamedCore core, final Asset asset, final String recipient, final Value amount, final String comment) {
         super(core, asset);
         this.amount = amount;
         this.comment = comment;
@@ -49,14 +49,16 @@ public final class TransferOrder extends AssetTransactionContract {
         public final SignedNamedObject read(final SignedNamedCore core, final Element elem) throws InvalidNamedObjectException {
             if (!elem.getNamespace().getURI().equals(TransferGlobals.XFER_NSURI))
                 throw new InvalidNamedObjectException(core.getName(), "Not in XML NameSpace: " + AssetGlobals.NS_ASSET.getURI());
-            if (!elem.getName().equals(TransferGlobals.XFER_TAGNAME))
+            if (!elem.getName().equals(TransferGlobals.ISSUE_TAGNAME))
                 throw new InvalidNamedObjectException(core.getName(), "Incorrect XML Tagname for reader: " + TransferGlobals.XFER_TAGNAME);
-
-            return new TransferOrder(core,
-                    TransferGlobals.parseAssetTag(elem),
-                    TransferGlobals.parseRecipientTag(elem),
-                    TransferGlobals.parseValueTag(elem),
-                    TransferGlobals.parseCommentElement(elem));
+            final Asset asset = TransferGlobals.parseAssetTag(elem);
+            if (asset.getIssuerKey() != null && core.getSignatory().getPublicKey().equals(asset.getIssuerKey()))
+                return new IssueOrder(core,
+                        asset,
+                        TransferGlobals.parseRecipientTag(elem),
+                        TransferGlobals.parseValueTag(elem),
+                        TransferGlobals.parseCommentElement(elem));
+            throw new InvalidNamedObjectException(core.getSignatory().getName() + " is not the issuer for asset: " + asset.getName());
         }
     }
 

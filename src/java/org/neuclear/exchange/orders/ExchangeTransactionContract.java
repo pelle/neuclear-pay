@@ -1,8 +1,8 @@
 package org.neuclear.exchange.orders;
 
+import org.neuclear.asset.contracts.Asset;
 import org.neuclear.asset.orders.AssetTransactionContract;
 import org.neuclear.exchange.contracts.ExchangeAgent;
-import org.neuclear.id.Service;
 import org.neuclear.id.SignedNamedCore;
 
 /*
@@ -23,8 +23,13 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: ExchangeTransactionContract.java,v 1.3 2004/04/05 16:31:43 pelle Exp $
+$Id: ExchangeTransactionContract.java,v 1.4 2004/04/06 16:24:34 pelle Exp $
 $Log: ExchangeTransactionContract.java,v $
+Revision 1.4  2004/04/06 16:24:34  pelle
+Added two new Data Objects IssuerOrder and IssueReceipt for managing the issuance process.
+Added Issuance support to the Asset and Audit Controllers.
+Implemented access control for complete and cancel exchange orders.
+
 Revision 1.3  2004/04/05 16:31:43  pelle
 Created new ServiceBuilder class for creating services. A service is an identity that has a seperate service URL and Service Public Key.
 
@@ -47,7 +52,7 @@ Updated the Exchange and transfer orders.
  * Time: 7:31:15 PM
  */
 public abstract class ExchangeTransactionContract extends AssetTransactionContract {
-    ExchangeTransactionContract(SignedNamedCore core, Service asset, ExchangeAgent agent) {
+    ExchangeTransactionContract(SignedNamedCore core, Asset asset, ExchangeAgent agent) {
         super(core, asset);
         this.agent = agent;
     }

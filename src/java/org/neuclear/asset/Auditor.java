@@ -1,6 +1,8 @@
 package org.neuclear.asset;
 
 import org.neuclear.asset.contracts.Asset;
+import org.neuclear.asset.orders.IssueOrder;
+import org.neuclear.asset.orders.IssueReceipt;
 import org.neuclear.asset.orders.TransferOrder;
 import org.neuclear.asset.orders.TransferReceipt;
 import org.neuclear.commons.NeuClearException;
@@ -29,8 +31,13 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: Auditor.java,v 1.3 2004/04/05 22:54:05 pelle Exp $
+$Id: Auditor.java,v 1.4 2004/04/06 16:24:34 pelle Exp $
 $Log: Auditor.java,v $
+Revision 1.4  2004/04/06 16:24:34  pelle
+Added two new Data Objects IssuerOrder and IssueReceipt for managing the issuance process.
+Added Issuance support to the Asset and Audit Controllers.
+Implemented access control for complete and cancel exchange orders.
+
 Revision 1.3  2004/04/05 22:54:05  pelle
 API changes in Ledger to support Auditor and CurrencyController in Pay
 
@@ -143,18 +150,22 @@ public class Auditor implements Receiver {
         try {
             if (contract instanceof TransferReceipt)
                 process((TransferReceipt) contract);
+            if (contract instanceof TransferOrder)
+                process((TransferOrder) contract);
             if (contract instanceof ExchangeOrderReceipt)
                 process((ExchangeOrderReceipt) contract);
             if (contract instanceof ExchangeCompletedReceipt)
                 process((ExchangeCompletedReceipt) contract);
-            if (contract instanceof TransferOrder)
-                process((TransferOrder) contract);
             if (contract instanceof ExchangeOrder)
                 process((ExchangeOrder) contract);
             if (contract instanceof ExchangeCompletionOrder)
                 process((ExchangeCompletionOrder) contract);
             if (contract instanceof CancelExchangeReceipt)
                 process((CancelExchangeReceipt) contract);
+            if (contract instanceof IssueReceipt)
+                process((IssueReceipt) contract);
+            if (contract instanceof IssueOrder)
+                process((IssueOrder) contract);
         } catch (LowLevelPaymentException e) {
             throw new NeuClearException(e);
         } catch (TransferDeniedException e) {
@@ -186,6 +197,32 @@ public class Auditor implements Receiver {
     public final void process(final TransferOrder req) throws InvalidTransferException, LowLevelPaymentException {
         try {
             ledger.transfer(req.getDigest(), req.getSignatory().getName(), req.getRecipient(), req.getAmount().getAmount(), req.getComment());
+        } catch (LowlevelLedgerException e) {
+            throw new LowLevelPaymentException(e);
+        } catch (InvalidTransactionException e) {
+            throw new InvalidTransferException(e.getSubMessage());
+        }
+    }
+
+    public final void process(final IssueReceipt receipt) throws InvalidTransferException, LowLevelPaymentException, TransferDeniedException, NeuClearException {
+        try {
+            final IssueOrder req = receipt.getOrder();
+            if (req.getSignatory().getPublicKey().equals(asset.getIssuerKey())) {
+                if (!ledger.transactionExists(req.getDigest()))
+                    process(req);
+                ledger.setReceiptId(req.getDigest(), receipt.getDigest());
+            }
+        } catch (LowlevelLedgerException e) {
+            throw new LowLevelPaymentException(e);
+        } catch (UnknownTransactionException e) {
+            throw new LowLevelPaymentException(e);
+        }
+    }
+
+    public final void process(final IssueOrder req) throws InvalidTransferException, LowLevelPaymentException {
+        try {
+            if (req.getSignatory().getPublicKey().equals(asset.getIssuerKey()))
+                ledger.transfer(req.getDigest(), req.getSignatory().getName(), req.getRecipient(), req.getAmount().getAmount(), req.getComment());
         } catch (LowlevelLedgerException e) {
             throw new LowLevelPaymentException(e);
         } catch (InvalidTransactionException e) {
@@ -256,6 +293,6 @@ public class Auditor implements Receiver {
     }
 
     private final Ledger ledger;
-    private final Service asset;
+    private final Asset asset;
 
 }

@@ -64,12 +64,16 @@ public final class ExchangeCompletionOrder extends ExchangeTransactionContract {
                 throw new InvalidNamedObjectException(core.getName(), "Not in XML NameSpace: " + ExchangeOrderGlobals.NS_EXCHANGE.getURI());
 
             if (elem.getName().equals(ExchangeOrderGlobals.COMPLETE_TAGNAME)) {
-                return new ExchangeCompletionOrder(core,
-                        (ExchangeOrderReceipt) TransferGlobals.parseEmbedded(elem, ExchangeOrderGlobals.createQName(ExchangeOrderGlobals.EXCHANGE_RCPT_TAGNAME)),
-                        TransferGlobals.parseRecipientTag(elem),
-                        TransferGlobals.parseValueTag(elem),
-                        TransferGlobals.parseTimeStampElement(elem, ExchangeOrderGlobals.createQName(ExchangeOrderGlobals.EXCHANGE_TIME_TAGNAME)),
-                        TransferGlobals.parseCommentElement(elem));
+                final ExchangeOrderReceipt receipt = (ExchangeOrderReceipt) TransferGlobals.parseEmbedded(elem, ExchangeOrderGlobals.createQName(ExchangeOrderGlobals.EXCHANGE_RCPT_TAGNAME));
+                if (core.getSignatory().getPublicKey().equals(receipt.getOrder().getAgent().getServiceKey()))
+                    return new ExchangeCompletionOrder(core,
+                            receipt,
+                            TransferGlobals.parseRecipientTag(elem),
+                            TransferGlobals.parseValueTag(elem),
+                            TransferGlobals.parseTimeStampElement(elem, ExchangeOrderGlobals.createQName(ExchangeOrderGlobals.EXCHANGE_TIME_TAGNAME)),
+                            TransferGlobals.parseCommentElement(elem));
+                throw new InvalidNamedObjectException("Signer does not have permission to Complete");
+
             }
             throw new InvalidNamedObjectException(core.getName(), "Not Matched");
         }

@@ -1,6 +1,6 @@
 package org.neuclear.asset.orders;
 
-import org.neuclear.id.Service;
+import org.neuclear.asset.contracts.Asset;
 import org.neuclear.id.SignedNamedCore;
 import org.neuclear.id.SignedNamedObject;
 
@@ -9,11 +9,16 @@ import org.neuclear.id.SignedNamedObject;
  * User: pelleb
  * Date: Nov 10, 2003
  * Time: 11:06:37 AM
- * $Id: AssetTransactionContract.java,v 1.3 2004/04/05 16:31:41 pelle Exp $
+ * $Id: AssetTransactionContract.java,v 1.4 2004/04/06 16:24:34 pelle Exp $
  * $Log: AssetTransactionContract.java,v $
+ * Revision 1.4  2004/04/06 16:24:34  pelle
+ * Added two new Data Objects IssuerOrder and IssueReceipt for managing the issuance process.
+ * Added Issuance support to the Asset and Audit Controllers.
+ * Implemented access control for complete and cancel exchange orders.
+ *
  * Revision 1.3  2004/04/05 16:31:41  pelle
  * Created new ServiceBuilder class for creating services. A service is an identity that has a seperate service URL and Service Public Key.
- *
+ * <p/>
  * Revision 1.2  2004/01/10 00:00:45  pelle
  * Implemented new Schema for Transfer*
  * Working on it for Exchange*, so far all Receipts are implemented.
@@ -89,15 +94,15 @@ import org.neuclear.id.SignedNamedObject;
  * AssetControlClient implementes a remote client for communicating with AssetControllers
  */
 public abstract class AssetTransactionContract extends SignedNamedObject {
-    private final Service asset;
+    private final Asset asset;
 
-    protected AssetTransactionContract(final SignedNamedCore core, final Service asset) {
+    protected AssetTransactionContract(final SignedNamedCore core, final Asset asset) {
         super(core);
         this.asset = asset;
     }
 
 
-    public final Service getAsset() {
+    public final Asset getAsset() {
         return asset;
     }
 

@@ -1,5 +1,7 @@
 package org.neuclear.asset;
 
+import org.neuclear.asset.orders.IssueOrder;
+import org.neuclear.asset.orders.IssueReceipt;
 import org.neuclear.asset.orders.TransferOrder;
 import org.neuclear.asset.orders.TransferReceipt;
 import org.neuclear.commons.NeuClearException;
@@ -27,8 +29,13 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: AssetController.java,v 1.15 2004/04/05 16:31:42 pelle Exp $
+$Id: AssetController.java,v 1.16 2004/04/06 16:24:34 pelle Exp $
 $Log: AssetController.java,v $
+Revision 1.16  2004/04/06 16:24:34  pelle
+Added two new Data Objects IssuerOrder and IssueReceipt for managing the issuance process.
+Added Issuance support to the Asset and Audit Controllers.
+Implemented access control for complete and cancel exchange orders.
+
 Revision 1.15  2004/04/05 16:31:42  pelle
 Created new ServiceBuilder class for creating services. A service is an identity that has a seperate service URL and Service Public Key.
 
@@ -129,6 +136,8 @@ public abstract class AssetController implements Receiver {
         try {
             if (contract instanceof TransferOrder)
                 return process((TransferOrder) contract);
+            if (contract instanceof IssueOrder)
+                return process((IssueOrder) contract);
             if (contract instanceof ExchangeOrder)
                 return process((ExchangeOrder) contract);
             if (contract instanceof ExchangeCompletionOrder)
@@ -165,6 +174,17 @@ public abstract class AssetController implements Receiver {
      * @throws InvalidTransferException 
      */
     public abstract TransferReceipt process(TransferOrder req) throws LowLevelPaymentException, TransferDeniedException, InvalidTransferException, NeuClearException;
+
+    /**
+     * Issues an asset. Thus moving assets into circulation
+     *
+     * @param req IssueOrder
+     * @return Unsigned Receipt
+     * @throws LowLevelPaymentException
+     * @throws TransferDeniedException
+     * @throws InvalidTransferException
+     */
+    public abstract IssueReceipt process(IssueOrder req) throws LowLevelPaymentException, TransferDeniedException, InvalidTransferException, NeuClearException;
 
     /**
      * Creates a HeldTransfer. This gives the recipient right within a limited period to "complete" the Transfer.
