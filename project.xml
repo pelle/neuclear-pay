@@ -94,7 +94,7 @@
            <name>neuclear-xmlsig</name>
            <version>0.10</version>
            <properties>
-                 <war.bundle.jar>true</war.bundle.jar>
+                 <war.bundle>true</war.bundle>
            </properties>
        </dependency>
     <dependency>
@@ -103,7 +103,7 @@
       <version>2.1</version>
       <jar>commons-collections-2.1.jar</jar>
       <properties>
-            <war.bundle.jar>true</war.bundle.jar>
+            <war.bundle>true</war.bundle>
       </properties>
     </dependency>
     <dependency>
@@ -111,7 +111,7 @@
       <version>1.4</version>
       <jar>dom4j-1.4.jar</jar>
       <properties>
-            <war.bundle.jar>true</war.bundle.jar>
+            <war.bundle>true</war.bundle>
       </properties>
     </dependency>
      <dependency>
@@ -125,7 +125,7 @@
       <version>115</version>
       <jar>jce-jdk13-115.jar</jar>
       <properties>
-            <war.bundle.jar>false</war.bundle.jar>
+            <war.bundle>false</war.bundle>
       </properties>
     </dependency>
    <dependency>
@@ -142,7 +142,7 @@
       <id>waterken-adt</id>
       <version>2.0-beta13</version>
       <properties>
-            <war.bundle.jar>true</war.bundle.jar>
+            <war.bundle>true</war.bundle>
       </properties>
     </dependency>
     <dependency>
@@ -157,6 +157,13 @@
       <jar>activation.jar</jar>
       <url>http://java.sun.com/products/javabeans/glasgow/jaf.html</url>
    </dependency>
+       <dependency>
+           <id>jstl</id>
+           <version>1.0.2</version>
+           <properties>
+            <war.bundle>true</war.bundle>
+      </properties>
+       </dependency>
 
   </dependencies>
   <build>
