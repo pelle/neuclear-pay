@@ -1,0 +1,196 @@
+package org.neuclear.pay;
+
+import junit.framework.TestCase;
+import org.neuclear.ledger.*;
+import org.neuclear.ledger.implementations.SQLLedger;
+import org.neuclear.commons.sql.SQLTools;
+import org.neuclear.commons.sql.DefaultConnectionSource;
+import org.neuclear.commons.configuration.ConfigurationException;
+import org.picocontainer.defaults.*;
+import org.picocontainer.PicoIntrospectionException;
+import org.picocontainer.PicoInitializationException;
+import org.picocontainer.PicoContainer;
+
+import java.io.IOException;
+import java.math.BigInteger;
+import java.sql.SQLException;
+import java.util.Random;
+import java.util.Date;
+import java.util.Calendar;
+
+/**
+ * 
+ * User: pelleb
+ * Date: Jul 21, 2003
+ * Time: 6:05:04 PM
+ */
+public class PaymentTests extends TestCase{
+    public PaymentTests(String s) throws SQLException, IOException, LowlevelLedgerException, BookExistsException, LedgerCreationException, ConfigurationException {
+        super(s);
+        proc=PaymentProcessor.getInstance();
+    }
+
+    private Account createNewAccount(String name,String title) throws BookExistsException, LowlevelLedgerException {
+        BigInteger id=new BigInteger(168,new Random());
+        return proc.createAccount(name+id.toString(36),title);
+    }
+    private Account createBobAccount() throws LowlevelLedgerException, BookExistsException {
+        return createNewAccount("neu://neuclear-pay/testusers/bob","Bob");
+    }
+    private Account createAliceAccount() throws LowlevelLedgerException, BookExistsException {
+        return createNewAccount("neu://neuclear-pay/testusers/alice","Alice");
+    }
+
+    public void testCreateAccount() throws LowlevelLedgerException, BookExistsException {
+        Account bob=createBobAccount();
+        assertNotNull(bob);
+        assertEquals(bob.getBalance(),0.0,0);
+    }
+
+    public void testFundAccount() throws LowlevelLedgerException, BookExistsException, UnknownBookException, UnBalancedTransactionException, InvalidTransactionException, NegativePaymentException {
+        Account bob=createBobAccount();
+        assertNotNull(bob);
+        assertEquals(bob.getBalance(),0.0,0);
+        proc.getIssuerAccount().fundAccount(bob,100,new Date());
+        assertEquals(bob.getBalance(),100.0,0);
+    }
+    public void testValidPayment() throws LowlevelLedgerException, BookExistsException, UnknownBookException, UnBalancedTransactionException, InvalidTransactionException, InsufficientFundsException, NegativePaymentException {
+         double initial=100;
+         double payment=75;
+         Account bob=createBobAccount();
+         Account alice=createAliceAccount();
+         assertNotNull(bob);
+         assertNotNull(alice);
+         assertEquals(bob.getBalance(),0.0,0);
+         assertEquals(alice.getBalance(),0.0,0);
+         proc.getIssuerAccount().fundAccount(bob,initial,new Date());
+         assertEquals(bob.getBalance(),initial,0);
+         bob.pay(alice,payment,new Date(),"Test Valid Payment");
+         assertEquals(bob.getBalance(),initial-payment,0);
+         assertEquals(alice.getBalance(),payment,0);
+     }
+
+    public void testInValidPayment() throws LowlevelLedgerException, BookExistsException, UnknownBookException, UnBalancedTransactionException, InvalidTransactionException, InsufficientFundsException, NegativePaymentException {
+         double initial=75;
+         double payment=100;
+         Account bob=createBobAccount();
+         Account alice=createAliceAccount();
+         assertNotNull(bob);
+         assertNotNull(alice);
+         assertEquals(bob.getBalance(),0.0,0);
+         assertEquals(alice.getBalance(),0.0,0);
+         proc.getIssuerAccount().fundAccount(bob,initial,new Date());
+         assertEquals(bob.getBalance(),initial,0);
+
+        // check for insufficient funds
+        try {
+            bob.pay(alice,payment,new Date(),"Test for Insufficient Funds");
+            assertTrue("Didnt get Insufficient Funds Exception",false);
+        } catch (InsufficientFundsException e) {
+            assertTrue("Got Insufficient Funds Exception",true);
+        }
+        assertEquals(bob.getBalance(),initial,0);
+        assertEquals(alice.getBalance(),0,0);
+        // Check for negative payments
+        try {
+            bob.pay(alice,-payment,new Date(),"Attempted negative payment");
+            assertTrue("Performed Negative Payment",false);
+        } catch (NegativePaymentException e) {
+            assertTrue("Couldnt perform Negative Payment",true);
+        }
+        assertEquals(bob.getBalance(),initial,0);
+        assertEquals(alice.getBalance(),0,0);
+
+     }
+
+    public void testHeldPayment() throws LowlevelLedgerException, BookExistsException, UnknownBookException, UnBalancedTransactionException, InvalidTransactionException, InsufficientFundsException, NegativePaymentException, PaymentNotStartedException, PaymentLargerThanHeldException, ExpiredHeldPaymentException {
+         double initial=100;
+         double payment=75;
+         Account bob=createBobAccount();
+         Account alice=createAliceAccount();
+         assertNotNull(bob);
+         assertNotNull(alice);
+         Calendar cal=Calendar.getInstance();
+         Date t1=cal.getTime();
+         cal.add(Calendar.DAY_OF_YEAR,1);
+         Date t2=cal.getTime();
+         cal.add(Calendar.DAY_OF_YEAR,1);
+         Date t3=cal.getTime();
+         cal.add(Calendar.DAY_OF_YEAR,1);
+         Date t4=cal.getTime();
+         cal.add(Calendar.DAY_OF_YEAR,1);
+         Date t5=cal.getTime();
+
+
+         assertEquals(bob.getBalance(),0.0,0);
+         assertEquals(alice.getBalance(),0.0,0);
+         proc.getIssuerAccount().fundAccount(bob,initial,t1);
+         assertEquals(bob.getBalance(t1),initial,0);
+
+         HeldPaymentReceipt hold=bob.hold(alice,payment,t2,t4,"Test Hold");
+         assertEquals(bob.getBalance(t2),initial,0);
+         assertEquals(bob.getBalance(t3),initial,0);
+         assertEquals(bob.getBalance(t4),initial,0);
+         assertEquals(bob.getAvailableBalance(t1),initial,0);
+         assertEquals(bob.getAvailableBalance(t2),initial-payment,0);
+         assertEquals(bob.getAvailableBalance(t3),initial-payment,0);
+         assertEquals(bob.getAvailableBalance(t4),initial-payment,0);
+         assertEquals(bob.getAvailableBalance(t5),initial,0);
+
+        // check for insufficient funds
+        try {
+            bob.pay(alice,payment,t3,"Test for Insufficient Funds");
+            assertTrue("Didnt get Insufficient Funds Exception",false);
+        } catch (InsufficientFundsException e) {
+            assertTrue("Got Insufficient Funds Exception",true);
+        }
+
+        try {
+            hold.complete(t3,payment+20,"attempt at completing with higher amount");
+            assertTrue("Should throw PaymentLargerThanHeldException",false);
+        } catch (PaymentLargerThanHeldException e) {
+              assertTrue("Got Payment Larger Than Held Exception",true);
+
+        } catch (PaymentNotStartedException e) {
+            e.printStackTrace();  //To change body of catch statement use Options | File Templates.
+        }
+
+        try {
+            hold.complete(t3,-payment,"attempt at completing with negative amount");
+            assertTrue("Should throw NegativePaymentException",false);
+        } catch (NegativePaymentException e) {
+              assertTrue("Got Negative Payment Exception",true);
+
+        }
+
+        try {
+            hold.complete(t5,payment,"attempt at completing payment at past date");
+            assertTrue("Should throw ExpiredHeldPaymentException",false);
+        } catch (ExpiredHeldPaymentException e) {
+            assertTrue("Threw ExpiredHeldPaymentException",true);
+        }
+
+        try {
+            hold.complete(t1,payment,"attempt at completing payment early");
+            assertTrue("Should throw ExpiredHeldPaymentException",false);
+        } catch (ExpiredHeldPaymentException e) {
+            assertTrue("Threw ExpiredHeldPaymentException",true);
+        }
+
+        PaymentReceipt receipt=hold.complete(t3,payment,"valid completion of held payment");
+        System.out.println("Completed held: "+hold.getId()+" complete= "+receipt.getId());
+        assertEquals(bob.getBalance(t2),initial,0);
+        assertEquals(bob.getBalance(t3),initial-payment,0);
+        assertEquals(bob.getBalance(t4),initial-payment,0);
+        assertEquals(bob.getBalance(t5),initial-payment,0);
+        assertEquals(bob.getAvailableBalance(t1),initial,0);
+        assertEquals(bob.getAvailableBalance(t2),initial,0);
+        assertEquals(bob.getAvailableBalance(t3),initial-payment,0);
+        assertEquals(bob.getAvailableBalance(t4),initial-payment,0);
+        assertEquals(bob.getAvailableBalance(t5),initial-payment,0);
+
+
+    }
+
+    private PaymentProcessor proc;
+}

@@ -1,0 +1,10 @@
+<components>
+    <component type="org.neuclear.commons.sql.ConnectionSource" class="org.neuclear.commons.sql.DefaultConnectionSource"/>
+    <component type="org.neuclear.ledger.Ledger" class="org.neuclear.ledger.implementations.SQLLedger">
+        <param type="java.lang.String">neu://superbux/reserve</param>
+    </component>
+    <component class="org.neuclear.pay.PaymentProcessor">
+        <param type="java.lang.String">SuperBux</param>
+        <param type="java.lang.String">neu://superbux/reserve</param>
+    </component>
+</components>
