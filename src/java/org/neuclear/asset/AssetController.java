@@ -12,6 +12,7 @@ import org.neuclear.id.Service;
 import org.neuclear.id.SignedNamedObject;
 import org.neuclear.id.receiver.Receiver;
 import org.neuclear.id.receiver.UnsupportedTransaction;
+import org.neuclear.ledger.LowlevelLedgerException;
 
 /*
 NeuClear Distributed Transaction Clearing Platform
@@ -31,8 +32,12 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: AssetController.java,v 1.17 2004/04/21 23:22:34 pelle Exp $
+$Id: AssetController.java,v 1.18 2004/04/22 23:59:06 pelle Exp $
 $Log: AssetController.java,v $
+Revision 1.18  2004/04/22 23:59:06  pelle
+Added various statistics to Ledger as well as AssetController
+Improved look and feel in the web app.
+
 Revision 1.17  2004/04/21 23:22:34  pelle
 Integrated Browser with the asset controller
 Updated look and feel
@@ -239,6 +244,6 @@ public abstract class AssetController implements Receiver {
     public abstract Asset getAsset();
 
 
-
+    public abstract AssetStatistics getStats() throws LowlevelLedgerException;
     //TODO Add getBalance
 }

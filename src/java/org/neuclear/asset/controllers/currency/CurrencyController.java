@@ -164,6 +164,26 @@ public final class CurrencyController extends AssetController {
         return asset;
     }
 
+    public AssetStatistics getStats() throws LowlevelLedgerException {
+        final double circulation = -ledger.getBalance(issuerBook);
+        final long accounts = ledger.getBookCount();
+        final long xcount = ledger.getTransactionCount();
+        return new AssetStatistics() {
+            public double getCirculation() {
+                return circulation;
+            }
+
+            public long getAmountOfAccounts() {
+                return accounts;
+            }
+
+            public long getTransactionCount() {
+                return xcount;
+            }
+
+        };
+    }
+
 
     private final Ledger ledger;
     private final Asset asset;

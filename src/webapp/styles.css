@@ -1,12 +1,8 @@
 	body	{
-		background: #EEF ;
+		background: #FFF ;
 		color: black;
-		margin: 0;
-		padding-top: 10px;
-		padding-left: 30px;
-		padding-right: 50px;
-		border: 0;
-		border-top: 5px solid #526968;
+        margin:0px 0px 10px 0px;
+		border-top: 5px solid #white;
 		text-align: left;
 		font-family: "Trebuchet MS", "Bitstream Vera Sans", verdana, lucida, arial, helvetica, sans-serif;
 		font-size: small;
@@ -42,6 +38,16 @@
 
 		letter-spacing: .2em;
 		}
+        #subtitle{
+            font-family: Georgia, Times;
+            color:#036;
+            font-size:14px;
+            font-weight:bold;
+            background:#E0E0FF;
+            padding-left:14px;
+            padding-top:3px;
+            padding-bottom:3px;
+            }
 
 		#topnav
 		{
@@ -133,12 +139,13 @@
 
 	#content {
 		float:left;
-		width:65%;
+		width:75%;
 		text-align: left;
 		margin-left:15px;
-		background:#eef;
+		background:#F0F0FFs;
 		border-right:2px solid #aab;
 		margin-right:15px;
+        padding-top:5px;
 		padding-bottom:20px;
 		}
 
@@ -247,14 +254,14 @@ td      {
 tr.odd      {
         background:#EEF;
 }
-tr.odd:hover     {
+tr.oddhover     {
         background:#DDE;
 }
 
 tr.even      {
         background:#FEE;
 }
-tr.even:hover     {
+tr.evenhover     {
         background:#EDD;
 }
 
