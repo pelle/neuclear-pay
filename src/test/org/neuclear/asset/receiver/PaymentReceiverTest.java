@@ -21,9 +21,11 @@ import org.neuclear.receiver.Receiver;
 import org.neuclear.tests.AbstractSigningTest;
 import org.neuclear.xml.XMLException;
 
+import javax.naming.NamingException;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.security.GeneralSecurityException;
+import java.sql.SQLException;
 
 /*
 NeuClear Distributed Transaction Clearing Platform
@@ -43,8 +45,11 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: PaymentReceiverTest.java,v 1.8 2003/11/28 00:11:51 pelle Exp $
+$Id: PaymentReceiverTest.java,v 1.9 2003/12/01 15:42:55 pelle Exp $
 $Log: PaymentReceiverTest.java,v $
+Revision 1.9  2003/12/01 15:42:55  pelle
+*** empty log message ***
+
 Revision 1.8  2003/11/28 00:11:51  pelle
 Getting the NeuClear web transactions working.
 
@@ -129,7 +134,7 @@ CreateTestPayments is a command line utility to create signed payment requests
  * Time: 11:20:31 AM
  */
 public final class PaymentReceiverTest extends AbstractSigningTest {
-    public PaymentReceiverTest(final String string) throws NeuClearException, GeneralSecurityException, UnknownLedgerException, LowlevelLedgerException, BookExistsException, IOException, InvalidTransferException, XMLException {
+    public PaymentReceiverTest(final String string) throws NeuClearException, GeneralSecurityException, UnknownLedgerException, LowlevelLedgerException, BookExistsException, IOException, InvalidTransferException, XMLException, SQLException, NamingException {
         super(string);
         AssetGlobals.registerReaders();
         TransferGlobals.registerReaders();
