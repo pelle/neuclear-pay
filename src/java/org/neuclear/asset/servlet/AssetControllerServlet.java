@@ -1,16 +1,13 @@
 package org.neuclear.asset.servlet;
 
+import org.neuclear.asset.AssetController;
 import org.neuclear.asset.contracts.Asset;
 import org.neuclear.asset.contracts.AssetGlobals;
 import org.neuclear.asset.controllers.currency.CurrencyController;
 import org.neuclear.asset.orders.TransferGlobals;
-import org.neuclear.asset.AssetController;
 import org.neuclear.commons.servlets.ServletTools;
-import org.neuclear.commons.sql.JNDIConnectionSource;
-import org.neuclear.commons.sql.statements.SimpleStatementFactory;
-import org.neuclear.id.resolver.NSResolver;
-import org.neuclear.ledger.implementations.SQLLedger;
 import org.neuclear.id.receiver.ReceiverServlet;
+import org.neuclear.id.resolver.NSResolver;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -33,8 +30,11 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: AssetControllerServlet.java,v 1.2 2004/03/02 18:58:34 pelle Exp $
+$Id: AssetControllerServlet.java,v 1.3 2004/03/21 00:48:45 pelle Exp $
 $Log: AssetControllerServlet.java,v $
+Revision 1.3  2004/03/21 00:48:45  pelle
+The problem with Enveloped signatures has now been fixed. It was a problem in the way transforms work. I have bandaided it, but in the future if better support for transforms need to be made, we need to rethink it a bit. Perhaps using the new crypto channel's in neuclear-commons.
+
 Revision 1.2  2004/03/02 18:58:34  pelle
 Further cleanups in neuclear-id. Moved everything under id.
 
@@ -106,24 +106,18 @@ Payment Web Application is getting there.
 public final class AssetControllerServlet extends ReceiverServlet {
     public final void init(final ServletConfig config) throws ServletException {
         super.init(config);
-        datasource = ServletTools.getInitParam("datasource",config);
+        datasource = ServletTools.getInitParam("datasource", config);
         AssetGlobals.registerReaders();
         TransferGlobals.registerReaders();
         try {
             asset = (Asset) NSResolver.resolveIdentity(getServiceid());
-            final AssetController receiver = new CurrencyController(
-                            new SQLLedger(
-                                    new SimpleStatementFactory(new JNDIConnectionSource(datasource)),
-                                    getServiceid()
-                            ),
-                            getSigner(),
-                            getServiceid()
-
-            );
+            final AssetController receiver = new CurrencyController(null,
+                    getSigner(),
+                    getServiceid());
             setReceiver(receiver);
 
         } catch (Exception e) {
-            ctx.log("AssetControllerServer: "+e.getLocalizedMessage());
+            ctx.log("AssetControllerServer: " + e.getLocalizedMessage());
             throw new ServletException(e);
         }
     }

@@ -4,23 +4,18 @@ import org.neuclear.asset.InvalidTransferException;
 import org.neuclear.asset.contracts.Asset;
 import org.neuclear.asset.contracts.AssetGlobals;
 import org.neuclear.asset.controllers.currency.CurrencyController;
+import org.neuclear.asset.orders.Amount;
 import org.neuclear.asset.orders.TransferGlobals;
 import org.neuclear.asset.orders.TransferOrder;
-import org.neuclear.asset.orders.Amount;
 import org.neuclear.asset.orders.builders.TransferOrderBuilder;
 import org.neuclear.commons.NeuClearException;
 import org.neuclear.commons.crypto.signers.TestCaseSigner;
-import org.neuclear.commons.sql.DefaultConnectionSource;
-import org.neuclear.commons.sql.statements.SimpleStatementFactory;
-import org.neuclear.commons.time.TimeTools;
 import org.neuclear.id.Identity;
 import org.neuclear.id.SignedNamedObject;
+import org.neuclear.id.receiver.Receiver;
 import org.neuclear.id.resolver.NSResolver;
-import org.neuclear.ledger.BookExistsException;
 import org.neuclear.ledger.LowlevelLedgerException;
 import org.neuclear.ledger.UnknownLedgerException;
-import org.neuclear.ledger.implementations.SQLLedger;
-import org.neuclear.id.receiver.Receiver;
 import org.neuclear.tests.AbstractSigningTest;
 import org.neuclear.xml.XMLException;
 
@@ -48,8 +43,11 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: PaymentReceiverTest.java,v 1.16 2004/03/02 18:58:35 pelle Exp $
+$Id: PaymentReceiverTest.java,v 1.17 2004/03/21 00:48:45 pelle Exp $
 $Log: PaymentReceiverTest.java,v $
+Revision 1.17  2004/03/21 00:48:45  pelle
+The problem with Enveloped signatures has now been fixed. It was a problem in the way transforms work. I have bandaided it, but in the future if better support for transforms need to be made, we need to rethink it a bit. Perhaps using the new crypto channel's in neuclear-commons.
+
 Revision 1.16  2004/03/02 18:58:35  pelle
 Further cleanups in neuclear-id. Moved everything under id.
 
@@ -178,21 +176,16 @@ CreateTestPayments is a command line utility to create signed payment requests
  * Time: 11:20:31 AM
  */
 public final class PaymentReceiverTest extends AbstractSigningTest {
-    public PaymentReceiverTest(final String string) throws NeuClearException, GeneralSecurityException, UnknownLedgerException, LowlevelLedgerException, BookExistsException, IOException, InvalidTransferException, XMLException, SQLException, NamingException {
+    public PaymentReceiverTest(final String string) throws NeuClearException, GeneralSecurityException, UnknownLedgerException, LowlevelLedgerException, IOException, InvalidTransferException, XMLException, SQLException, NamingException {
         super(string);
         AssetGlobals.registerReaders();
         TransferGlobals.registerReaders();
         asset = (Asset) NSResolver.resolveIdentity(assetName);
 
-        proc = new CurrencyController(
-                new SQLLedger(
-                        new SimpleStatementFactory(new DefaultConnectionSource()),
-                        assetName
-                ),
+        proc = new CurrencyController(null,
                 new TestCaseSigner(),
-                assetName
-        );
-        receiver=proc;
+                assetName);
+        receiver = proc;
     }
 
 
@@ -223,8 +216,8 @@ public final class PaymentReceiverTest extends AbstractSigningTest {
 
         if (obj instanceof TransferOrder) {
             final TransferOrder transfer = (TransferOrder) obj;
-            final double fromBalance = proc.getBalance(transfer.getSignatory(), transfer.getTimeStamp());
-            final double toBalance = proc.getBalance(transfer.getRecipient(), transfer.getTimeStamp());
+            final double fromBalance = proc.getBalance(transfer.getSignatory());
+            final double toBalance = proc.getBalance(transfer.getRecipient());
 
             return new double[]{fromBalance, toBalance};
 
@@ -235,8 +228,8 @@ public final class PaymentReceiverTest extends AbstractSigningTest {
     public final boolean verifyTransaction(final SignedNamedObject obj, final Object state) throws Exception {
         if (obj instanceof TransferOrder) {
             final TransferOrder transfer = (TransferOrder) obj;
-            final double fromBalance = proc.getBalance(transfer.getSignatory(), transfer.getTimeStamp());
-            final double toBalance = proc.getBalance(transfer.getRecipient(), transfer.getTimeStamp());
+            final double fromBalance = proc.getBalance(transfer.getSignatory());
+            final double toBalance = proc.getBalance(transfer.getRecipient());
             final double prebalances[] = (double[]) state;
 
             return (fromBalance == prebalances[0] - transfer.getAmount().getAmount()) &&
@@ -247,7 +240,7 @@ public final class PaymentReceiverTest extends AbstractSigningTest {
 
     public final SignedNamedObject createPayments(final Identity from, final Identity to, final double amount) throws InvalidTransferException, XMLException, NeuClearException, IOException, UnsupportedEncodingException {
         final TransferOrderBuilder transfer = new TransferOrderBuilder(asset, to, new Amount(amount), "Test One");
-        return transfer.convert(from.getName(),getSigner());
+        return transfer.convert(from.getName(), getSigner());
     }
 
     protected final String assetName = "neu://test/bux";

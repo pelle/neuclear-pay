@@ -9,15 +9,11 @@ import org.neuclear.commons.NeuClearException;
 import org.neuclear.commons.crypto.signers.Signer;
 import org.neuclear.commons.time.TimeTools;
 import org.neuclear.exchange.orders.*;
-import org.neuclear.exchange.orders.builders.CancelExchangeReceiptBuilder;
-import org.neuclear.exchange.orders.builders.ExchangeOrderReceiptBuilder;
-import org.neuclear.exchange.orders.builders.ExchangeCompletedReceiptBuilder;
 import org.neuclear.id.Identity;
 import org.neuclear.id.resolver.NSResolver;
 import org.neuclear.ledger.*;
 
 import java.sql.Timestamp;
-import java.util.Date;
 import java.util.Iterator;
 
 /**
@@ -30,19 +26,12 @@ public final class CurrencyController extends AssetController {
 //    public CurrencyController(String ledgername,String title,String reserve) throws LedgerCreationException, LowlevelLedgerException, BookExistsException {
 //        this(LedgerFactory.getInstance().getLedger(ledgername),title,reserve);
 //    }
-    public CurrencyController(final Ledger ledger, final Signer signer,final String assetname) throws LowlevelLedgerException, BookExistsException, NeuClearException {
+    public CurrencyController(final Ledger ledger, final Signer signer, final String assetname) throws LowlevelLedgerException, NeuClearException {
         super();
         this.ledger = ledger;
-        this.signer=signer;
+        this.signer = signer;
         asset = (Asset) NSResolver.resolveIdentity(assetname);
-
-        Book tmpIssuer = null;
-        try {
-            tmpIssuer = ledger.getBook(asset.getName());
-        } catch (UnknownBookException e) {
-            tmpIssuer = ledger.createNewBook(asset.getName());
-        }
-        issuerBook = tmpIssuer;
+        issuerBook = asset.getName();
     }
 
     public boolean canProcess(final Asset asset) {
@@ -52,14 +41,10 @@ public final class CurrencyController extends AssetController {
     public final TransferReceipt process(final TransferOrder req) throws InvalidTransferException, LowLevelPaymentException, TransferDeniedException, NeuClearException {
 
         try {
-            final Book from = getBook(req.getSignatory());
-            final Book to = getBook(req.getRecipient());
 
-            final Timestamp valuetime =TimeTools.now();
-            final PostedTransaction posted = from.transfer(to, req.getAmount().getAmount(), req.getComment(), valuetime);
-            return (TransferReceipt) new TransferReceiptBuilder(req, valuetime).convert(asset.getName(),signer);
-        } catch (UnknownBookException e) {
-            throw new InvalidTransferException(e.getSubMessage());
+            final Timestamp valuetime = TimeTools.now();
+            final PostedTransaction posted = ledger.transfer("id", req.getName(), req.getSignatory().getName(), req.getRecipient().getName(), req.getAmount().getAmount(), req.getComment());
+            return (TransferReceipt) new TransferReceiptBuilder(req, valuetime).convert(asset.getName(), signer);
         } catch (LowlevelLedgerException e) {
             throw new LowLevelPaymentException(e);
         } catch (InvalidTransactionException e) {
@@ -75,10 +60,6 @@ public final class CurrencyController extends AssetController {
         return req.getDigest();
     }
 
-    private Book getBook(final Identity id) throws UnknownBookException, LowlevelLedgerException {
-        return ledger.getBook(id.getName());
-    }
-
     /**
      * Returns balance for a given Identity.
      * This is a temporary method and will be replaced by a full BalanceRequestContract etc.
@@ -87,23 +68,19 @@ public final class CurrencyController extends AssetController {
      * @return 
      * @throws LowLevelPaymentException 
      */
-    public double getBalance(final Identity id, final Date time) throws LowLevelPaymentException {
+    public double getBalance(final Identity id) throws LowLevelPaymentException {
         try {
-            return getBook(id).getBalance(time);
+            return ledger.getBalance(id.getName());
         } catch (LowlevelLedgerException e) {
             throw new LowLevelPaymentException(e);
-        } catch (UnknownBookException e) {
-            return 0.0;// If an account isnt listed its balance is always 0
         }
     }
 
-    public final ExchangeOrderReceipt process(final ExchangeOrder req) throws InvalidTransferException, LowLevelPaymentException, TransferDeniedException, NeuClearException {
-        try {
-            final Book from = getBook(req.getSignatory());
-            final Book to = getBook(req.getAgent());
-            final Timestamp valuetime = TimeTools.now();
 
-            final PostedHeldTransaction posted = from.hold(to, req.getAmount().getAmount(), req.getComment(), valuetime,req.getExpiry());
+    public final ExchangeOrderReceipt process(final ExchangeOrder req) throws InvalidTransferException, LowLevelPaymentException, TransferDeniedException, NeuClearException {
+/*
+        try {
+            final PostedHeldTransaction posted = ledger.hold(to, req.getAmount().getAmount(), req.getComment(), valuetime,req.getExpiry());
 
             return (ExchangeOrderReceipt) new ExchangeOrderReceiptBuilder(req, valuetime).convert(asset.getName(),signer);
         } catch (UnknownBookException e) { //TODO Implement something like this eg. AccountNotValidException
@@ -117,9 +94,12 @@ public final class CurrencyController extends AssetController {
         } catch (NegativeTransferException e) {
             throw new InvalidTransferException("postive amount");
         }
+*/
+        return null;
     }
 
     public final ExchangeCompletedReceipt process(final ExchangeCompletionOrder complete) throws LowLevelPaymentException, InvalidTransferException, TransferDeniedException, NeuClearException {
+/*
         try {
             //
             final PostedHeldTransaction heldTran = ledger.findHeldTransaction(complete.getReceipt().getOrder().getDigest());
@@ -144,9 +124,11 @@ public final class CurrencyController extends AssetController {
         } catch (LowlevelLedgerException e) {
             throw new LowLevelPaymentException(e);
         }
+*/           return null;
     }
 
     public final CancelExchangeReceipt process(final CancelExchangeOrder cancel) throws InvalidTransferException, LowLevelPaymentException, TransferDeniedException, NeuClearException {
+/*
         try {
             final PostedHeldTransaction heldTran = ledger.findHeldTransaction(cancel.getReceipt().getOrder().getDigest());
             if (!isRecipient(cancel.getSignatory(), heldTran))
@@ -158,7 +140,9 @@ public final class CurrencyController extends AssetController {
         } catch (LowlevelLedgerException e) {
             throw new LowLevelPaymentException(e);
         }
+*/    return null;
     }
+
 
     /**
      * Little tool to return the amount of a ledger transaction.
@@ -189,7 +173,7 @@ public final class CurrencyController extends AssetController {
         final Iterator iter = tran.getItems();
         while (iter.hasNext()) {
             final TransactionItem item = (TransactionItem) iter.next();
-            if (item.getAmount() >= 0 && item.getBook().getBookID().equals(id.getName()))
+            if (item.getAmount() >= 0 && item.getBook().equals(id.getName()))
                 return true;
         }
         return false;
@@ -197,6 +181,6 @@ public final class CurrencyController extends AssetController {
 
     private final Ledger ledger;
     private final Asset asset;
-    private final Book issuerBook;
+    private final String issuerBook;
     private final Signer signer;
 }

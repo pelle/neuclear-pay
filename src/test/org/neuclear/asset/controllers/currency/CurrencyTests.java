@@ -1,19 +1,12 @@
 package org.neuclear.asset.controllers.currency;
 
 import junit.framework.TestCase;
-import org.neuclear.asset.*;
-import org.neuclear.asset.controllers.currency.CurrencyController;
-import org.neuclear.exchange.orders.ExchangeOrderReceipt;
-import org.neuclear.asset.orders.TransferReceipt;
 import org.neuclear.commons.configuration.ConfigurationException;
-import org.neuclear.ledger.*;
+import org.neuclear.ledger.LedgerCreationException;
+import org.neuclear.ledger.LowlevelLedgerException;
 
 import java.io.IOException;
-import java.math.BigInteger;
 import java.sql.SQLException;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Random;
 
 /**
  * User: pelleb
@@ -21,7 +14,7 @@ import java.util.Random;
  * Time: 6:05:04 PM
  */
 public final class CurrencyTests extends TestCase {
-    public CurrencyTests(final String s) throws SQLException, IOException, LowlevelLedgerException, BookExistsException, LedgerCreationException, ConfigurationException {
+    public CurrencyTests(final String s) throws SQLException, IOException, LowlevelLedgerException, LedgerCreationException, ConfigurationException {
         super(s);
 //        proc = CurrencyController.getInstance();
     }
