@@ -4,6 +4,7 @@ import org.neuclear.asset.AssetController;
 import org.neuclear.asset.contracts.Asset;
 import org.neuclear.asset.contracts.AssetGlobals;
 import org.neuclear.asset.orders.TransferGlobals;
+import org.neuclear.commons.Utility;
 import org.neuclear.commons.servlets.ServletTools;
 import org.neuclear.id.Service;
 import org.neuclear.id.SignedNamedObject;
@@ -14,6 +15,8 @@ import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 
 /*
 NeuClear Distributed Transaction Clearing Platform
@@ -33,8 +36,11 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: AssetControllerServlet.java,v 1.12 2004/04/28 00:22:28 pelle Exp $
+$Id: AssetControllerServlet.java,v 1.13 2004/06/22 14:23:33 pelle Exp $
 $Log: AssetControllerServlet.java,v $
+Revision 1.13  2004/06/22 14:23:33  pelle
+Fixed issues with endpoints in the signing request and signing servlets
+
 Revision 1.12  2004/04/28 00:22:28  pelle
 Fixed the strange verification error
 Added bunch of new unit tests to support this.
@@ -177,14 +183,23 @@ public final class AssetControllerServlet extends ReceiverServlet {
         ServletTools.printHeader(writer, request, getTitle(), "Transaction Successful");
         writer.print("<hr/><h3 onclick=\"if (receipt.style.display=='none')receipt.style.display='block'; else receipt.style.display='none'\">Click to toggle display of raw receipt</h3>");
 
-//        writer.print("<div style=\"font-size:small\" onclick=\"receipt.style.display=block;\">View Receipt</div></br>");
+        writer.print("<div style=\"font-size:small\" onclick=\"document.getElementById('receipt').style.display=block;\">View Receipt</div></br>");
         writer.print(receipt.getDigest());
-//        writer.print("</div>");
+        writer.print("</div>");
         writer.println("<form><textarea id=\"receipt\" rows=\"30\" cols=\"80\" style=\"display:none\">");
         writer.println(receipt.getEncoded());
         writer.println("</textarea></form><hr><a href=\"");
-        writer.println(ServletTools.getAbsoluteURL(request, "/"));
-        writer.println("\">Go to Menu</a>");
+        if (!Utility.isEmpty(request.getParameter("endpoint"))) {
+            writer.print(request.getParameter("endpoint"));
+            writer.print("?receipt=");
+            try {
+                writer.print(URLEncoder.encode(receipt.getDigest(), "UTF-8"));
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            }
+        } else
+            writer.print(ServletTools.getAbsoluteURL(request, "/"));
+        writer.println("\">Continue</a>");
 
     }
 

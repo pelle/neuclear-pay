@@ -50,8 +50,11 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: TransferOrderServlet.java,v 1.1 2004/06/19 21:20:03 pelle Exp $
+$Id: TransferOrderServlet.java,v 1.2 2004/06/22 14:23:33 pelle Exp $
 $Log: TransferOrderServlet.java,v $
+Revision 1.2  2004/06/22 14:23:33  pelle
+Fixed issues with endpoints in the signing request and signing servlets
+
 Revision 1.1  2004/06/19 21:20:03  pelle
 Added TransferOrderServlet which is fully localized to Spanish and English
 Asset now has a getFormatter() method which returns a localized currency formatter for amounts of Asset.
@@ -269,6 +272,10 @@ public class TransferOrderServlet extends SignatureRequestServlet {
         } catch (UnknownBookException e) {
             e.printStackTrace();
         }
+    }
+
+    protected String getReceiver(HttpServletRequest request, String siteurl) {
+        return asset.getServiceUrl();
     }
 
     protected Builder createBuilder(HttpServletRequest request) throws NeuClearException {
