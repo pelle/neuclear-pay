@@ -1,7 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-$Id: xfer.xsd,v 1.3 2004/01/07 17:15:57 pelle Exp $
+$Id: xfer.xsd,v 1.4 2004/01/07 23:11:06 pelle Exp $
 $Log: xfer.xsd,v $
+Revision 1.4  2004/01/07 23:11:06  pelle
+XMLSig now has various added features:
+-  KeyInfo supports X509v3 (untested)
+-  KeyInfo supports KeyName
+-  When creating a XMLSignature and signing it with a Signer, it adds the alias to the KeyName
+Added KeyResolver interface and KeyResolverFactory Class. At the moment no implementations.
+
 Revision 1.3  2004/01/07 17:15:57  pelle
 Added support for non fungible transfers. Ie. Transfers of specific serial numbered items.
 This is implement through the abstract element Value, which contains the two implementing tags:
@@ -54,7 +61,6 @@ Updated the Exchange and transfer orders.
             </xs:complexContent>
         </xs:complexType>
     </xs:element>
-
     <xs:element name="TransferReceipt" nillable="false">
         <xs:complexType >
             <xs:complexContent>
