@@ -2,6 +2,7 @@ package org.neuclear.asset.servlet;
 
 import org.neuclear.asset.AssetController;
 import org.neuclear.asset.contracts.Asset;
+import org.neuclear.asset.contracts.AssetGlobals;
 import org.neuclear.asset.controllers.currency.CurrencyController;
 import org.neuclear.commons.crypto.CryptoTools;
 import org.neuclear.commons.crypto.signers.ServletSignerFactory;
@@ -42,6 +43,7 @@ public final class ServletAssetControllerFactory {
 
     private ServletAssetControllerFactory() {
         map = Collections.synchronizedMap(new HashMap());
+        AssetGlobals.registerReaders();
     }
 
     public synchronized AssetController createAssetController(ServletConfig config) throws LowlevelLedgerException {
