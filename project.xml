@@ -36,19 +36,19 @@
       <name>NeuClear Announce</name>
       <subscribe>http://lists.sourceforge.net/lists/listinfo/neuclear-announce</subscribe>
       <unsubscribe>http://lists.sourceforge.net/lists/listinfo/neuclear-announce</unsubscribe>
-      <archive>http://www.geocrawler.com/redir-sf.php3?list=neuclear-announce</archive>
+      <archive>http://sourceforge.net/mailarchive/forum.php?forum=neuclear-announce</archive>
     </mailingList>
     <mailingList>
       <name>NeuClear General</name>
       <subscribe>http://lists.sourceforge.net/lists/listinfo/neuclear-general</subscribe>
       <unsubscribe>http://lists.sourceforge.net/lists/listinfo/neuclear-general</unsubscribe>
-      <archive>http://www.geocrawler.com/redir-sf.php3?list=neuclear-general</archive>
+      <archive>http://sourceforge.net/mailarchive/forum.php?forum=neuclear-general</archive>
     </mailingList>
       <mailingList>
         <name>NeuClear Develop</name>
         <subscribe>http://lists.sourceforge.net/lists/listinfo/neuclear-develop</subscribe>
         <unsubscribe>http://lists.sourceforge.net/lists/listinfo/neuclear-develop</unsubscribe>
-        <archive>http://www.geocrawler.com/redir-sf.php3?list=neuclear-develop</archive>
+        <archive>http://sourceforge.net/mailarchive/forum.php?forum=neuclear-develop</archive>
       </mailingList>
   </mailingLists>
 
@@ -80,7 +80,36 @@
            <id>picocontainer</id>
            <version>1.0-beta-1</version>
        </dependency>
-
+       <dependency>
+          <id>neuclear-id</id>
+       <name>neuclear-id</name>
+       <version>0.7-SNAPSHOT</version>
+       </dependency>
+       <dependency>
+           <id>neudist-xmlsig</id>
+           <name>neudist-xmlsig</name>
+           <version>0.9-SNAPSHOT</version>
+           <properties>
+                 <war.bundle.jar>true</war.bundle.jar>
+           </properties>
+       </dependency>
+    <dependency>
+    	<id>commons-collections</id>
+      <name>commons-collections</name>
+      <version>2.1</version>
+      <jar>commons-collections-2.1.jar</jar>
+      <properties>
+            <war.bundle.jar>true</war.bundle.jar>
+      </properties>
+    </dependency>
+    <dependency>
+      <id>dom4j</id>
+      <version>1.4</version>
+      <jar>dom4j-1.4.jar</jar>
+      <properties>
+            <war.bundle.jar>true</war.bundle.jar>
+      </properties>
+    </dependency>
 <!--    <dependency>
    	<id>neudistframework</id>
 	<name>neudistframework</name>
