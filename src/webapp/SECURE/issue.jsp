@@ -17,10 +17,9 @@
                  org.neuclear.commons.crypto.signers.TestCaseSigner,
                  org.neuclear.commons.crypto.signers.ServletSignerFactory,
                  org.neuclear.commons.crypto.signers.Signer,
+                 org.neuclear.asset.orders.builders.IssueOrderBuilder,
                  org.neuclear.asset.AssetController,
-                 org.neuclear.asset.servlet.ServletAssetControllerFactory,
-                 org.neuclear.ledger.Ledger,
-                 org.neuclear.ledger.servlets.ServletLedgerFactory"%>
+                 org.neuclear.asset.servlet.ServletAssetControllerFactory"%>
 <%
     AssetGlobals.registerReaders();
     TransferGlobals.registerReaders();
@@ -28,13 +27,9 @@
     Signatory userns=(Signatory) request.getUserPrincipal();
     String service=ServletTools.getInitParam("serviceid",config);
 //    String asseturl=ServletTools.getInitParam("asset",config);
-    AssetController controller=ServletAssetControllerFactory.getInstance().createAssetController(config);
-    Ledger ledger=ServletLedgerFactory.getInstance().createLedger(config);
-    Asset asset=controller.getAsset();
-    String recipient=Utility.denullString(request.getParameter("recipient"));
+    Asset asset=(Asset)Resolver.resolveIdentity(ServletTools.getAbsoluteURL(request,"/bux.html"));
     double amount=Double.parseDouble(Utility.denullString(request.getParameter("amount"),"0"));
     boolean submit=!Utility.isEmpty(request.getParameter("submit"));
-    String comment=Utility.denullString(request.getParameter("comment"));
 
 %>
 <html>
@@ -46,53 +41,39 @@ NeuClear Bux
 <body>
 <div id="banner">
 <img src="../images/logo.png"  alt=" "/>NeuClear Bux</div>
-<div id="subtitle">Transfer Funds</div>
-
+<div id="subtitle">Request Funds</div>
+<h3>Request Beta Bux</h3>
 
 <div id="content">
 <%
 if (!submit){
 %>
 <p>
-       Use this screen to perform a transfer of funds to another id.
+       Use this screen to receive free beta bux.
 </p>
 <p>
-<form action="transfer.jsp" method="POST">
-    <p>Account: <br/><%=userns.getName()%></p>
-    <p>Available Balance: <br/><%=ledger.getAvailableBalance(userns.getName())%></p>
-    <hr/>
-    <p>Recipient:<br/>
-    <input type="text" name="recipient" value="<%=recipient%>"/></p>
-    <p>Amount:<br/>
+<form action="issue.jsp" method="POST">
+    <p>Account Recipient: <%=userns.getName()%></p>
+    <p>Amount:
     <input type="text" name="amount" value="<%=amount%>"/></p>
-    <p>Comment:<br/>
-    <input type="text" name="comment" value="<%=comment%>"/></p>
-    <hr/>
     <p><input type="submit" name="submit" value="Verify"/></p>
 
 </form>
 </p>
 <% } else {
-    TransferOrderBuilder transfer=new TransferOrderBuilder(
+    IssueOrderBuilder transfer=new IssueOrderBuilder(
             asset.getName(),
-            recipient,//new Signatory(signer.getPublicKey(recipient)),
+            userns.getName(),//new Signatory(signer.getPublicKey(recipient)),
             new Amount(amount),
-            comment
+            "Present"
     ) ;
-    SignatureRequestBuilder sigreq=new SignatureRequestBuilder(transfer,comment);
-    SignedNamedObject sig=sigreq.convert(service,signer);
-
+    SignedNamedObject sig=transfer.convert("carol",signer);
+    AssetController controller=ServletAssetControllerFactory.getInstance().createAssetController(config);
+    SignedNamedObject obj=controller.receive(sig);
 %>
-<form action="http://localhost:11870/Signer" method="POST">
-<input name="neuclear-request" value="<%=Base64.encode(sig.getEncoded().getBytes())%>" type="hidden">
-<input name="endpoint" value="<%=ServletTools.getAbsoluteURL(request, "/Asset")%>" type="hidden">
-</form>
-    Transfering to Signing Server
-<script language="javascript">
-<!--
-document.forms[0].submit();
--->
-</script>
+    <p>You have just received <%=amount%> neuclear beta bux.</p>
+    <hr/>
+    <a href="<%=ServletTools.getAbsoluteURL(request,"/")%>">Main Menu</a>
 <%
 }
     %>

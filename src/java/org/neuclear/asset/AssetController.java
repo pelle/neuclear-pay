@@ -1,11 +1,13 @@
 package org.neuclear.asset;
 
+import org.neuclear.asset.contracts.Asset;
 import org.neuclear.asset.orders.IssueOrder;
 import org.neuclear.asset.orders.IssueReceipt;
 import org.neuclear.asset.orders.TransferOrder;
 import org.neuclear.asset.orders.TransferReceipt;
 import org.neuclear.commons.NeuClearException;
 import org.neuclear.exchange.orders.*;
+import org.neuclear.id.Identity;
 import org.neuclear.id.Service;
 import org.neuclear.id.SignedNamedObject;
 import org.neuclear.id.receiver.Receiver;
@@ -29,8 +31,16 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: AssetController.java,v 1.16 2004/04/06 16:24:34 pelle Exp $
+$Id: AssetController.java,v 1.17 2004/04/21 23:22:34 pelle Exp $
 $Log: AssetController.java,v $
+Revision 1.17  2004/04/21 23:22:34  pelle
+Integrated Browser with the asset controller
+Updated look and feel
+Added ServletLedgerFactory
+Added ServletAssetControllerFactory
+Created issue.jsp file
+Fixed many smaller issues
+
 Revision 1.16  2004/04/06 16:24:34  pelle
 Added two new Data Objects IssuerOrder and IssueReceipt for managing the issuance process.
 Added Issuance support to the Asset and Audit Controllers.
@@ -134,6 +144,8 @@ public abstract class AssetController implements Receiver {
      */
     public final SignedNamedObject receive(final SignedNamedObject contract) throws UnsupportedTransaction, NeuClearException {
         try {
+            if (contract instanceof Identity)
+                return process((Identity) contract);
             if (contract instanceof TransferOrder)
                 return process((TransferOrder) contract);
             if (contract instanceof IssueOrder)
@@ -154,6 +166,8 @@ public abstract class AssetController implements Receiver {
 
         return null;
     }
+
+    public abstract SignedNamedObject process(Identity identity) throws LowLevelPaymentException;
 
     /**
      * Verify that the assetName controller handles the given assetName
@@ -221,6 +235,8 @@ public abstract class AssetController implements Receiver {
      */
 
     public abstract CancelExchangeReceipt process(CancelExchangeOrder cancel) throws LowLevelPaymentException, TransferDeniedException, InvalidTransferException, NeuClearException;
+
+    public abstract Asset getAsset();
 
 
 

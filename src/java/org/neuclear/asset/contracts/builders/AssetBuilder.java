@@ -33,8 +33,16 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: AssetBuilder.java,v 1.14 2004/04/20 23:30:42 pelle Exp $
+$Id: AssetBuilder.java,v 1.15 2004/04/21 23:22:19 pelle Exp $
 $Log: AssetBuilder.java,v $
+Revision 1.15  2004/04/21 23:22:19  pelle
+Integrated Browser with the asset controller
+Updated look and feel
+Added ServletLedgerFactory
+Added ServletAssetControllerFactory
+Created issue.jsp file
+Fixed many smaller issues
+
 Revision 1.14  2004/04/20 23:30:42  pelle
 All unit tests (junit and cactus) work. The AssetControllerServlet is operational.
 
@@ -157,7 +165,7 @@ public final class AssetBuilder extends ServiceBuilder {
             AssetGlobals.registerReaders();
 
             final AssetBuilder assetraw = new AssetBuilder("Bux",
-                    "http://bux.neuclear.org",
+                    "http://bux.neuclear.org/Asset",
                     signer.getPublicKey("bux"),
                     signer.getPublicKey("carol"),
                     2,

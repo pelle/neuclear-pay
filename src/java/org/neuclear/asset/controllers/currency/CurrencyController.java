@@ -14,8 +14,10 @@ import org.neuclear.exchange.orders.*;
 import org.neuclear.exchange.orders.builders.CancelExchangeReceiptBuilder;
 import org.neuclear.exchange.orders.builders.ExchangeCompletedReceiptBuilder;
 import org.neuclear.exchange.orders.builders.ExchangeOrderReceiptBuilder;
+import org.neuclear.id.Identity;
 import org.neuclear.id.Service;
 import org.neuclear.id.Signatory;
+import org.neuclear.id.SignedNamedObject;
 import org.neuclear.ledger.*;
 
 import java.util.Date;
@@ -37,6 +39,15 @@ public final class CurrencyController extends AssetController {
         this.asset = asset;
         this.alias = alias;
         issuerBook = new Signatory(asset.getIssuerKey()).getName();
+    }
+
+    public SignedNamedObject process(Identity identity) throws LowLevelPaymentException {
+        try {
+            ledger.registerBook(identity.getSignatory().getName(), identity.getSignatory().getName().substring(0, 10), "identity", "", identity.getEncoded());
+        } catch (LowlevelLedgerException e) {
+            throw new LowLevelPaymentException(e);
+        }
+        return null;
     }
 
     public boolean canProcess(final Service asset) {
@@ -149,9 +160,13 @@ public final class CurrencyController extends AssetController {
         }
     }
 
+    public Asset getAsset() {
+        return asset;
+    }
+
 
     private final Ledger ledger;
-    private final Service asset;
+    private final Asset asset;
     private final String issuerBook;
     private final Signer signer;
     private final String alias;

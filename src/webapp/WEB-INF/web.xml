@@ -9,6 +9,15 @@
         <description>NeuClear id of Service</description>
     </context-param>
     <context-param>
+        <param-name>ledger</param-name>
+        <param-value>hibernate</param-value>
+    </context-param>
+    <context-param>
+        <param-name>assettype</param-name>
+        <param-value>currency</param-value>
+        <description>Type of Asset Controller</description>
+    </context-param>
+    <context-param>
         <param-name>title</param-name>
         <param-value>NeuClear Sample E-Currency Application</param-value>
     </context-param>
@@ -50,6 +59,24 @@
         <servlet-class>org.neuclear.id.auth.AuthenticationServlet</servlet-class>
         <load-on-startup>1</load-on-startup>
     </servlet>
+    <servlet>
+        <servlet-name>browser</servlet-name>
+        <servlet-class>org.neuclear.ledger.servlets.LedgerBrowserServlet</servlet-class>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+    <servlet>
+        <servlet-name>statement</servlet-name>
+        <servlet-class>org.neuclear.ledger.servlets.LedgerStatementServlet</servlet-class>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>browser</servlet-name>
+        <url-pattern>/SECURE/browse/*</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>statement</servlet-name>
+        <url-pattern>/SECURE/statement/*</url-pattern>
+    </servlet-mapping>
     <servlet-mapping>
         <servlet-name>assetcontroller</servlet-name>
         <url-pattern>/Asset</url-pattern>
