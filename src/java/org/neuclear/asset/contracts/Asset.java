@@ -33,8 +33,11 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: Asset.java,v 1.22 2004/09/06 22:24:24 pelle Exp $
+$Id: Asset.java,v 1.23 2004/09/07 18:47:34 pelle Exp $
 $Log: Asset.java,v $
+Revision 1.23  2004/09/07 18:47:34  pelle
+Added support for dom4j 1.5 and added a new XPP3Reader
+
 Revision 1.22  2004/09/06 22:24:24  pelle
 Added a package for calculating fees. This has been integrated into the Asset contract.
 
@@ -155,7 +158,7 @@ SOAPTools was changed to return a stream. This is required by the VerifyingReade
  * @see org.neuclear.asset.contracts.builders.AssetBuilder
  */
 public final class Asset extends Service {
-    protected Asset(final SignedNamedCore core, final String nickname, final String original, final String serviceUrl, final PublicKey servicekey, final PublicKey issuerKey, final Targets targets, final int decimal, final double minimumTransaction, final String units, final FeeStructure fees) {
+    protected Asset(final SignedNamedCore core, final String nickname, final String original, final String serviceUrl, final PublicKey servicekey, final PublicKey issuerKey, final Targets targets, final int decimal, final double minimumTransaction, final String units, final FeeStructure fees, final PublicKey feePub) {
         super(core, nickname, original, serviceUrl, servicekey, targets);
         this.issuer = new Signatory(issuerKey);
         this.decimal = decimal;
@@ -163,6 +166,7 @@ public final class Asset extends Service {
         this.minimumTransaction = minimumTransaction;
         this.units = units;
         this.fees = fees;
+        this.feeAccount = feePub != null ? new Signatory(feePub) : null;
     }
 
 /*
@@ -238,8 +242,12 @@ public final class Asset extends Service {
         return format;
     }
 
-    public FeeStructure getFeeStructure() {
+    public final FeeStructure getFeeStructure() {
         return fees;
+    }
+
+    public final Signatory getFeeAccount() {
+        return feeAccount;
     }
 
     public static final class Reader implements NamedObjectReader {
@@ -266,7 +274,12 @@ public final class Asset extends Service {
                 final Element unitselem = XMLTools.getByID(elem, "asset.units");
                 final String units = (unitselem == null) ? "units" : unitselem.getTextTrim();
                 final FeeStructure fees = FeeStructureReader.readFeeStructure(units, elem);
-                return new Asset(core, nickname, original, url.getValue(), sPub, iPub, targets, decimal, minimum, units, fees);
+
+                PublicKey feePub = null;
+                final Element feeAccountElem = XMLTools.getByID(elem, "fee.account");
+                if (feeAccountElem != null)
+                    feePub = extractPublicKey(feeAccountElem);
+                return new Asset(core, nickname, original, url.getValue(), sPub, iPub, targets, decimal, minimum, units, fees, feePub);
             } catch (XMLSecurityException e) {
                 throw new InvalidNamedObjectException("invalid asset xml");
             }
@@ -292,6 +305,7 @@ public final class Asset extends Service {
     }
 
     private final Signatory issuer;
+    private final Signatory feeAccount;
     private final int decimal;
     private final int multiplier;
     private final double minimumTransaction;
