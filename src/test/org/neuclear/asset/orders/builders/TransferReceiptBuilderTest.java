@@ -1,13 +1,13 @@
 package org.neuclear.asset.orders.builders;
 
 import org.neuclear.asset.InvalidTransferException;
-import org.neuclear.asset.contracts.Asset;
 import org.neuclear.asset.contracts.builders.AssetBuilder;
 import org.neuclear.asset.orders.Amount;
 import org.neuclear.asset.orders.TransferOrder;
 import org.neuclear.asset.orders.TransferReceipt;
 import org.neuclear.commons.NeuClearException;
 import org.neuclear.commons.crypto.signers.NonExistingSignerException;
+import org.neuclear.id.Service;
 import org.neuclear.id.SignedNamedObject;
 import org.neuclear.id.builders.Builder;
 import org.neuclear.tests.AbstractObjectCreationTest;
@@ -34,8 +34,11 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: TransferReceiptBuilderTest.java,v 1.1 2004/04/02 23:04:36 pelle Exp $
+$Id: TransferReceiptBuilderTest.java,v 1.2 2004/04/05 16:31:43 pelle Exp $
 $Log: TransferReceiptBuilderTest.java,v $
+Revision 1.2  2004/04/05 16:31:43  pelle
+Created new ServiceBuilder class for creating services. A service is an identity that has a seperate service URL and Service Public Key.
+
 Revision 1.1  2004/04/02 23:04:36  pelle
 Got TransferOrder and Builder working with their test cases.
 Working on TransferReceipt which is the first embedded receipt. This is causing some problems at the moment.
@@ -98,14 +101,14 @@ public class TransferReceiptBuilderTest extends AbstractObjectCreationTest {
         return new TransferReceiptBuilder((TransferOrder) builder.convert(NAME, getSigner()), new Date());
     }
 
-    public Asset createTestAsset() throws NeuClearException {
+    public Service createTestAsset() throws NeuClearException {
         AssetBuilder builder = new AssetBuilder("http://bux.neuclear.org",
                 getSigner().getPublicKey("neu://test/bux"),
                 getAlice().getPublicKey(),
                 2, 0);
-        return (Asset) builder.convert(NAME, getSigner());
+        return (Service) builder.convert(NAME, getSigner());
 
     }
 
-    private Asset asset;
+    private Service asset;
 }

@@ -1,7 +1,6 @@
 package org.neuclear.asset.controllers.currency;
 
 import org.neuclear.asset.*;
-import org.neuclear.asset.contracts.Asset;
 import org.neuclear.asset.orders.TransferOrder;
 import org.neuclear.asset.orders.TransferReceipt;
 import org.neuclear.asset.orders.builders.TransferReceiptBuilder;
@@ -9,6 +8,7 @@ import org.neuclear.commons.NeuClearException;
 import org.neuclear.commons.crypto.signers.Signer;
 import org.neuclear.exchange.orders.*;
 import org.neuclear.id.Identity;
+import org.neuclear.id.Service;
 import org.neuclear.id.resolver.Resolver;
 import org.neuclear.ledger.*;
 
@@ -28,11 +28,11 @@ public final class CurrencyController extends AssetController {
         super();
         this.ledger = ledger;
         this.signer = signer;
-        asset = (Asset) Resolver.resolveIdentity(assetname);
+        asset = (Service) Resolver.resolveIdentity(assetname);
         issuerBook = asset.getName();
     }
 
-    public boolean canProcess(final Asset asset) {
+    public boolean canProcess(final Service asset) {
         return this.asset.getName().equals(asset.getName());
     }
 
@@ -175,7 +175,7 @@ public final class CurrencyController extends AssetController {
     }
 
     private final Ledger ledger;
-    private final Asset asset;
+    private final Service asset;
     private final String issuerBook;
     private final Signer signer;
 }

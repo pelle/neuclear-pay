@@ -1,8 +1,12 @@
 package org.neuclear.exchange.contracts;
 
-import org.neuclear.id.Identity;
-import org.neuclear.id.SignedNamedCore;
+import org.dom4j.Element;
+import org.neuclear.id.*;
 import org.neuclear.id.targets.Targets;
+import org.neuclear.xml.xmlsec.XMLSecTools;
+import org.neuclear.xml.xmlsec.XMLSecurityException;
+
+import java.security.PublicKey;
 
 /*
 NeuClear Distributed Transaction Clearing Platform
@@ -22,8 +26,11 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: ExchangeAgent.java,v 1.4 2004/04/01 23:18:33 pelle Exp $
+$Id: ExchangeAgent.java,v 1.5 2004/04/05 16:31:42 pelle Exp $
 $Log: ExchangeAgent.java,v $
+Revision 1.5  2004/04/05 16:31:42  pelle
+Created new ServiceBuilder class for creating services. A service is an identity that has a seperate service URL and Service Public Key.
+
 Revision 1.4  2004/04/01 23:18:33  pelle
 Split Identity into Signatory and Identity class.
 Identity remains a signed named object and will in the future just be used for self declared information.
@@ -50,9 +57,35 @@ Got rid of much of the inheritance that was lying around and thought a bit furth
  * Date: Jan 5, 2004
  * Time: 11:04:32 PM
  */
-public class ExchangeAgent extends Identity {
-    public ExchangeAgent(SignedNamedCore core, String signer, Targets targets) {
-        super(core, signer, targets);
+public class ExchangeAgent extends Service {
+    public ExchangeAgent(SignedNamedCore core, String serviceUrl, PublicKey serviceKey, Targets targets) {
+        super(core, serviceUrl, serviceKey, targets);
+    }
+
+    public static final class Reader implements NamedObjectReader {
+        /**
+         * Read object from Element and fill in its details
+         *
+         * @param elem
+         * @return
+         */
+        public final SignedNamedObject read(final SignedNamedCore core, final Element elem) throws InvalidNamedObjectException {
+            if (!elem.getNamespace().equals(ExchangeAgentGlobals.NS_EXAGENT))
+                throw new InvalidNamedObjectException(core.getName(), "Not in XML NameSpace: " + ExchangeAgentGlobals.NS_EXAGENT.getURI());
+            final Element serviceElement = InvalidNamedObjectException.assertContainsElementQName(core, elem, SignedNamedObject.createNEUIDQName("Service"));
+            final Element serviceKeyElement = InvalidNamedObjectException.assertContainsElementQName(core, serviceElement, XMLSecTools.createQName("KeyInfo"));
+            final Element serviceUrlElement = InvalidNamedObjectException.assertContainsElementQName(core, serviceElement, SignedNamedObject.createNEUIDQName("Url"));
+            try {
+                final PublicKey sPub = extractPublicKey(serviceKeyElement);
+                final String serviceurl = serviceUrlElement.getTextTrim();
+                final Targets targets = Targets.parseList(elem);
+                return new ExchangeAgent(core, serviceurl, sPub, targets);
+            } catch (XMLSecurityException e) {
+                throw new InvalidNamedObjectException("invalid exchange agent xml");
+            }
+        }
+
+
     }
 
 }

@@ -1,10 +1,8 @@
 package org.neuclear.exchange.orders.builders;
 
+import org.neuclear.exchange.orders.ExchangeOrderGlobals;
+import org.neuclear.exchange.orders.ExchangeOrderReceipt;
 import org.neuclear.id.builders.EmbeddedSignedObjectBuilder;
-import org.neuclear.id.SignedNamedObject;
-import org.neuclear.exchange.orders.ExchangeOrder;
-import org.neuclear.exchange.orders.ExchangeGlobals;
-import org.dom4j.QName;
 
 /**
  * Created by IntelliJ IDEA.
@@ -14,7 +12,7 @@ import org.dom4j.QName;
  * To change this template use Options | File Templates.
  */
 public class CancelExchangeOrderBuilder extends EmbeddedSignedObjectBuilder {
-    public CancelExchangeOrderBuilder(final ExchangeOrder embedded) {
-        super(ExchangeGlobals.createQName(ExchangeGlobals.CANCEL_TAGNAME), embedded);
+    public CancelExchangeOrderBuilder(final ExchangeOrderReceipt embedded) {
+        super(ExchangeOrderGlobals.createQName(ExchangeOrderGlobals.CANCEL_TAGNAME), embedded);
     }
 }

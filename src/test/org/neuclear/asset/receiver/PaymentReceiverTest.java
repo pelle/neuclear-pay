@@ -1,7 +1,6 @@
 package org.neuclear.asset.receiver;
 
 import org.neuclear.asset.InvalidTransferException;
-import org.neuclear.asset.contracts.Asset;
 import org.neuclear.asset.contracts.AssetGlobals;
 import org.neuclear.asset.controllers.currency.CurrencyController;
 import org.neuclear.asset.orders.Amount;
@@ -10,6 +9,7 @@ import org.neuclear.asset.orders.TransferOrder;
 import org.neuclear.asset.orders.builders.TransferOrderBuilder;
 import org.neuclear.commons.NeuClearException;
 import org.neuclear.commons.crypto.signers.TestCaseSigner;
+import org.neuclear.id.Service;
 import org.neuclear.id.SignedNamedObject;
 import org.neuclear.id.receiver.Receiver;
 import org.neuclear.id.resolver.Resolver;
@@ -42,8 +42,11 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: PaymentReceiverTest.java,v 1.19 2004/04/02 23:04:37 pelle Exp $
+$Id: PaymentReceiverTest.java,v 1.20 2004/04/05 16:31:43 pelle Exp $
 $Log: PaymentReceiverTest.java,v $
+Revision 1.20  2004/04/05 16:31:43  pelle
+Created new ServiceBuilder class for creating services. A service is an identity that has a seperate service URL and Service Public Key.
+
 Revision 1.19  2004/04/02 23:04:37  pelle
 Got TransferOrder and Builder working with their test cases.
 Working on TransferReceipt which is the first embedded receipt. This is causing some problems at the moment.
@@ -188,7 +191,7 @@ public final class PaymentReceiverTest extends AbstractSigningTest {
         super(string);
         AssetGlobals.registerReaders();
         TransferGlobals.registerReaders();
-        asset = (Asset) Resolver.resolveIdentity(assetName);
+        asset = (Service) Resolver.resolveIdentity(assetName);
 
         proc = new CurrencyController(null,
                 new TestCaseSigner(),
@@ -205,7 +208,7 @@ public final class PaymentReceiverTest extends AbstractSigningTest {
         return ".xml";
     }
 
-    public final Asset getAsset() {
+    public final Service getAsset() {
         return asset;
     }
 
@@ -253,7 +256,7 @@ public final class PaymentReceiverTest extends AbstractSigningTest {
 
     protected final String assetName = "neu://test/bux";
 
-    private final Asset asset;
+    private final Service asset;
     private final Receiver receiver;
     private final CurrencyController proc;
     private final double balance = 0.0;

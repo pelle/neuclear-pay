@@ -4,8 +4,8 @@ import org.neuclear.asset.InvalidTransferException;
 import org.neuclear.asset.NegativeTransferException;
 import org.neuclear.asset.orders.builders.ReceiptBuilder;
 import org.neuclear.commons.NeuClearException;
-import org.neuclear.exchange.orders.ExchangeGlobals;
 import org.neuclear.exchange.orders.ExchangeOrder;
+import org.neuclear.exchange.orders.ExchangeOrderGlobals;
 
 import java.util.Date;
 
@@ -27,8 +27,11 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: ExchangeOrderReceiptBuilder.java,v 1.1 2004/01/12 22:39:15 pelle Exp $
+$Id: ExchangeOrderReceiptBuilder.java,v 1.2 2004/04/05 16:31:43 pelle Exp $
 $Log: ExchangeOrderReceiptBuilder.java,v $
+Revision 1.2  2004/04/05 16:31:43  pelle
+Created new ServiceBuilder class for creating services. A service is an identity that has a seperate service URL and Service Public Key.
+
 Revision 1.1  2004/01/12 22:39:15  pelle
 Completed all the builders and contracts.
 Added a new abstract Value class to contain either an amount or a list of serial numbers.
@@ -93,7 +96,7 @@ which will handle all neuclear-ledger based AssetControllers.
  * Time: 8:05:15 PM
  */
 public final class ExchangeOrderReceiptBuilder extends ReceiptBuilder {
-    public ExchangeOrderReceiptBuilder(final ExchangeOrder order,Date valuetime) throws InvalidTransferException, NegativeTransferException, NeuClearException {
-        super(ExchangeGlobals.createQName(ExchangeGlobals.EXCHANGE_RCPT_TAGNAME), order,valuetime);
+    public ExchangeOrderReceiptBuilder(final ExchangeOrder order, Date valuetime) throws InvalidTransferException, NegativeTransferException, NeuClearException {
+        super(ExchangeOrderGlobals.createQName(ExchangeOrderGlobals.EXCHANGE_RCPT_TAGNAME), order, valuetime);
     }
 }

@@ -1,12 +1,13 @@
 package org.neuclear.exchange.orders;
 
 import org.dom4j.*;
-import org.neuclear.asset.contracts.Asset;
 import org.neuclear.asset.orders.TransferGlobals;
 import org.neuclear.exchange.contracts.ExchangeAgent;
 import org.neuclear.id.InvalidNamedObjectException;
 import org.neuclear.id.NameResolutionException;
+import org.neuclear.id.Service;
 import org.neuclear.id.resolver.Resolver;
+import org.neuclear.id.verifier.VerifyingReader;
 
 /*
 NeuClear Distributed Transaction Clearing Platform
@@ -26,8 +27,11 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: ExchangeGlobals.java,v 1.4 2004/04/01 23:18:33 pelle Exp $
-$Log: ExchangeGlobals.java,v $
+$Id: ExchangeOrderGlobals.java,v 1.1 2004/04/05 16:31:43 pelle Exp $
+$Log: ExchangeOrderGlobals.java,v $
+Revision 1.1  2004/04/05 16:31:43  pelle
+Created new ServiceBuilder class for creating services. A service is an identity that has a seperate service URL and Service Public Key.
+
 Revision 1.4  2004/04/01 23:18:33  pelle
 Split Identity into Signatory and Identity class.
 Identity remains a signed named object and will in the future just be used for self declared information.
@@ -116,8 +120,8 @@ TransferReceiptBuilder has been created for use by Transfer processors. It is us
  * Date: Oct 3, 2003
  * Time: 3:55:06 PM
  */
-public final class ExchangeGlobals {
-    private ExchangeGlobals() {
+public final class ExchangeOrderGlobals {
+    private ExchangeOrderGlobals() {
         // Instantiation is not allowed
     }
 
@@ -163,10 +167,10 @@ public final class ExchangeGlobals {
 
     }
 
-    public static final Asset parseAssetTag(final Element elem, final String tag) throws InvalidNamedObjectException {
+    public static final Service parseAssetTag(final Element elem, final String tag) throws InvalidNamedObjectException {
         final String name = getElementValue(elem, tag);
         try {
-            return (Asset) Resolver.resolveIdentity(name);
+            return (Service) Resolver.resolveIdentity(name);
         } catch (ClassCastException e) {
             throw new InvalidNamedObjectException(name, e);
         } catch (NameResolutionException e) {
@@ -177,12 +181,12 @@ public final class ExchangeGlobals {
 
 
     public static void registerReaders() {
-//        VerifyingReader.getInstance().registerReader(ExchangeGlobals.CANCEL_TAGNAME, new AssetTransactionContract.Reader());
-//        VerifyingReader.getInstance().registerReader(ExchangeGlobals.CANCEL_RCPT_TAGNAME, new AssetTransactionContract.Reader());
-//        VerifyingReader.getInstance().registerReader(ExchangeGlobals.EXCHANGE_TAGNAME, new AssetTransactionContract.Reader());
-//        VerifyingReader.getInstance().registerReader(ExchangeGlobals.EXCHANGE_RCPT_TAGNAME, new AssetTransactionContract.Reader());
-//        VerifyingReader.getInstance().registerReader(ExchangeGlobals.COMPLETE_TAGNAME, new AssetTransactionContract.Reader());
-//        VerifyingReader.getInstance().registerReader(ExchangeGlobals.COMPLETE_RCPT_TAGNAME, new AssetTransactionContract.Reader());
+        VerifyingReader.getInstance().registerReader(ExchangeOrderGlobals.CANCEL_TAGNAME, new CancelExchangeOrder.Reader());
+        VerifyingReader.getInstance().registerReader(ExchangeOrderGlobals.CANCEL_RCPT_TAGNAME, new CancelExchangeReceipt.Reader());
+        VerifyingReader.getInstance().registerReader(ExchangeOrderGlobals.EXCHANGE_TAGNAME, new ExchangeOrder.Reader());
+        VerifyingReader.getInstance().registerReader(ExchangeOrderGlobals.EXCHANGE_RCPT_TAGNAME, new ExchangeOrderReceipt.Reader());
+        VerifyingReader.getInstance().registerReader(ExchangeOrderGlobals.COMPLETE_TAGNAME, new ExchangeCompletionOrder.Reader());
+        VerifyingReader.getInstance().registerReader(ExchangeOrderGlobals.COMPLETE_RCPT_TAGNAME, new ExchangeCompletedReceipt.Reader());
 
     }
 
@@ -204,5 +208,6 @@ public final class ExchangeGlobals {
 
     public static final String EX_NSPREFIX = "ex";
     public static final String EX_NSURI = "http://neuclear.org/neu/exch";
+    public static final Namespace NS_EXCHANGE = createNameSpace();
 
 }

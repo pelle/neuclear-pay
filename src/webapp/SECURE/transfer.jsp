@@ -11,13 +11,14 @@
                  org.neuclear.id.SignedNamedObject,
                  org.neuclear.commons.crypto.Base64,
                  org.neuclear.commons.servlets.ServletTools,
-                 org.neuclear.asset.orders.transfers.TransferGlobals"%>
+                 org.neuclear.asset.orders.transfers.TransferGlobals,
+                 org.neuclear.id.Service"%>
 <%
     AssetGlobals.registerReaders();
     TransferGlobals.registerReaders();
     Identity userns=(Identity) request.getUserPrincipal();
     String service=ServletTools.getInitParam("service",config);
-    Asset asset=(Asset)Resolver.resolveIdentity(service);
+    Service asset=(Service)Resolver.resolveIdentity(service);
     String recipient=Utility.denullString(request.getParameter("recipient"));
     double amount=Double.parseDouble(Utility.denullString(request.getParameter("amount"),"0"));
     boolean submit=!Utility.isEmpty(request.getParameter("submit"));

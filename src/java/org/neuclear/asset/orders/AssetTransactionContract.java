@@ -1,6 +1,6 @@
 package org.neuclear.asset.orders;
 
-import org.neuclear.asset.contracts.Asset;
+import org.neuclear.id.Service;
 import org.neuclear.id.SignedNamedCore;
 import org.neuclear.id.SignedNamedObject;
 
@@ -9,40 +9,43 @@ import org.neuclear.id.SignedNamedObject;
  * User: pelleb
  * Date: Nov 10, 2003
  * Time: 11:06:37 AM
- * $Id: AssetTransactionContract.java,v 1.2 2004/01/10 00:00:45 pelle Exp $
+ * $Id: AssetTransactionContract.java,v 1.3 2004/04/05 16:31:41 pelle Exp $
  * $Log: AssetTransactionContract.java,v $
+ * Revision 1.3  2004/04/05 16:31:41  pelle
+ * Created new ServiceBuilder class for creating services. A service is an identity that has a seperate service URL and Service Public Key.
+ *
  * Revision 1.2  2004/01/10 00:00:45  pelle
  * Implemented new Schema for Transfer*
  * Working on it for Exchange*, so far all Receipts are implemented.
  * Added SignedNamedDocument which is a generic SignedNamedObject that works with all Signed XML.
  * Changed SignedNamedObject.getDigest() from byte array to String.
  * The whole malarchy in neuclear-pay does not build yet. The refactoring is a big job, but getting there.
- *
+ * <p/>
  * Revision 1.1  2004/01/05 23:47:09  pelle
  * Create new Document classification "order", which is really just inherint in the new
  * package layout.
  * Got rid of much of the inheritance that was lying around and thought a bit further about the format of the exchange orders.
- *
+ * <p/>
  * Revision 1.11  2004/01/03 20:36:25  pelle
  * Renamed HeldTransfer to Exchange
  * Dropped valuetime from the request objects.
  * Doesnt yet compile. New commit to follow soon.
- *
+ * <p/>
  * Revision 1.10  2003/12/19 18:02:35  pelle
  * Revamped a lot of exception handling throughout the framework, it has been simplified in most places:
  * - For most cases the main exception to worry about now is InvalidNamedObjectException.
  * - Most lowerlevel exception that cant be handled meaningful are now wrapped in the LowLevelException, a
- *   runtime exception.
+ * runtime exception.
  * - Source and Store patterns each now have their own exceptions that generalizes the various physical
- *   exceptions that can happen in that area.
- *
+ * exceptions that can happen in that area.
+ * <p/>
  * Revision 1.9  2003/12/10 23:52:39  pelle
  * Did some cleaning up in the builders
  * Fixed some stuff in IdentityCreator
  * New maven goal to create executable jarapp
  * We are close to 0.8 final of ID, 0.11 final of XMLSIG and 0.5 of commons.
  * Will release shortly.
- *
+ * <p/>
  * Revision 1.8  2003/11/28 00:11:50  pelle
  * Getting the NeuClear web transactions working.
  * <p/>
@@ -86,15 +89,15 @@ import org.neuclear.id.SignedNamedObject;
  * AssetControlClient implementes a remote client for communicating with AssetControllers
  */
 public abstract class AssetTransactionContract extends SignedNamedObject {
-    private final Asset asset;
+    private final Service asset;
 
-    protected AssetTransactionContract(final SignedNamedCore core, final Asset asset)  {
+    protected AssetTransactionContract(final SignedNamedCore core, final Service asset) {
         super(core);
         this.asset = asset;
     }
 
 
-    public final Asset getAsset() {
+    public final Service getAsset() {
         return asset;
     }
 

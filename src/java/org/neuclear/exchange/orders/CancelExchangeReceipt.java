@@ -1,7 +1,7 @@
 package org.neuclear.exchange.orders;
 
+import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
-import org.neuclear.asset.contracts.AssetGlobals;
 import org.neuclear.asset.orders.TransferGlobals;
 import org.neuclear.id.InvalidNamedObjectException;
 import org.neuclear.id.NamedObjectReader;
@@ -29,7 +29,7 @@ public final class CancelExchangeReceipt extends ExchangeTransactionContract {
         return order;
     }
 
-    public Timestamp getCanceltime() {
+    public Timestamp getCancellationTime() {
         return new Timestamp(canceltime);
     }
 
@@ -44,12 +44,14 @@ public final class CancelExchangeReceipt extends ExchangeTransactionContract {
          * @return
          */
         public final SignedNamedObject read(final SignedNamedCore core, final Element elem) throws InvalidNamedObjectException {
-            if (!elem.getNamespace().equals(AssetGlobals.NS_ASSET))
-                throw new InvalidNamedObjectException(core.getName(), "Not in XML NameSpace: " + AssetGlobals.NS_ASSET.getURI());
+            if (!elem.getNamespace().equals(ExchangeOrderGlobals.NS_EXCHANGE))
+                throw new InvalidNamedObjectException(core.getName(), "Not in XML NameSpace: " + ExchangeOrderGlobals.NS_EXCHANGE.getURI());
 
-            if (elem.getName().equals(ExchangeGlobals.CANCEL_RCPT_TAGNAME)) {
+            if (elem.getName().equals(ExchangeOrderGlobals.CANCEL_RCPT_TAGNAME)) {
                 final Date valuetime = TransferGlobals.parseValueTimeElement(elem);
-                CancelExchangeOrder order = (CancelExchangeOrder) VerifyingReader.getInstance().read(elem.element(ExchangeGlobals.createQName(ExchangeGlobals.CANCEL_TAGNAME)));
+                final Element orderElement = elem.element(ExchangeOrderGlobals.createQName(ExchangeOrderGlobals.CANCEL_TAGNAME)).createCopy();
+                DocumentHelper.createDocument(orderElement);
+                CancelExchangeOrder order = (CancelExchangeOrder) VerifyingReader.getInstance().read(orderElement);
                 return new CancelExchangeReceipt(core, order, valuetime);
             }
             throw new InvalidNamedObjectException(core.getName(), "Not Matched");

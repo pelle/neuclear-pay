@@ -1,12 +1,8 @@
 package org.neuclear.asset.orders;
 
 import org.dom4j.Element;
-import org.neuclear.asset.contracts.Asset;
 import org.neuclear.asset.contracts.AssetGlobals;
-import org.neuclear.id.InvalidNamedObjectException;
-import org.neuclear.id.NamedObjectReader;
-import org.neuclear.id.SignedNamedCore;
-import org.neuclear.id.SignedNamedObject;
+import org.neuclear.id.*;
 
 /**
  * User: pelleb
@@ -15,7 +11,7 @@ import org.neuclear.id.SignedNamedObject;
  */
 public final class TransferOrder extends AssetTransactionContract {
 
-    private TransferOrder(final SignedNamedCore core, final Asset asset, final String recipient, final Value amount, final String comment) {
+    private TransferOrder(final SignedNamedCore core, final Service asset, final String recipient, final Value amount, final String comment) {
         super(core, asset);
         this.amount = amount;
         this.comment = comment;

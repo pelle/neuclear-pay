@@ -1,7 +1,6 @@
 package org.neuclear.exchange.orders;
 
 import org.dom4j.Element;
-import org.neuclear.asset.contracts.AssetGlobals;
 import org.neuclear.asset.orders.TransferGlobals;
 import org.neuclear.id.InvalidNamedObjectException;
 import org.neuclear.id.NamedObjectReader;
@@ -29,8 +28,11 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: ExchangeCompletedReceipt.java,v 1.2 2004/01/10 00:00:46 pelle Exp $
+$Id: ExchangeCompletedReceipt.java,v 1.3 2004/04/05 16:31:43 pelle Exp $
 $Log: ExchangeCompletedReceipt.java,v $
+Revision 1.3  2004/04/05 16:31:43  pelle
+Created new ServiceBuilder class for creating services. A service is an identity that has a seperate service URL and Service Public Key.
+
 Revision 1.2  2004/01/10 00:00:46  pelle
 Implemented new Schema for Transfer*
 Working on it for Exchange*, so far all Receipts are implemented.
@@ -49,18 +51,18 @@ Updated the Exchange and transfer orders.
  * Date: Jan 6, 2004
  * Time: 7:38:36 PM
  */
-public final class ExchangeCompletedReceipt extends ExchangeTransactionContract{
+public final class ExchangeCompletedReceipt extends ExchangeTransactionContract {
     private ExchangeCompletedReceipt(SignedNamedCore core, ExchangeCompletionOrder order, Date valuetime) {
         super(core, order.getAsset(), order.getAgent());
         this.valuetime = valuetime.getTime();
-        this.order=order;
+        this.order = order;
     }
 
     public ExchangeCompletionOrder getOrder() {
         return order;
     }
 
-    public final Timestamp getValueTime(){
+    public final Timestamp getValueTime() {
         return new Timestamp(valuetime);
     }
 
@@ -75,15 +77,15 @@ public final class ExchangeCompletedReceipt extends ExchangeTransactionContract{
          * @return
          */
         public final SignedNamedObject read(final SignedNamedCore core, final Element elem) throws InvalidNamedObjectException {
-            if (!elem.getNamespace().equals(AssetGlobals.NS_ASSET))
-                throw new InvalidNamedObjectException(core.getName(),"Not in XML NameSpace: "+AssetGlobals.NS_ASSET.getURI());
+            if (!elem.getNamespace().equals(ExchangeOrderGlobals.NS_EXCHANGE))
+                throw new InvalidNamedObjectException(core.getName(), "Not in XML NameSpace: " + ExchangeOrderGlobals.NS_EXCHANGE.getURI());
 
-            if (elem.getName().equals(ExchangeGlobals.COMPLETE_RCPT_TAGNAME)){
+            if (elem.getName().equals(ExchangeOrderGlobals.COMPLETE_RCPT_TAGNAME)) {
                 return new ExchangeCompletedReceipt(core,
-                        (ExchangeCompletionOrder) TransferGlobals.parseEmbedded(elem,ExchangeGlobals.createQName(ExchangeGlobals.COMPLETE_TAGNAME)),
+                        (ExchangeCompletionOrder) TransferGlobals.parseEmbedded(elem, ExchangeOrderGlobals.createQName(ExchangeOrderGlobals.COMPLETE_TAGNAME)),
                         TransferGlobals.parseValueTimeElement(elem));
             }
-            throw new InvalidNamedObjectException(core.getName(),"Not Matched");
+            throw new InvalidNamedObjectException(core.getName(), "Not Matched");
         }
     }
 

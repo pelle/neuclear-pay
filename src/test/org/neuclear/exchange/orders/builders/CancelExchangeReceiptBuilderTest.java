@@ -1,18 +1,16 @@
-package org.neuclear.asset.orders.builders;
+package org.neuclear.exchange.orders.builders;
 
 import org.neuclear.asset.InvalidTransferException;
-import org.neuclear.asset.contracts.builders.AssetBuilder;
 import org.neuclear.asset.orders.Amount;
-import org.neuclear.asset.orders.TransferOrder;
 import org.neuclear.commons.NeuClearException;
 import org.neuclear.commons.crypto.signers.NonExistingSignerException;
-import org.neuclear.id.Service;
+import org.neuclear.exchange.orders.*;
 import org.neuclear.id.SignedNamedObject;
 import org.neuclear.id.builders.Builder;
-import org.neuclear.tests.AbstractObjectCreationTest;
 import org.neuclear.xml.XMLException;
 
 import java.security.GeneralSecurityException;
+import java.util.Date;
 
 /*
 NeuClear Distributed Transaction Clearing Platform
@@ -32,9 +30,9 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: TransferOrderBuilderTest.java,v 1.7 2004/04/05 16:31:43 pelle Exp $
-$Log: TransferOrderBuilderTest.java,v $
-Revision 1.7  2004/04/05 16:31:43  pelle
+$Id: CancelExchangeReceiptBuilderTest.java,v 1.1 2004/04/05 16:31:45 pelle Exp $
+$Log: CancelExchangeReceiptBuilderTest.java,v $
+Revision 1.1  2004/04/05 16:31:45  pelle
 Created new ServiceBuilder class for creating services. A service is an identity that has a seperate service URL and Service Public Key.
 
 Revision 1.6  2004/04/02 23:04:36  pelle
@@ -66,41 +64,48 @@ Started the unit tests for the new payment message format.
  * Date: Jan 21, 2004
  * Time: 9:11:44 PM
  */
-public class TransferOrderBuilderTest extends AbstractObjectCreationTest {
-    public TransferOrderBuilderTest(String string) throws NeuClearException, GeneralSecurityException {
+public class CancelExchangeReceiptBuilderTest extends AbstractExchangeOrderTest {
+    public CancelExchangeReceiptBuilderTest(String string) throws NeuClearException, GeneralSecurityException {
         super(string);
-        asset = createTestAsset();
     }
 
     protected void verifyObject(SignedNamedObject obj) throws NonExistingSignerException {
         assertNotNull(obj);
-        assertTrue(obj instanceof TransferOrder);
-        TransferOrder order = (TransferOrder) obj;
-        assertEquals(asset.getDigest(), order.getAsset().getDigest());
-        assertEquals(getSigner().getPublicKey("neu://test").getEncoded(), order.getSignatory().getPublicKey().getEncoded());
+        assertTrue(obj instanceof CancelExchangeReceipt);
+        CancelExchangeReceipt cr = (CancelExchangeReceipt) obj;
+        assertEquals(getSigner().getPublicKey("neu://test").getEncoded(), cr.getSignatory().getPublicKey().getEncoded());
+        assertNotNull(cr.getCancellationTime());
+        assertNotNull(cr.getOrder());
+
+        CancelExchangeOrder cancel = (CancelExchangeOrder) cr.getOrder();
+        assertEquals(getSigner().getPublicKey("neu://test/bux").getEncoded(), cancel.getSignatory().getPublicKey().getEncoded());
+        assertNotNull(cancel.getReceipt());
+        ExchangeOrderReceipt receipt = cancel.getReceipt();
+        assertEquals(getSigner().getPublicKey("neu://test/bux").getEncoded(), receipt.getSignatory().getPublicKey().getEncoded());
+        assertNotNull(receipt.getValuetime());
+        assertNotNull(receipt.getOrder());
+        ExchangeOrder order = receipt.getOrder();
+        assertEquals(bux.getDigest(), order.getAsset().getDigest());
+        assertEquals(getSigner().getPublicKey("neu://test/bux").getEncoded(), order.getSignatory().getPublicKey().getEncoded());
 //        assertEquals(getBob().getPublicKey().getEncoded(), order.getRecipient().getSignatory().getPublicKey().getEncoded());
         assertEquals("Test", order.getComment());
         assertEquals(20.0, order.getAmount().getAmount(), 0);
     }
 
     protected Class getRequiredClass() {
-        return TransferOrder.class;
+        return CancelExchangeReceipt.class;
     }
 
     protected Builder createBuilder() throws NeuClearException, InvalidTransferException, XMLException {
-        Builder builder = new TransferOrderBuilder(asset, getAlice(), new Amount(20), "Test");
-//        System.out.println(builder.asXML());
+        BidItem bids[] = new BidItem[]{new BidItem(shoes, new Amount(5))};
+        Builder ob = new ExchangeOrderBuilder(bux, agent, new Amount(20), new Date(System.currentTimeMillis() + 10000), bids, "Test");
+        ExchangeOrderReceiptBuilder rb = new ExchangeOrderReceiptBuilder((ExchangeOrder) ob.convert("neu://test/bux", getSigner()), new Date());
+        CancelExchangeOrderBuilder cb = new CancelExchangeOrderBuilder((ExchangeOrderReceipt) rb.convert("neu://test/bux", getSigner()));
+        System.out.println(cb.asXML());
+
+        final CancelExchangeOrder req = (CancelExchangeOrder) cb.convert("neu://test/bux", getSigner());
+        CancelExchangeReceiptBuilder builder = new CancelExchangeReceiptBuilder(req, new Date());
         return builder;
     }
 
-    public Service createTestAsset() throws NeuClearException {
-        AssetBuilder builder = new AssetBuilder("http://bux.neuclear.org",
-                getSigner().getPublicKey("neu://test/bux"),
-                getAlice().getPublicKey(),
-                2, 0);
-        return (Service) builder.convert(NAME, getSigner());
-
-    }
-
-    private Service asset;
 }

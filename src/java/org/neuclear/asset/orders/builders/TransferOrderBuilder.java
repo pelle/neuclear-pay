@@ -3,11 +3,11 @@ package org.neuclear.asset.orders.builders;
 import org.dom4j.Element;
 import org.neuclear.asset.InvalidTransferException;
 import org.neuclear.asset.NegativeTransferException;
-import org.neuclear.asset.contracts.Asset;
 import org.neuclear.asset.orders.TransferGlobals;
 import org.neuclear.asset.orders.Value;
 import org.neuclear.commons.NeuClearException;
 import org.neuclear.commons.Utility;
+import org.neuclear.id.Service;
 import org.neuclear.id.Signatory;
 import org.neuclear.id.builders.Builder;
 
@@ -29,8 +29,11 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: TransferOrderBuilder.java,v 1.5 2004/04/02 23:04:35 pelle Exp $
+$Id: TransferOrderBuilder.java,v 1.6 2004/04/05 16:31:41 pelle Exp $
 $Log: TransferOrderBuilder.java,v $
+Revision 1.6  2004/04/05 16:31:41  pelle
+Created new ServiceBuilder class for creating services. A service is an identity that has a seperate service URL and Service Public Key.
+
 Revision 1.5  2004/04/02 23:04:35  pelle
 Got TransferOrder and Builder working with their test cases.
 Working on TransferReceipt which is the first embedded receipt. This is causing some problems at the moment.
@@ -136,7 +139,7 @@ TransferReceiptBuilder has been created for use by Transfer processors. It is us
  * Time: 3:13:27 PM
  */
 public class TransferOrderBuilder extends Builder {
-    public TransferOrderBuilder(final Asset asset, final Signatory recipient, final Value amount, final String comment) throws InvalidTransferException, NegativeTransferException, NeuClearException {
+    public TransferOrderBuilder(final Service asset, final Signatory recipient, final Value amount, final String comment) throws InvalidTransferException, NegativeTransferException, NeuClearException {
         this(asset.getName(), recipient.getName(), amount, comment);
     }
 

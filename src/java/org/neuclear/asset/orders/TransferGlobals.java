@@ -32,8 +32,11 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: TransferGlobals.java,v 1.9 2004/04/02 23:04:36 pelle Exp $
+$Id: TransferGlobals.java,v 1.10 2004/04/05 16:31:41 pelle Exp $
 $Log: TransferGlobals.java,v $
+Revision 1.10  2004/04/05 16:31:41  pelle
+Created new ServiceBuilder class for creating services. A service is an identity that has a seperate service URL and Service Public Key.
+
 Revision 1.9  2004/04/02 23:04:36  pelle
 Got TransferOrder and Builder working with their test cases.
 Working on TransferReceipt which is the first embedded receipt. This is causing some problems at the moment.
@@ -273,7 +276,8 @@ public final class TransferGlobals {
     }
 
     public static final SignedNamedObject parseEmbedded(Element elem, QName name) throws InvalidNamedObjectException {
-        Element embedded = elem.element(name);
+        final Element embedded = elem.element(name).createCopy();
+        DocumentHelper.createDocument(embedded);
         if (embedded == null)
             throw new InvalidNamedObjectException("Element: " + elem.getName() + " doesnt contain a " + name.getQualifiedName());
         return VerifyingReader.getInstance().read(embedded);

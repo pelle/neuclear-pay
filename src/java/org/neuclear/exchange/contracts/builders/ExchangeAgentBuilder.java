@@ -1,13 +1,8 @@
-package org.neuclear.asset.contracts.builders;
+package org.neuclear.exchange.contracts.builders;
 
-import org.dom4j.Element;
-import org.neuclear.asset.contracts.AssetGlobals;
 import org.neuclear.commons.NeuClearException;
-import org.neuclear.commons.crypto.signers.JCESigner;
-import org.neuclear.commons.crypto.signers.TestCaseSigner;
-import org.neuclear.id.Service;
+import org.neuclear.exchange.contracts.ExchangeAgentGlobals;
 import org.neuclear.id.builders.ServiceBuilder;
-import org.neuclear.xml.xmlsec.KeyInfo;
 
 import java.security.PublicKey;
 
@@ -29,9 +24,9 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: AssetBuilder.java,v 1.11 2004/04/05 16:31:40 pelle Exp $
-$Log: AssetBuilder.java,v $
-Revision 1.11  2004/04/05 16:31:40  pelle
+$Id: ExchangeAgentBuilder.java,v 1.1 2004/04/05 16:31:42 pelle Exp $
+$Log: ExchangeAgentBuilder.java,v $
+Revision 1.1  2004/04/05 16:31:42  pelle
 Created new ServiceBuilder class for creating services. A service is an identity that has a seperate service URL and Service Public Key.
 
 Revision 1.10  2004/04/02 16:58:53  pelle
@@ -116,43 +111,15 @@ TransferReceiptBuilder has been created for use by Transfer processors. It is us
  * Date: Oct 3, 2003
  * Time: 3:13:27 PM
  */
-public final class AssetBuilder extends ServiceBuilder {
+public final class ExchangeAgentBuilder extends ServiceBuilder {
     /**
      * @param serviceUrl
      * @param serviceKey
-     * @param issuerKey
-     * @param decimal
-     * @param minimum
-     * @throws NeuClearException
+     * @throws org.neuclear.commons.NeuClearException
+     *
      */
-    public AssetBuilder(final String serviceUrl, final PublicKey serviceKey, final PublicKey issuerKey, final int decimal, final double minimum) throws NeuClearException {
-        super(AssetGlobals.createQName(AssetGlobals.ASSET_TAGNAME), serviceUrl, serviceKey);
-        final Element elem = getElement();
-        final Element issuerElem = AssetGlobals.createElement("Issuer");
-        issuerElem.add(new KeyInfo(issuerKey).getElement());
-        elem.add(issuerElem);
-        final Element dec = AssetGlobals.createElement(AssetGlobals.DECIMAL_POINT_TAGNAME);
-        dec.setText(Integer.toString(decimal));
-        elem.add(dec);
-        final Element min = AssetGlobals.createElement(AssetGlobals.MINIMUM_TAGNAME);
-        min.setText(Double.toString(minimum));
-        elem.add(min);
+    public ExchangeAgentBuilder(final String serviceUrl, final PublicKey serviceKey) throws NeuClearException {
+        super(ExchangeAgentGlobals.createQName(ExchangeAgentGlobals.EXCHANGEAGENT_TAGNAME), serviceUrl, serviceKey);
     }
 
-    public static void main(final String[] args) {
-        try {
-            final JCESigner signer = new TestCaseSigner();
-
-            final AssetBuilder assetraw = new AssetBuilder("http://bux.neuclear.org",
-                    signer.getPublicKey("neu://test/bux"),
-                    signer.getPublicKey("neu://alice@test"),
-                    2,
-                    0.01);
-            final Service asset = (Service) assetraw.convert("neu://bob@test", signer);
-
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
 }

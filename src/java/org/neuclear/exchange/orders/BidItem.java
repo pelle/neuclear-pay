@@ -10,7 +10,7 @@ import org.neuclear.asset.orders.Value;
  * Time: 5:27:24 PM
  * To change this template use Options | File Templates.
  */
-public  class BidItem {
+public class BidItem {
     public BidItem(Asset asset, Value amount) {
         this.asset = asset;
         this.amount = amount;

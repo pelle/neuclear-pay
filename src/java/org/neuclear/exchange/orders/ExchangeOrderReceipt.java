@@ -1,7 +1,6 @@
 package org.neuclear.exchange.orders;
 
 import org.dom4j.Element;
-import org.neuclear.asset.contracts.AssetGlobals;
 import org.neuclear.asset.orders.TransferGlobals;
 import org.neuclear.id.InvalidNamedObjectException;
 import org.neuclear.id.NamedObjectReader;
@@ -18,12 +17,13 @@ import java.util.Date;
  */
 public final class ExchangeOrderReceipt extends ExchangeTransactionContract {
 
-    private ExchangeOrderReceipt(final SignedNamedCore core, final ExchangeOrder order,final Date valuetime) {
+    private ExchangeOrderReceipt(final SignedNamedCore core, final ExchangeOrder order, final Date valuetime) {
         super(core, order.getAsset(), order.getAgent());
         this.valuetime = valuetime.getTime();
-        this.order=order;
+        this.order = order;
     }
-    public ExchangeOrder getOrder(){
+
+    public ExchangeOrder getOrder() {
         return order;
     }
 
@@ -42,15 +42,15 @@ public final class ExchangeOrderReceipt extends ExchangeTransactionContract {
          * @return
          */
         public final SignedNamedObject read(final SignedNamedCore core, final Element elem) throws InvalidNamedObjectException {
-            if (!elem.getNamespace().equals(AssetGlobals.NS_ASSET))
-                throw new InvalidNamedObjectException(core.getName(),"Not in XML NameSpace: "+AssetGlobals.NS_ASSET.getURI());
+            if (!elem.getNamespace().equals(ExchangeOrderGlobals.NS_EXCHANGE))
+                throw new InvalidNamedObjectException(core.getName(), "Not in XML NameSpace: " + ExchangeOrderGlobals.NS_EXCHANGE.getURI());
 
-            if (elem.getName().equals(ExchangeGlobals.EXCHANGE_RCPT_TAGNAME)){
+            if (elem.getName().equals(ExchangeOrderGlobals.EXCHANGE_RCPT_TAGNAME)) {
                 return new ExchangeOrderReceipt(core,
-                        (ExchangeOrder) TransferGlobals.parseEmbedded(elem,ExchangeGlobals.createQName(ExchangeGlobals.EXCHANGE_TAGNAME)),
+                        (ExchangeOrder) TransferGlobals.parseEmbedded(elem, ExchangeOrderGlobals.createQName(ExchangeOrderGlobals.EXCHANGE_TAGNAME)),
                         TransferGlobals.parseValueTimeElement(elem));
             }
-            throw new InvalidNamedObjectException(core.getName(),"Not Matched");
+            throw new InvalidNamedObjectException(core.getName(), "Not Matched");
         }
     }
 

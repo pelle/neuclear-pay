@@ -3,16 +3,18 @@ package org.neuclear.exchange.orders.builders;
 import org.dom4j.Element;
 import org.neuclear.asset.InvalidTransferException;
 import org.neuclear.asset.NegativeTransferException;
-import org.neuclear.asset.contracts.Asset;
 import org.neuclear.asset.orders.TransferGlobals;
 import org.neuclear.asset.orders.Value;
 import org.neuclear.commons.NeuClearException;
 import org.neuclear.commons.Utility;
+import org.neuclear.commons.time.TimeTools;
 import org.neuclear.exchange.contracts.ExchangeAgent;
-import org.neuclear.exchange.orders.ExchangeGlobals;
 import org.neuclear.exchange.orders.BidItem;
-import org.neuclear.xml.xmlsec.SignedElement;
+import org.neuclear.exchange.orders.ExchangeOrderGlobals;
+import org.neuclear.id.Service;
 import org.neuclear.id.builders.Builder;
+
+import java.util.Date;
 
 /*
 NeuClear Distributed Transaction Clearing Platform
@@ -32,8 +34,11 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: ExchangeOrderBuilder.java,v 1.2 2004/01/12 22:39:15 pelle Exp $
+$Id: ExchangeOrderBuilder.java,v 1.3 2004/04/05 16:31:43 pelle Exp $
 $Log: ExchangeOrderBuilder.java,v $
+Revision 1.3  2004/04/05 16:31:43  pelle
+Created new ServiceBuilder class for creating services. A service is an identity that has a seperate service URL and Service Public Key.
+
 Revision 1.2  2004/01/12 22:39:15  pelle
 Completed all the builders and contracts.
 Added a new abstract Value class to contain either an amount or a list of serial numbers.
@@ -127,23 +132,24 @@ TransferReceiptBuilder has been created for use by Transfer processors. It is us
  * Time: 3:13:27 PM
  */
 public class ExchangeOrderBuilder extends Builder {
-    protected ExchangeOrderBuilder(final Asset asset, final ExchangeAgent agent, final Value amount, final BidItem items[], final String comment) throws InvalidTransferException, NegativeTransferException, NeuClearException {
-        super(ExchangeGlobals.createQName(ExchangeGlobals.EXCHANGE_TAGNAME));
+    protected ExchangeOrderBuilder(final Service asset, final ExchangeAgent agent, final Value amount, final Date expiry, final BidItem items[], final String comment) throws InvalidTransferException, NegativeTransferException, NeuClearException {
+        super(ExchangeOrderGlobals.createQName(ExchangeOrderGlobals.EXCHANGE_TAGNAME));
         if (amount.getAmount() < 0)
             throw new NegativeTransferException(amount);
-        if (asset==null)
+        if (asset == null)
             throw new InvalidTransferException("assetName");
         if (agent == null)
             throw new InvalidTransferException("agent");
 
         final Element element = getElement();
-        element.add(ExchangeGlobals.createElement(ExchangeGlobals.AGENT_TAG, agent.getName()));
+        element.add(ExchangeOrderGlobals.createElement(ExchangeOrderGlobals.AGENT_TAG, agent.getName()));
         element.add(TransferGlobals.createElement(TransferGlobals.ASSET_TAG, asset.getName()));
         element.add(TransferGlobals.createValueTag(amount));
+        element.add(ExchangeOrderGlobals.createElement(ExchangeOrderGlobals.EXPIRY_TAG, TimeTools.formatTimeStamp(expiry)));
 
         for (int i = 0; i < items.length; i++) {
             BidItem item = items[i];
-            Element bidelem=element.addElement(ExchangeGlobals.BID_ITEM_TAG);
+            Element bidelem = element.addElement(ExchangeOrderGlobals.BID_ITEM_TAG);
             bidelem.addElement(TransferGlobals.createQName(TransferGlobals.ASSET_TAG)).setText(item.getAsset().getName());
             bidelem.add(TransferGlobals.createValueTag(item.getAmount()));
         }

@@ -4,7 +4,6 @@ import org.dom4j.Element;
 import org.neuclear.commons.Utility;
 import org.neuclear.id.*;
 import org.neuclear.id.targets.Targets;
-import org.neuclear.xml.xmlsec.KeyInfo;
 import org.neuclear.xml.xmlsec.XMLSecTools;
 import org.neuclear.xml.xmlsec.XMLSecurityException;
 
@@ -28,8 +27,11 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: Asset.java,v 1.16 2004/04/02 16:58:53 pelle Exp $
+$Id: Asset.java,v 1.17 2004/04/05 16:31:40 pelle Exp $
 $Log: Asset.java,v $
+Revision 1.17  2004/04/05 16:31:40  pelle
+Created new ServiceBuilder class for creating services. A service is an identity that has a seperate service URL and Service Public Key.
+
 Revision 1.16  2004/04/02 16:58:53  pelle
 Updated Asset and Asset Builder with semi fully featured functionality.
 It now has Issuer, Service etc.
@@ -130,12 +132,10 @@ SOAPTools was changed to return a stream. This is required by the VerifyingReade
  * 
  * @see org.neuclear.asset.contracts.builders.AssetBuilder
  */
-public final class Asset extends Identity {
+public final class Asset extends Service {
     protected Asset(final SignedNamedCore core, final String serviceUrl, final PublicKey servicekey, final PublicKey issuerKey, final Targets targets, final int decimal, final double minimumTransaction) {
-        super(core, null, targets);
-        this.serviceUrl = serviceUrl;
+        super(core, serviceUrl, servicekey, targets);
         this.issuerKey = issuerKey;
-        this.serviceKey = servicekey;
         this.decimal = decimal;
         this.multiplier = (int) Math.round(Math.pow(10, -decimal));
         this.minimumTransaction = minimumTransaction;
@@ -180,14 +180,6 @@ public final class Asset extends Identity {
         return issuerKey;
     }
 
-    public final PublicKey getServiceKey() {
-        return serviceKey;
-    }
-
-    public final String getServiceUrl() {
-        return serviceUrl;
-    }
-
     public int getDecimal() {
         return decimal;
     }
@@ -211,9 +203,9 @@ public final class Asset extends Identity {
             if (!elem.getNamespace().equals(AssetGlobals.NS_ASSET))
                 throw new InvalidNamedObjectException(core.getName(), "Not in XML NameSpace: " + AssetGlobals.NS_ASSET.getURI());
             final Element issuerElement = InvalidNamedObjectException.assertContainsElementQName(core, elem, AssetGlobals.createQName("Issuer"));
-            final Element serviceElement = InvalidNamedObjectException.assertContainsElementQName(core, elem, AssetGlobals.createQName("Service"));
+            final Element serviceElement = InvalidNamedObjectException.assertContainsElementQName(core, elem, SignedNamedObject.createNEUIDQName("Service"));
             final Element serviceKeyElement = InvalidNamedObjectException.assertContainsElementQName(core, serviceElement, XMLSecTools.createQName("KeyInfo"));
-            final Element serviceUrlElement = InvalidNamedObjectException.assertContainsElementQName(core, serviceElement, AssetGlobals.createQName("Url"));
+            final Element serviceUrlElement = InvalidNamedObjectException.assertContainsElementQName(core, serviceElement, SignedNamedObject.createNEUIDQName("Url"));
             try {
                 final PublicKey sPub = extractPublicKey(serviceKeyElement);
                 final String serviceurl = serviceUrlElement.getTextTrim();
@@ -228,11 +220,6 @@ public final class Asset extends Identity {
         }
 
 
-    }
-
-    private static PublicKey extractPublicKey(Element kiElem) throws XMLSecurityException {
-        final KeyInfo sKi = new KeyInfo(kiElem);
-        return sKi.getPublicKey();
     }
 
     private static double extractMinimumTransactionAmount(Element elem) {
@@ -252,8 +239,6 @@ public final class Asset extends Identity {
     }
 
     private final PublicKey issuerKey;
-    private final String serviceUrl;
-    private final PublicKey serviceKey;
     private final int decimal;
     private final int multiplier;
     private final double minimumTransaction;

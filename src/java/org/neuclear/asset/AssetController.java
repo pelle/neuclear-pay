@@ -1,11 +1,10 @@
 package org.neuclear.asset;
 
-import org.neuclear.asset.contracts.Asset;
-import org.neuclear.asset.orders.AssetTransactionContract;
 import org.neuclear.asset.orders.TransferOrder;
 import org.neuclear.asset.orders.TransferReceipt;
 import org.neuclear.commons.NeuClearException;
 import org.neuclear.exchange.orders.*;
+import org.neuclear.id.Service;
 import org.neuclear.id.SignedNamedObject;
 import org.neuclear.id.receiver.Receiver;
 import org.neuclear.id.receiver.UnsupportedTransaction;
@@ -28,8 +27,11 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: AssetController.java,v 1.14 2004/03/02 18:58:35 pelle Exp $
+$Id: AssetController.java,v 1.15 2004/04/05 16:31:42 pelle Exp $
 $Log: AssetController.java,v $
+Revision 1.15  2004/04/05 16:31:42  pelle
+Created new ServiceBuilder class for creating services. A service is an identity that has a seperate service URL and Service Public Key.
+
 Revision 1.14  2004/03/02 18:58:35  pelle
 Further cleanups in neuclear-id. Moved everything under id.
 
@@ -123,7 +125,7 @@ public abstract class AssetController implements Receiver {
      * @param contract 
      * @return 
      */
-    public final SignedNamedObject receive(final SignedNamedObject contract) throws UnsupportedTransaction , NeuClearException {
+    public final SignedNamedObject receive(final SignedNamedObject contract) throws UnsupportedTransaction, NeuClearException {
         try {
             if (contract instanceof TransferOrder)
                 return process((TransferOrder) contract);
@@ -150,7 +152,7 @@ public abstract class AssetController implements Receiver {
      * @param asset 
      * @return true if able to process
      */
-    public abstract boolean canProcess(Asset asset);
+    public abstract boolean canProcess(Service asset);
 
 
     /**

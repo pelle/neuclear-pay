@@ -1,7 +1,6 @@
 package org.neuclear.exchange.orders;
 
 import org.dom4j.Element;
-import org.neuclear.asset.contracts.AssetGlobals;
 import org.neuclear.asset.orders.TransferGlobals;
 import org.neuclear.asset.orders.Value;
 import org.neuclear.id.InvalidNamedObjectException;
@@ -61,15 +60,15 @@ public final class ExchangeCompletionOrder extends ExchangeTransactionContract {
          * @return
          */
         public final SignedNamedObject read(final SignedNamedCore core, final Element elem) throws InvalidNamedObjectException {
-            if (!elem.getNamespace().equals(AssetGlobals.NS_ASSET))
-                throw new InvalidNamedObjectException(core.getName(), "Not in XML NameSpace: " + AssetGlobals.NS_ASSET.getURI());
+            if (!elem.getNamespace().equals(ExchangeOrderGlobals.NS_EXCHANGE))
+                throw new InvalidNamedObjectException(core.getName(), "Not in XML NameSpace: " + ExchangeOrderGlobals.NS_EXCHANGE.getURI());
 
-            if (elem.getName().equals(ExchangeGlobals.COMPLETE_TAGNAME)) {
+            if (elem.getName().equals(ExchangeOrderGlobals.COMPLETE_TAGNAME)) {
                 return new ExchangeCompletionOrder(core,
-                        (ExchangeOrderReceipt) TransferGlobals.parseEmbedded(elem, ExchangeGlobals.createQName(ExchangeGlobals.EXCHANGE_RCPT_TAGNAME)),
+                        (ExchangeOrderReceipt) TransferGlobals.parseEmbedded(elem, ExchangeOrderGlobals.createQName(ExchangeOrderGlobals.EXCHANGE_RCPT_TAGNAME)),
                         TransferGlobals.parseRecipientTag(elem),
                         TransferGlobals.parseValueTag(elem),
-                        TransferGlobals.parseTimeStampElement(elem, ExchangeGlobals.createQName(ExchangeGlobals.EXCHANGE_TIME_TAGNAME)),
+                        TransferGlobals.parseTimeStampElement(elem, ExchangeOrderGlobals.createQName(ExchangeOrderGlobals.EXCHANGE_TIME_TAGNAME)),
                         TransferGlobals.parseCommentElement(elem));
             }
             throw new InvalidNamedObjectException(core.getName(), "Not Matched");

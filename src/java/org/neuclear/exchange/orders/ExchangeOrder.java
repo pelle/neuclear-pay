@@ -1,8 +1,6 @@
 package org.neuclear.exchange.orders;
 
 import org.dom4j.Element;
-import org.neuclear.asset.contracts.Asset;
-import org.neuclear.asset.contracts.AssetGlobals;
 import org.neuclear.asset.orders.TransferGlobals;
 import org.neuclear.asset.orders.Value;
 import org.neuclear.exchange.contracts.ExchangeAgent;
@@ -20,7 +18,7 @@ import java.util.List;
  */
 public final class ExchangeOrder extends ExchangeTransactionContract {
     private ExchangeOrder(final SignedNamedCore core,
-                          final Asset bidAsset, final ExchangeAgent agent, final Value amount,
+                          final Service bidAsset, final ExchangeAgent agent, final Value amount,
                           BidItem items[], final String comment, final Date expires) {
         super(core, bidAsset, agent);
         this.items = makeSafeCopy(items);
@@ -83,22 +81,22 @@ public final class ExchangeOrder extends ExchangeTransactionContract {
          * @return
          */
         public final SignedNamedObject read(final SignedNamedCore core, final Element elem) throws InvalidNamedObjectException {
-            if (!elem.getNamespace().equals(AssetGlobals.NS_ASSET))
-                throw new InvalidNamedObjectException(core.getName(), "Not in XML NameSpace: " + AssetGlobals.NS_ASSET.getURI());
+            if (!elem.getNamespace().equals(ExchangeOrderGlobals.NS_EXCHANGE))
+                throw new InvalidNamedObjectException(core.getName(), "Not in XML NameSpace: " + ExchangeOrderGlobals.NS_EXCHANGE.getURI());
 
-            if (elem.getName().equals(ExchangeGlobals.EXCHANGE_TAGNAME))
+            if (elem.getName().equals(ExchangeOrderGlobals.EXCHANGE_TAGNAME))
                 return new ExchangeOrder(core,
                         TransferGlobals.parseAssetTag(elem),
-                        ExchangeGlobals.parseAgentTag(elem),
+                        ExchangeOrderGlobals.parseAgentTag(elem),
                         TransferGlobals.parseValueTag(elem),
                         parseBidItems(elem),
                         TransferGlobals.parseCommentElement(elem),
-                        TransferGlobals.parseTimeStampElement(elem, ExchangeGlobals.createQName(ExchangeGlobals.EXPIRY_TAG)));
+                        TransferGlobals.parseTimeStampElement(elem, ExchangeOrderGlobals.createQName(ExchangeOrderGlobals.EXPIRY_TAG)));
             throw new InvalidNamedObjectException(core.getName(), "Not Matched");
         }
 
         private BidItem[] parseBidItems(Element elem) throws InvalidNamedObjectException {
-            List list = elem.elements(ExchangeGlobals.createQName(ExchangeGlobals.BID_ITEM_TAG));
+            List list = elem.elements(ExchangeOrderGlobals.createQName(ExchangeOrderGlobals.BID_ITEM_TAG));
             BidItem items[] = new BidItem[list.size()];
             for (int i = 0; i < list.size(); i++)
                 items[i] = parseBidItem(elem);

@@ -1,11 +1,11 @@
 package org.neuclear.asset.servlet;
 
 import org.neuclear.asset.AssetController;
-import org.neuclear.asset.contracts.Asset;
 import org.neuclear.asset.contracts.AssetGlobals;
 import org.neuclear.asset.controllers.currency.CurrencyController;
 import org.neuclear.asset.orders.TransferGlobals;
 import org.neuclear.commons.servlets.ServletTools;
+import org.neuclear.id.Service;
 import org.neuclear.id.receiver.ReceiverServlet;
 import org.neuclear.id.resolver.Resolver;
 
@@ -30,8 +30,11 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: AssetControllerServlet.java,v 1.4 2004/04/01 23:18:33 pelle Exp $
+$Id: AssetControllerServlet.java,v 1.5 2004/04/05 16:31:42 pelle Exp $
 $Log: AssetControllerServlet.java,v $
+Revision 1.5  2004/04/05 16:31:42  pelle
+Created new ServiceBuilder class for creating services. A service is an identity that has a seperate service URL and Service Public Key.
+
 Revision 1.4  2004/04/01 23:18:33  pelle
 Split Identity into Signatory and Identity class.
 Identity remains a signed named object and will in the future just be used for self declared information.
@@ -115,7 +118,7 @@ public final class AssetControllerServlet extends ReceiverServlet {
         AssetGlobals.registerReaders();
         TransferGlobals.registerReaders();
         try {
-            asset = (Asset) Resolver.resolveIdentity(getServiceid());
+            asset = (Service) Resolver.resolveIdentity(getServiceid());
             final AssetController receiver = new CurrencyController(null,
                     getSigner(),
                     getServiceid());
@@ -127,7 +130,7 @@ public final class AssetControllerServlet extends ReceiverServlet {
         }
     }
 
-    public final Asset getAsset() {
+    public final Service getAsset() {
         return asset;
     }
 
@@ -136,6 +139,6 @@ public final class AssetControllerServlet extends ReceiverServlet {
         return datasource;
     }
 
-    private Asset asset;
+    private Service asset;
     private String datasource;
 }
