@@ -69,12 +69,12 @@
 	<dependency>
    	<id>neuclear-ledger</id>
 	<name>neuclear-ledger</name>
-	<version>0.3-SNAPSHOT</version>
+	<version>0.3</version>
     </dependency>
        <dependency>
           <id>neuclear-commons</id>
        <name>neuclear-commons</name>
-       <version>0.3-SNAPSHOT</version>
+       <version>0.3</version>
        </dependency>
        <dependency>
            <id>picocontainer</id>
@@ -87,12 +87,12 @@
        <dependency>
           <id>neuclear-id</id>
        <name>neuclear-id</name>
-       <version>0.7-SNAPSHOT</version>
+       <version>0.7</version>
        </dependency>
        <dependency>
            <id>neudist-xmlsig</id>
            <name>neudist-xmlsig</name>
-           <version>0.9-SNAPSHOT</version>
+           <version>0.9</version>
            <properties>
                  <war.bundle.jar>true</war.bundle.jar>
            </properties>
