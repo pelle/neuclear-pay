@@ -83,7 +83,7 @@
         <dependency>
             <id>neuclear-ledger</id>
             <name>neuclear-ledger</name>
-            <version>0.5.5</version>
+            <version>0.6</version>
             <properties>
                 <war.bundle>true</war.bundle>
             </properties>
@@ -91,7 +91,7 @@
         <dependency>
             <id>neuclear-ledger-prevalent</id>
             <name>neuclear-ledger-prevalent</name>
-            <version>0.5</version>
+            <version>0.6</version>
             <properties>
                 <war.bundle>true</war.bundle>
             </properties>
@@ -99,7 +99,7 @@
         <dependency>
             <id>neuclear-ledger-hibernate</id>
             <name>neuclear-ledger-hibernate</name>
-            <version>0.5.4</version>
+            <version>0.6</version>
             <properties>
                 <war.bundle>true</war.bundle>
             </properties>

@@ -14,8 +14,11 @@ import org.neuclear.id.receiver.UnsupportedTransaction;
 import org.neuclear.ledger.*;
 
 /*
-$Id: ExchangeCompletionOrderReceiver.java,v 1.1 2004/07/22 21:48:42 pelle Exp $
+$Id: ExchangeCompletionOrderReceiver.java,v 1.2 2004/07/23 18:58:39 pelle Exp $
 $Log: ExchangeCompletionOrderReceiver.java,v $
+Revision 1.2  2004/07/23 18:58:39  pelle
+Updated to use the new complete method in ledger.
+
 Revision 1.1  2004/07/22 21:48:42  pelle
 Further receivers and unit tests for for Exchanges etc.
 I've also changed the internal asset to ledger id from being the pk of the contract signer, to being the pk of the service key.
@@ -43,7 +46,7 @@ public class ExchangeCompletionOrderReceiver extends SigningLedgerReceiver imple
                 throw new InvalidTransferException("Only Agent is allowed to Sign Completion Order");
             if (complete.getAmount().getAmount() > complete.getReceipt().getOrder().getAmount().getAmount())
                 throw new InvalidTransferException("Attempting to complete larger than authorized amount");
-            PostedTransaction tran = ledger.complete(complete.getReceipt().getOrder().getDigest(), complete.getAmount().getAmount(), complete.getComment());
+            PostedTransaction tran = ledger.complete(complete.getReceipt().getOrder().getDigest(), complete.getSignatory().getName(), complete.getCounterparty(), complete.getAmount().getAmount(), complete.getComment());
             if (!signer.canSignFor(name))
                 return null;
             ExchangeCompletedReceipt receipt = (ExchangeCompletedReceipt) new ExchangeCompletedReceiptBuilder(complete, tran.getTransactionTime()).convert(name, signer);
@@ -67,6 +70,8 @@ public class ExchangeCompletionOrderReceiver extends SigningLedgerReceiver imple
         } catch (InvalidTransactionException e) {
             throw new NeuClearException(e);
         } catch (TransactionExpiredException e) {
+            throw new NeuClearException(e);
+        } catch (UnknownBookException e) {
             throw new NeuClearException(e);
         }
     }

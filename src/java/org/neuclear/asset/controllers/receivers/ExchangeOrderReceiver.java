@@ -14,8 +14,11 @@ import org.neuclear.id.receiver.UnsupportedTransaction;
 import org.neuclear.ledger.*;
 
 /*
-$Id: ExchangeOrderReceiver.java,v 1.1 2004/07/22 21:48:42 pelle Exp $
+$Id: ExchangeOrderReceiver.java,v 1.2 2004/07/23 18:58:39 pelle Exp $
 $Log: ExchangeOrderReceiver.java,v $
+Revision 1.2  2004/07/23 18:58:39  pelle
+Updated to use the new complete method in ledger.
+
 Revision 1.1  2004/07/22 21:48:42  pelle
 Further receivers and unit tests for for Exchanges etc.
 I've also changed the internal asset to ledger id from being the pk of the contract signer, to being the pk of the service key.
@@ -39,7 +42,7 @@ public class ExchangeOrderReceiver extends SigningLedgerReceiver implements Hand
         try {
             ExchangeOrder order = (ExchangeOrder) obj;
             String name = order.getAsset().getServiceId();
-            final PostedTransaction posted = ledger.hold(name, order.getDigest(), order.getSignatory().getName(), order.getAgent().getSignatory().getName(), order.getExpiry(), order.getAmount().getAmount(), order.getComment());
+            final PostedTransaction posted = ledger.hold(name, order.getDigest(), order.getSignatory().getName(), order.getAgent().getServiceId(), order.getExpiry(), order.getAmount().getAmount(), order.getComment());
             if (!signer.canSignFor(name))
                 return null;
             final ExchangeOrderReceipt receipt = (ExchangeOrderReceipt) new ExchangeOrderReceiptBuilder(order, posted.getTransactionTime()).convert(name, signer);
