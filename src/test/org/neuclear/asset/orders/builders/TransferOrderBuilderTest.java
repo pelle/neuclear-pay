@@ -2,6 +2,7 @@ package org.neuclear.asset.orders.builders;
 
 import org.neuclear.asset.InvalidTransferException;
 import org.neuclear.asset.contracts.Asset;
+import org.neuclear.asset.contracts.builders.AssetBuilder;
 import org.neuclear.asset.orders.Amount;
 import org.neuclear.asset.orders.TransferOrder;
 import org.neuclear.commons.NeuClearException;
@@ -31,8 +32,11 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: TransferOrderBuilderTest.java,v 1.4 2004/04/01 23:18:33 pelle Exp $
+$Id: TransferOrderBuilderTest.java,v 1.5 2004/04/02 17:56:16 pelle Exp $
 $Log: TransferOrderBuilderTest.java,v $
+Revision 1.5  2004/04/02 17:56:16  pelle
+Added new createTestAsset() method.
+
 Revision 1.4  2004/04/01 23:18:33  pelle
 Split Identity into Signatory and Identity class.
 Identity remains a signed named object and will in the future just be used for self declared information.
@@ -77,14 +81,18 @@ public class TransferOrderBuilderTest extends AbstractObjectCreationTest {
     }
 
     protected Builder createBuilder() throws NeuClearException, InvalidTransferException, XMLException {
-        Builder builder = new TransferOrderBuilder("neu://test/bux", "neu://bob@test", new Amount(20), "Test");
-        System.out.println(builder.asXML());
+        Builder builder = new TransferOrderBuilder(asset, null, new Amount(20), "Test");
+//        System.out.println(builder.asXML());
         return builder;
     }
 
-    public Asset createTestAsset() throws NonExistingSignerException {
-//        return new Asset("http://localhost",getSigner().getPublicKey("neu://test/bux"),1,1);
-        return null;//TODO FIX
+    public Asset createTestAsset() throws NeuClearException {
+        AssetBuilder builder = new AssetBuilder("http://bux.neuclear.org",
+                getSigner().getPublicKey("neu://test/bux"),
+                getAlice().getPublicKey(),
+                2, 0);
+        return (Asset) builder.convert(NAME, getSigner());
+
     }
 
     private Asset asset;
