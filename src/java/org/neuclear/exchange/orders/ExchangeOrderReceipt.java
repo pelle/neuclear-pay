@@ -1,12 +1,8 @@
 package org.neuclear.exchange.orders;
 
-import org.neuclear.commons.NeuClearException;
-import org.neuclear.id.Identity;
 import org.neuclear.id.SignedNamedCore;
-import org.neuclear.asset.orders.exchanges.Exchange;
-import org.neuclear.asset.orders.TransferContract;
-import org.neuclear.asset.orders.AssetTransactionContract;
 import org.neuclear.asset.contracts.Asset;
+import org.neuclear.exchange.contracts.ExchangeAgent;
 
 import java.sql.Timestamp;
 import java.util.Date;
@@ -16,11 +12,10 @@ import java.util.Date;
  * Date: Jul 30, 2003
  * Time: 11:59:36 AM
  */
-public final class ExchangeOrderReceipt extends AssetTransactionContract {
+public final class ExchangeOrderReceipt extends ExchangeTransactionContract {
 
-    private ExchangeOrderReceipt(final SignedNamedCore core, final Asset asset, Identity agent, String orderid, Date valuetime, Asset neededAsset, double neededAmount, double bidAmount, String comment, Date expires) {
-        super(core, asset);
-        this.agent = agent;
+    private ExchangeOrderReceipt(final SignedNamedCore core, final Asset asset, final ExchangeAgent agent, final String orderid, final Date valuetime, Asset neededAsset, double neededAmount, double bidAmount, final String comment, final Date expires) {
+        super(core, asset,agent);
         this.orderid = orderid;
         this.valuetime = valuetime.getTime();
         this.neededAsset = neededAsset;
@@ -34,9 +29,6 @@ public final class ExchangeOrderReceipt extends AssetTransactionContract {
         return null;
     }
 
-    public Identity getAgent() {
-        return agent;
-    }
 
     public String getOrderid() {
         return orderid;
@@ -66,7 +58,6 @@ public final class ExchangeOrderReceipt extends AssetTransactionContract {
         return new Timestamp(expires);
     }
 
-    private final Identity agent;
     private final String orderid;
     private final long valuetime;
     private final Asset neededAsset;

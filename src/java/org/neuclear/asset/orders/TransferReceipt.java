@@ -21,46 +21,22 @@ import java.text.ParseException;
  */
 public class TransferReceipt extends AssetTransactionContract {
 
-    private TransferReceipt(final SignedNamedCore core, final Asset asset, final Identity from, final Identity to, final String reqid, final double amount, final Date valuetime, final String comment)  {
-        super(core, asset);
-        this.from = from;
-        this.reqid = reqid;
-        this.to=to;
+    private TransferReceipt(final SignedNamedCore core, final TransferOrder order, final Date valuetime)  {
+        super(core, order.getAsset());
         this.valuetime=valuetime.getTime();
-        this.amount = amount;
-        this.comment = (comment != null) ? comment : "";
+        this.order=order;
     }
 
-    public final Identity getFrom() {
-        return from;
-    }
-
-    public final String getRequestId() {
-        return reqid;
-    }
-
-    public final Identity getTo() {
-        return to;
+    public final TransferOrder getOrder(){
+        return order;
     }
     public final Date getValueTime() {
         return new Timestamp(valuetime);
     }
 
-    public final double getAmount() {
-            return amount;
-        }
-
-    public final String getComment() {
-        return comment;
-    }
-
-
-    private final double amount;
-    private final String comment;
     private final long valuetime;
-    private final Identity from;
-    private final String reqid;
-    private final Identity to;
+    private final TransferOrder order;
+
   public static final class Reader implements NamedObjectReader {
         /**
          * Read object from Element and fill in its details

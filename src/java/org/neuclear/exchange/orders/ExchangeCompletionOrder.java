@@ -6,6 +6,7 @@ import org.neuclear.id.SignedNamedCore;
 import org.neuclear.asset.orders.TransferContract;
 import org.neuclear.asset.orders.AssetTransactionContract;
 import org.neuclear.asset.contracts.Asset;
+import org.neuclear.exchange.contracts.ExchangeAgent;
 
 import java.sql.Timestamp;
 import java.util.Date;
@@ -15,9 +16,9 @@ import java.util.Date;
  * Date: Jul 21, 2003
  * Time: 5:35:26 PM
  */
-public final class ExchangeCompletionOrder extends AssetTransactionContract {
-    public ExchangeCompletionOrder(final SignedNamedCore core, final Asset asset, final Date valuetime, final double amount, final String holdid, final String counterpartyid) {
-        super(core, asset);
+public final class ExchangeCompletionOrder extends ExchangeTransactionContract {
+    private ExchangeCompletionOrder(final SignedNamedCore core, final Asset asset, final ExchangeAgent agent, final Date valuetime, final double amount, final String holdid, final String counterpartyid) {
+        super(core, asset,agent);
         this.valuetime = valuetime.getTime();
         this.amount = amount;
         this.holdid = holdid;

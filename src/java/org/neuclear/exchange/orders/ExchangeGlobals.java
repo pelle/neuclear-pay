@@ -1,9 +1,10 @@
-package org.neuclear.asset.orders;
+package org.neuclear.exchange.orders;
 
 import org.dom4j.*;
 import org.neuclear.id.verifier.VerifyingReader;
 import org.neuclear.asset.orders.AssetTransactionContract;
 import org.neuclear.asset.orders.AssetTransactionContract;
+import org.neuclear.asset.orders.TransferGlobals;
 
 /*
 NeuClear Distributed Transaction Clearing Platform
@@ -23,9 +24,9 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: TransferGlobals.java,v 1.2 2004/01/06 23:26:48 pelle Exp $
-$Log: TransferGlobals.java,v $
-Revision 1.2  2004/01/06 23:26:48  pelle
+$Id: ExchangeGlobals.java,v 1.1 2004/01/06 23:26:48 pelle Exp $
+$Log: ExchangeGlobals.java,v $
+Revision 1.1  2004/01/06 23:26:48  pelle
 Started restructuring the original xml schemas.
 Updated the Exchange and transfer orders.
 
@@ -91,13 +92,13 @@ TransferReceiptBuilder has been created for use by Transfer processors. It is us
  * Date: Oct 3, 2003
  * Time: 3:55:06 PM
  */
-public final class TransferGlobals {
-    private TransferGlobals() {
+public final class ExchangeGlobals {
+    private ExchangeGlobals() {
         // Instantiation is not allowed
     }
 
     public static Namespace createNameSpace() {
-        return DocumentHelper.createNamespace(XFER_NSPREFIX, XFER_NSURI);
+        return DocumentHelper.createNamespace(EX_NSPREFIX, EX_NSURI);
     }
 
     public static QName createQName(final String name) {
@@ -119,16 +120,26 @@ public final class TransferGlobals {
     }
 
     public static void registerReaders() {
-        VerifyingReader.getInstance().registerReader(TransferGlobals.XFER_TAGNAME, new TransferOrder.Reader());
-        VerifyingReader.getInstance().registerReader(TransferGlobals.XFER_RCPT_TAGNAME, new TransferReceipt.Reader());
+        VerifyingReader.getInstance().registerReader(ExchangeGlobals.CANCEL_TAGNAME, new AssetTransactionContract.Reader());
+        VerifyingReader.getInstance().registerReader(ExchangeGlobals.CANCEL_RCPT_TAGNAME, new AssetTransactionContract.Reader());
+        VerifyingReader.getInstance().registerReader(ExchangeGlobals.EXCHANGE_TAGNAME, new AssetTransactionContract.Reader());
+        VerifyingReader.getInstance().registerReader(ExchangeGlobals.EXCHANGE_RCPT_TAGNAME, new AssetTransactionContract.Reader());
+        VerifyingReader.getInstance().registerReader(ExchangeGlobals.COMPLETE_TAGNAME, new AssetTransactionContract.Reader());
+        VerifyingReader.getInstance().registerReader(ExchangeGlobals.COMPLETE_RCPT_TAGNAME, new AssetTransactionContract.Reader());
+
     }
 
     static {
         registerReaders();
     }
 
-    public static final String XFER_TAGNAME = "TransferOrder";
-    public static final String XFER_RCPT_TAGNAME = "TransferReceipt";
-    public static final String XFER_NSPREFIX = "xfer";
-    public static final String XFER_NSURI = "http://neuclear.org/neu/xfer.xsd";
+    public static final String EXCHANGE_TAGNAME = "ExchangeOrder";
+    public static final String EXCHANGE_RCPT_TAGNAME = "ExchangeOrderReceipt";
+    public static final String COMPLETE_TAGNAME = "ExchangeCompletionOrder";
+    public static final String COMPLETE_RCPT_TAGNAME = "ExchangeCompletedReceipt";
+    public static final String CANCEL_TAGNAME = "CancelExchangeOrder";
+    public static final String CANCEL_RCPT_TAGNAME = "CancelExchangeReceipt";
+
+    public static final String EX_NSPREFIX = "ex";
+    public static final String EX_NSURI = "http://neuclear.org/neu/exch";
 }

@@ -19,17 +19,16 @@ import java.util.Date;
  * Date: Jul 30, 2003
  * Time: 12:01:03 PM
  */
-public final class ExchangeOrder extends AssetTransactionContract {
+public final class ExchangeOrder extends ExchangeTransactionContract {
     private ExchangeOrder(final SignedNamedCore core,
                     final Asset bidAsset, final ExchangeAgent agent, final double bid,
                     final Asset neededAsset, final double neededAmount,  final String comment, final Date expires)  {
-        super(core, bidAsset);
+        super(core, bidAsset,agent);
         this.neededAsset = neededAsset;
         this.neededAmount = neededAmount;
         this.bidAmount = bid;
         this.comment = (comment != null) ? comment : "";
         this.expires = expires.getTime();
-        this.agent = agent;
     }
 
     public final Date getExpiry() {
@@ -56,15 +55,10 @@ public final class ExchangeOrder extends AssetTransactionContract {
         return comment;
     }
 
-    public ExchangeAgent getAgent() {
-        return agent;
-    }
-
     private final Asset neededAsset;
     private final double neededAmount;
     private final double bidAmount;
     private final String comment;
     private final long expires;
-    private final ExchangeAgent agent;
 
 }
