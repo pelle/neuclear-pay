@@ -21,10 +21,10 @@
     <url>http://dev.neuclear.org/pay/</url>
     <repository>
         <connection>
-         scm:cvs:pserver:anonymous@cvs.neuclear.sourceforge.net:/cvsroot/neuclear:neuclear-pay
+         scm:cvs:pserver:anonymous@cvs.sourceforge.net:/cvsroot/neuclear:neuclear-pay
         </connection>
         <url>
-      http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/neuclear/neuclear-pay/
+      http://cvs.sourceforge.net/viewcvs.py/neuclear/neuclear-pay/
         </url>
     </repository>
 
