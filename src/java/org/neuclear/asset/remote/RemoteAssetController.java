@@ -29,8 +29,12 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: RemoteAssetController.java,v 1.2 2003/11/08 01:39:58 pelle Exp $
+$Id: RemoteAssetController.java,v 1.3 2003/11/09 03:47:35 pelle Exp $
 $Log: RemoteAssetController.java,v $
+Revision 1.3  2003/11/09 03:47:35  pelle
+AssetController has now got a single process(transaction) method, which calls its abstract methods.
+The AssetControllerReceiver uses this and is at once massively simplified.
+
 Revision 1.2  2003/11/08 01:39:58  pelle
 WARNING this rev is majorly unstable and will almost certainly not compile.
 More major refactoring in neuclear-pay.
@@ -87,7 +91,7 @@ public class RemoteAssetController extends AssetController {
         return null;
     }
 
-    public HeldTransferReceipt processHeldTransfer(HeldTransferRequest req) throws UnknownBookException, LowlevelLedgerException, InvalidTransactionException {
+    public org.neuclear.asset.contracts.builders.HeldTransferReceiptBuilder processHeldTransfer(HeldTransferRequest req) throws UnknownBookException, LowlevelLedgerException, InvalidTransactionException {
         return null;
     }
 

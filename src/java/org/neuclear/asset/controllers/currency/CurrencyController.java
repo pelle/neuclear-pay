@@ -3,6 +3,7 @@ package org.neuclear.asset.controllers.currency;
 import org.neuclear.asset.*;
 import org.neuclear.asset.contracts.*;
 import org.neuclear.asset.contracts.builders.TransferReceiptBuilder;
+import org.neuclear.asset.contracts.builders.HeldTransferReceiptBuilder;
 import org.neuclear.commons.NeuClearException;
 import org.neuclear.commons.configuration.Configuration;
 import org.neuclear.commons.configuration.ConfigurationException;
@@ -73,18 +74,29 @@ public final class CurrencyController extends AssetController {
     }
 
 
-    public final HeldTransferReceipt processHeldTransfer(HeldTransferRequest req) throws UnknownBookException, LowlevelLedgerException, InvalidTransactionException {
-        Book from = ((CurrencyAccount) req.getFrom()).getBook();
+    public final HeldTransferReceiptBuilder processHeldTransfer(HeldTransferRequest req) throws InvalidTransferException {
+       try {
+            Book from = getBook(req.getFrom());
+            Book to = getBook(req.getTo());
 
-        Book to = ((CurrencyAccount) req.getTo()).getBook();
-        try {
-            PostedTransaction posted = from.hold(to, req.getAmount(), req.getComment(), req.getValueTime(), req.getHeldUntil());
+            PostedTransaction posted = from.transfer(to, req.getAmount(), req.getComment(), req.getValueTime());
 
-            return createHeldTransferReceipt(req, posted.getXid());
+
+            return new HeldTransferReceiptBuilder(req, createTransactionId(req, posted));
+        } catch (UnknownBookException e) { //TODO Implement something like this eg. AccountNotValidException
+            throw new InvalidTransferException(e.getSubMessage());
+        } catch (LowlevelLedgerException e) { //TODO Really need to move this out of ledger
+            e.printStackTrace();
+        } catch (InvalidTransactionException e) {
+            throw new InvalidTransferException(e.getSubMessage());
         } catch (UnBalancedTransactionException e) {
-            // This should never happen so I will rethrow this as a lowlevel
-            throw new LowlevelLedgerException(ledger, e);
-        }
+            throw new InvalidTransferException("unbalanced");
+        } catch (NegativeTransferException e) {
+            throw new InvalidTransferException("postive amount");
+        } catch (InvalidTransferException e) {
+           e.printStackTrace();  //To change body of catch statement use Options | File Templates.
+       }
+        return null;//TODO No no no
     }
 
     public final TransferReceipt processCompleteHold(HeldTransferReceipt hold, Date valuedate, double amount, String comment) throws LowlevelLedgerException, NegativeTransferException, TransferLargerThanHeldException, TransferNotStartedException, ExpiredHeldTransferException, InvalidTransferException {

@@ -3,8 +3,10 @@ package org.neuclear.asset.receiver;
 import org.neuclear.asset.AssetController;
 import org.neuclear.asset.InsufficientFundsException;
 import org.neuclear.asset.NegativeTransferException;
+import org.neuclear.asset.TransferDeniedException;
 import org.neuclear.asset.contracts.*;
 import org.neuclear.asset.contracts.builders.TransferReceiptBuilder;
+import org.neuclear.asset.contracts.builders.TransferBuilder;
 import org.neuclear.id.SignedNamedObject;
 import org.neuclear.id.verifier.VerifyingReader;
 import org.neuclear.ledger.InvalidTransactionException;
@@ -59,33 +61,26 @@ public class AssetControllerReceiver implements Receiver {
     public final ElementProxy receive(SignedNamedObject obj) throws UnsupportedTransaction {
         if (obj instanceof TransferContract) {
             TransferContract transfer = (TransferContract) obj;
-            if (!transfer.getAsset().equals(asset))
+            if (!proc.canProcess(transfer.getAsset()))
                 throw new UnsupportedTransaction(obj);
 
             try {
-                Account from = proc.getAccount(transfer.getName());
-                Account to = proc.getAccount(transfer.getName());
-                TransferReceipt receipt = from.pay(to, transfer.getAmount(), transfer.getTimeStamp(), "asset");
-                TransferReceiptBuilder sigReceipt = new TransferReceiptBuilder(receipt);
+                TransferBuilder sigReceipt = proc.process(transfer);
                 sigReceipt.sign(asset, signer);
                 return sigReceipt;
                 //TODO do something with receipt
-            } catch (UnknownBookException e) {
-                throw new UnsupportedTransaction(obj);
-            } catch (LowlevelLedgerException e) {
-                e.printStackTrace();
-            } catch (InsufficientFundsException e) {
-                e.printStackTrace();
+            } catch (TransferDeniedException e) {
+                e.printStackTrace();  //To change body of catch statement use Options | File Templates.
             } catch (InvalidTransactionException e) {
-                e.printStackTrace();
+                e.printStackTrace();  //To change body of catch statement use Options | File Templates.
+            } catch (UnknownBookException e) {
+                e.printStackTrace();  //To change body of catch statement use Options | File Templates.
             } catch (UnBalancedTransactionException e) {
-                e.printStackTrace();
-            } catch (NegativeTransferException e) {
-                e.printStackTrace();
+                e.printStackTrace();  //To change body of catch statement use Options | File Templates.
             } catch (XMLSecurityException e) {
-                e.printStackTrace();
-            } catch (AssetMismatchException e) {
-                e.printStackTrace();
+                e.printStackTrace();  //To change body of catch statement use Options | File Templates.
+            } catch (LowlevelLedgerException e) {
+                e.printStackTrace();  //To change body of catch statement use Options | File Templates.
             }
 
         } else

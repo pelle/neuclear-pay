@@ -1,6 +1,7 @@
 package org.neuclear.asset;
 
 import org.neuclear.asset.contracts.*;
+import org.neuclear.asset.contracts.builders.TransferBuilder;
 import org.neuclear.ledger.InvalidTransactionException;
 import org.neuclear.ledger.LowlevelLedgerException;
 import org.neuclear.ledger.UnBalancedTransactionException;
@@ -26,8 +27,12 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: AssetController.java,v 1.2 2003/11/08 01:39:58 pelle Exp $
+$Id: AssetController.java,v 1.3 2003/11/09 03:47:35 pelle Exp $
 $Log: AssetController.java,v $
+Revision 1.3  2003/11/09 03:47:35  pelle
+AssetController has now got a single process(transaction) method, which calls its abstract methods.
+The AssetControllerReceiver uses this and is at once massively simplified.
+
 Revision 1.2  2003/11/08 01:39:58  pelle
 WARNING this rev is majorly unstable and will almost certainly not compile.
 More major refactoring in neuclear-pay.
@@ -56,12 +61,20 @@ SOAPTools was changed to return a stream. This is required by the VerifyingReade
  */
 public abstract class AssetController {
 
+    public final TransferBuilder process(TransferContract contract) throws UnknownBookException, LowlevelLedgerException, UnBalancedTransactionException, InvalidTransactionException, TransferDeniedException{
+        if (contract instanceof TransferRequest)
+            return processTransfer((TransferRequest)contract);
+        if (contract instanceof HeldTransferRequest)
+            return processHeldTransfer((HeldTransferRequest)contract);
+        return null;//TODO implement for all
+    }
     public abstract boolean canProcess(Asset asset);
 
     public abstract org.neuclear.asset.contracts.builders.TransferReceiptBuilder processTransfer(TransferRequest req) throws UnknownBookException, LowlevelLedgerException, UnBalancedTransactionException, InvalidTransactionException, TransferDeniedException;
 
-    public abstract HeldTransferReceipt processHeldTransfer(HeldTransferRequest req) throws UnknownBookException, LowlevelLedgerException, InvalidTransactionException;
+    public abstract org.neuclear.asset.contracts.builders.HeldTransferReceiptBuilder processHeldTransfer(HeldTransferRequest req) throws UnknownBookException, LowlevelLedgerException, InvalidTransactionException;
 
+    //TODO implement completeHold and cancelHold contract/builder pairs
     public abstract TransferReceipt processCompleteHold(HeldTransferReceipt hold, Date valuedate, double amount, String comment) throws LowlevelLedgerException, NegativeTransferException, TransferLargerThanHeldException, TransferNotStartedException, ExpiredHeldTransferException, InvalidTransferException;
 
     public abstract void processCancelHold(HeldTransferReceipt hold) throws LowlevelLedgerException;
