@@ -2,12 +2,10 @@ package org.neuclear.asset.controllers.currency;
 
 import org.neuclear.asset.*;
 import org.neuclear.asset.contracts.*;
-import org.neuclear.asset.contracts.builders.TransferReceiptBuilder;
-import org.neuclear.asset.contracts.builders.HeldTransferReceiptBuilder;
 import org.neuclear.asset.contracts.builders.CancelHeldTransferReceiptBuilder;
+import org.neuclear.asset.contracts.builders.HeldTransferReceiptBuilder;
+import org.neuclear.asset.contracts.builders.TransferReceiptBuilder;
 import org.neuclear.commons.NeuClearException;
-import org.neuclear.commons.configuration.Configuration;
-import org.neuclear.commons.configuration.ConfigurationException;
 import org.neuclear.id.Identity;
 import org.neuclear.id.resolver.NSResolver;
 import org.neuclear.ledger.*;
@@ -73,49 +71,66 @@ public final class CurrencyController extends AssetController {
         return ledger.getBook(id.getName());
     }
 
+    /**
+     * Returns balance for a given Identity.
+     * This is a temporary method and will be replaced by a full BalanceRequestContract etc.
+     * 
+     * @param id 
+     * @return 
+     * @throws LowLevelPaymentException 
+     */
+    public double getBalance(Identity id, Date time) throws LowLevelPaymentException {
+        try {
+            return getBook(id).getBalance(time);
+        } catch (LowlevelLedgerException e) {
+            throw new LowLevelPaymentException(e);
+        } catch (UnknownBookException e) {
+            return 0.0;// If an account isnt listed its balance is always 0
+        }
+    }
 
     public final HeldTransferReceiptBuilder processHeldTransfer(HeldTransferRequest req) throws InvalidTransferException, LowLevelPaymentException, TransferDeniedException {
-       try {
-           if (!req.getSignatory().equals(req.getFrom()))
-               throw new TransferDeniedException(req);
+        try {
+            if (!req.getSignatory().equals(req.getFrom()))
+                throw new TransferDeniedException(req);
             Book from = getBook(req.getFrom());
             Book to = getBook(req.getTo());
 
-            PostedHeldTransaction posted = from.hold(to, req.getAmount(), req.getComment(), req.getValueTime(),req.getHeldUntil());
+            PostedHeldTransaction posted = from.hold(to, req.getAmount(), req.getComment(), req.getValueTime(), req.getHeldUntil());
 
 
             return new HeldTransferReceiptBuilder(req, createTransactionId(req, posted));
         } catch (UnknownBookException e) { //TODO Implement something like this eg. AccountNotValidException
             throw new InvalidTransferException(e.getSubMessage());
         } catch (LowlevelLedgerException e) {
-           throw new LowLevelPaymentException(e);
+            throw new LowLevelPaymentException(e);
         } catch (InvalidTransactionException e) {
             throw new InvalidTransferException(e.getSubMessage());
         } catch (UnBalancedTransactionException e) {
             throw new InvalidTransferException("unbalanced");
         } catch (NegativeTransferException e) {
             throw new InvalidTransferException("postive amount");
-       }
+        }
     }
 
-    public final TransferReceiptBuilder processCompleteHold(CompleteHeldTransferRequest complete) throws LowLevelPaymentException,InvalidTransferException,TransferDeniedException {
+    public final TransferReceiptBuilder processCompleteHold(CompleteHeldTransferRequest complete) throws LowLevelPaymentException, InvalidTransferException, TransferDeniedException {
         try {
             if (!complete.getSignatory().equals(complete.getTo()))
                 throw new TransferDeniedException(complete);
 
             PostedHeldTransaction heldTran = ledger.findHeldTransaction(complete.getName());
-            if (heldTran==null)
+            if (heldTran == null)
                 throw new InvalidTransferException("holdid");
             double amount = getTransactionAmount(heldTran);
             if (amount > complete.getAmount())
-                throw new TransferLargerThanHeldException(complete,amount);
+                throw new TransferLargerThanHeldException(complete, amount);
             if (complete.getAmount() < 0)
                 throw new NegativeTransferException(complete.getAmount());
             if (heldTran.getExpiryTime().before(complete.getValueTime()) || heldTran.getTransactionTime().after(complete.getValueTime()))
                 throw new ExpiredHeldTransferException(complete);
 
-            PostedTransaction tran = heldTran.complete(complete.getAmount(),complete.getValueTime(),complete.getComment());
-            return new TransferReceiptBuilder(complete,tran.getXid());
+            PostedTransaction tran = heldTran.complete(complete.getAmount(), complete.getValueTime(), complete.getComment());
+            return new TransferReceiptBuilder(complete, tran.getXid());
         } catch (UnknownTransactionException e) {
             throw new NonExistantHoldException(complete.getHoldId());
         } catch (TransactionExpiredException e) {
@@ -127,47 +142,50 @@ public final class CurrencyController extends AssetController {
         }
     }
 
-    public final CancelHeldTransferReceiptBuilder processCancelHold(CancelHeldTransferRequest cancel) throws InvalidTransferException,LowLevelPaymentException,TransferDeniedException {
+    public final CancelHeldTransferReceiptBuilder processCancelHold(CancelHeldTransferRequest cancel) throws InvalidTransferException, LowLevelPaymentException, TransferDeniedException {
         try {
             PostedHeldTransaction heldTran = ledger.findHeldTransaction(cancel.getHoldId());
-            if (!isRecipient(cancel.getSignatory(),heldTran))
+            if (!isRecipient(cancel.getSignatory(), heldTran))
                 throw new TransferDeniedException(cancel);
             heldTran.cancel();
             return new CancelHeldTransferReceiptBuilder(cancel);
         } catch (UnknownTransactionException e) {
             throw new NonExistantHoldException(cancel.getHoldId());
         } catch (LowlevelLedgerException e) {
-            throw new LowLevelPaymentException( e);
+            throw new LowLevelPaymentException(e);
         }
     }
 
     /**
      * Little tool to return the amount of a ledger transaction.
      * It returns the sum of all the positive values.
-     * @param tran
-     * @return
+     * 
+     * @param tran 
+     * @return 
      */
-    private static double getTransactionAmount(PostedTransaction tran){
-        Iterator iter=tran.getItems();
-        double amount=0;
+    private static double getTransactionAmount(PostedTransaction tran) {
+        Iterator iter = tran.getItems();
+        double amount = 0;
         while (iter.hasNext()) {
             TransactionItem item = (TransactionItem) iter.next();
-            if (item.getAmount()>0)
-                amount+=item.getAmount();
+            if (item.getAmount() > 0)
+                amount += item.getAmount();
         }
         return amount;
     }
+
     /**
      * Utility to verify if the identity is a recepient of funds in a given transaction
-     * @param id
-     * @param tran
-     * @return
+     * 
+     * @param id   
+     * @param tran 
+     * @return 
      */
-    private static boolean isRecipient(Identity id,PostedTransaction tran){
-        Iterator iter=tran.getItems();
+    private static boolean isRecipient(Identity id, PostedTransaction tran) {
+        Iterator iter = tran.getItems();
         while (iter.hasNext()) {
             TransactionItem item = (TransactionItem) iter.next();
-            if (item.getAmount()>=0&&item.getBook().getBookID().equals(id.getName()))
+            if (item.getAmount() >= 0 && item.getBook().getBookID().equals(id.getName()))
                 return true;
         }
         return false;

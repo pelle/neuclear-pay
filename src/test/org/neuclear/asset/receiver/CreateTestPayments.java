@@ -2,12 +2,11 @@ package org.neuclear.asset.receiver;
 
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-import org.neuclear.asset.contracts.builders.TransferRequestBuilder;
 import org.neuclear.asset.contracts.Asset;
+import org.neuclear.asset.contracts.builders.TransferRequestBuilder;
 import org.neuclear.commons.configuration.ConfigurationException;
-import org.neuclear.id.NSTools;
-import org.neuclear.id.resolver.NSResolver;
 import org.neuclear.id.builders.NamedObjectBuilder;
+import org.neuclear.id.resolver.NSResolver;
 import org.neuclear.signers.commandline.CommandLineSigner;
 
 import java.io.IOException;
@@ -34,8 +33,12 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: CreateTestPayments.java,v 1.2 2003/11/10 17:42:08 pelle Exp $
+$Id: CreateTestPayments.java,v 1.3 2003/11/12 23:47:05 pelle Exp $
 $Log: CreateTestPayments.java,v $
+Revision 1.3  2003/11/12 23:47:05  pelle
+Much work done in creating good test environment.
+PaymentReceiverTest works, but needs a abit more work in its environment to succeed testing.
+
 Revision 1.2  2003/11/10 17:42:08  pelle
 The AssetController interface has been more or less finalized.
 CurrencyController fully implemented
@@ -85,13 +88,13 @@ public class CreateTestPayments extends CommandLineSigner {
         double amount = Double.parseDouble(cmd.getOptionValue("x"));
 
         return new TransferRequestBuilder(
-                    (Asset)NSResolver.resolveIdentity(asset),
-                    NSResolver.resolveIdentity(alias),
-                    NSResolver.resolveIdentity(to),
-                    amount,
-                    new Date(),
-                    "Test Request"
-                );
+                (Asset) NSResolver.resolveIdentity(asset),
+                NSResolver.resolveIdentity(alias),
+                NSResolver.resolveIdentity(to),
+                amount,
+                new Date(),
+                "Test Request"
+        );
     }
 
     public static void main(String args[]) {
@@ -104,7 +107,7 @@ public class CreateTestPayments extends CommandLineSigner {
     }
 
     protected String getExtraHelp() {
-        return "[--asset neu://verax/pay --payee neu://bob@verax --amount 20.00]";
+        return "[--assetName neu://verax/pay --payee neu://bob@verax --amount 20.00]";
     }
 
     protected boolean hasArguments() {
@@ -112,7 +115,7 @@ public class CreateTestPayments extends CommandLineSigner {
     }
 
     protected void getLocalOptions(Options options) {
-        options.addOption("c", "asset", true, "specify id of asset");
+        options.addOption("c", "assetName", true, "specify id of assetName");
         options.addOption("r", "payee", true, "specify id of payee");
         options.addOption("x", "amount", true, "specify amount");
     }

@@ -20,8 +20,12 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: AssetGlobals.java,v 1.3 2003/11/10 17:42:07 pelle Exp $
+$Id: AssetGlobals.java,v 1.4 2003/11/12 23:47:04 pelle Exp $
 $Log: AssetGlobals.java,v $
+Revision 1.4  2003/11/12 23:47:04  pelle
+Much work done in creating good test environment.
+PaymentReceiverTest works, but needs a abit more work in its environment to succeed testing.
+
 Revision 1.3  2003/11/10 17:42:07  pelle
 The AssetController interface has been more or less finalized.
 CurrencyController fully implemented
@@ -94,5 +98,5 @@ public final class AssetGlobals {
 
     public static final String ASSET_TAGNAME = "Asset";
     public static final String XFER_ASSETS = "http://neuclear.org/neu/assets";
-    public static final String ASSET_NSPREFIX = "asset";
+    public static final String ASSET_NSPREFIX = "assetName";
 }

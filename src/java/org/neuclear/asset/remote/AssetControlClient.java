@@ -1,24 +1,15 @@
 package org.neuclear.asset.remote;
 
-import org.neuclear.asset.*;
-import org.neuclear.asset.contracts.*;
-import org.neuclear.asset.contracts.builders.TransferRequestBuilder;
-import org.neuclear.asset.contracts.builders.HeldTransferRequestBuilder;
-import org.neuclear.asset.contracts.builders.CompleteHeldTransferRequestBuilder;
+import org.neuclear.asset.contracts.CancelHeldTransferReceipt;
+import org.neuclear.asset.contracts.HeldTransferReceipt;
+import org.neuclear.asset.contracts.TransferReceipt;
 import org.neuclear.asset.contracts.builders.CancelHeldTransferRequestBuilder;
+import org.neuclear.asset.contracts.builders.CompleteHeldTransferRequestBuilder;
+import org.neuclear.asset.contracts.builders.HeldTransferRequestBuilder;
+import org.neuclear.asset.contracts.builders.TransferRequestBuilder;
 import org.neuclear.commons.NeuClearException;
-import org.neuclear.ledger.InvalidTransactionException;
-import org.neuclear.ledger.LowlevelLedgerException;
-import org.neuclear.ledger.UnBalancedTransactionException;
-import org.neuclear.ledger.UnknownBookException;
-import org.neuclear.id.verifier.VerifyingReader;
-import org.neuclear.senders.SoapSender;
-import org.neuclear.senders.Sender;
 import org.neuclear.commons.crypto.signers.Signer;
 import org.neuclear.xml.xmlsec.XMLSecurityException;
-import org.neuclear.xml.soap.SOAPTools;
-
-import java.util.Date;
 
 /*
 NeuClear Distributed Transaction Clearing Platform
@@ -38,8 +29,12 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: AssetControlClient.java,v 1.4 2003/11/11 21:17:19 pelle Exp $
+$Id: AssetControlClient.java,v 1.5 2003/11/12 23:47:05 pelle Exp $
 $Log: AssetControlClient.java,v $
+Revision 1.5  2003/11/12 23:47:05  pelle
+Much work done in creating good test environment.
+PaymentReceiverTest works, but needs a abit more work in its environment to succeed testing.
+
 Revision 1.4  2003/11/11 21:17:19  pelle
 Further vital reshuffling.
 org.neudist.crypto.* and org.neudist.utils.* have been moved to respective areas under org.neuclear.commons
@@ -83,26 +78,28 @@ SOAPTools was changed to return a stream. This is required by the VerifyingReade
 */
 
 /**
- * This client can be used to perform all the major Asset Transfer functionality using the Assets remote asset server.
- *
+ * This client can be used to perform all the major Asset Transfer functionality using the Assets remote assetName server.
  */
-public class AssetControlClient  {
+public class AssetControlClient {
     public AssetControlClient(Signer signer) throws NeuClearException {
         this.signer = signer;
     }
 
     public TransferReceipt performTransfer(TransferRequestBuilder req) throws NeuClearException, XMLSecurityException {
         req.sign(signer);
-        return (TransferReceipt)req.getAsset().send(req);
+        return (TransferReceipt) req.getAsset().send(req);
     }
+
     public HeldTransferReceipt performHeldTransfer(HeldTransferRequestBuilder req) throws NeuClearException, XMLSecurityException {
         req.sign(signer);
         return (HeldTransferReceipt) req.getAsset().send(req);
     }
+
     public TransferReceipt performCompleteHeld(CompleteHeldTransferRequestBuilder req) throws NeuClearException, XMLSecurityException {
         req.sign(signer);
         return (TransferReceipt) req.getAsset().send(req);
     }
+
     public CancelHeldTransferReceipt performCancelHeld(CancelHeldTransferRequestBuilder req) throws NeuClearException, XMLSecurityException {
         req.sign(signer);
         return (CancelHeldTransferReceipt) req.getAsset().send(req);

@@ -1,15 +1,15 @@
 package org.neuclear.asset.contracts.builders;
 
 import org.dom4j.Element;
-import org.neuclear.id.builders.NamedObjectBuilder;
+import org.neuclear.asset.InvalidTransferException;
+import org.neuclear.asset.NegativeTransferException;
+import org.neuclear.asset.contracts.Asset;
+import org.neuclear.asset.contracts.TransferGlobals;
+import org.neuclear.commons.Utility;
+import org.neuclear.commons.time.TimeTools;
 import org.neuclear.id.Identity;
 import org.neuclear.id.NSTools;
-import org.neuclear.asset.contracts.TransferGlobals;
-import org.neuclear.asset.contracts.Asset;
-import org.neuclear.asset.NegativeTransferException;
-import org.neuclear.asset.InvalidTransferException;
-import org.neuclear.commons.time.TimeTools;
-import org.neuclear.commons.Utility;
+import org.neuclear.id.builders.NamedObjectBuilder;
 
 import java.util.Date;
 
@@ -31,8 +31,12 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: TransferBuilder.java,v 1.4 2003/11/11 21:17:19 pelle Exp $
+$Id: TransferBuilder.java,v 1.5 2003/11/12 23:47:04 pelle Exp $
 $Log: TransferBuilder.java,v $
+Revision 1.5  2003/11/12 23:47:04  pelle
+Much work done in creating good test environment.
+PaymentReceiverTest works, but needs a abit more work in its environment to succeed testing.
+
 Revision 1.4  2003/11/11 21:17:19  pelle
 Further vital reshuffling.
 org.neudist.crypto.* and org.neudist.utils.* have been moved to respective areas under org.neuclear.commons
@@ -74,21 +78,21 @@ TransferReceiptBuilder has been created for use by Transfer processors. It is us
  * Time: 3:13:27 PM
  */
 public abstract class TransferBuilder extends NamedObjectBuilder {
-    protected TransferBuilder(String tagname, Asset asset,Identity signer, Identity to, double amount, Date valuetime,String comment) throws InvalidTransferException, NegativeTransferException {
-        super(NSTools.createUniqueNamedID(signer.getName(),to.getName()), TransferGlobals.createQName(tagname));
+    protected TransferBuilder(String tagname, Asset asset, Identity signer, Identity to, double amount, Date valuetime, String comment) throws InvalidTransferException, NegativeTransferException {
+        super(NSTools.createUniqueNamedID(signer.getName(), to.getName()), TransferGlobals.createQName(tagname));
         if (amount < 0)
             throw new NegativeTransferException(amount);
         if (Utility.isEmpty(asset))
-            throw new InvalidTransferException("asset");
-        if (to==null)
+            throw new InvalidTransferException("assetName");
+        if (to == null)
             throw new InvalidTransferException("to");
-        if (valuetime==null)
+        if (valuetime == null)
             throw new InvalidTransferException("valuetime");
 
-        this.asset=asset;
+        this.asset = asset;
         Element element = getElement();
         element.add(TransferGlobals.createAttribute(element, "recipient", to.getName()));
-        element.add(TransferGlobals.createAttribute(element, "asset", asset.getName()));
+        element.add(TransferGlobals.createAttribute(element, "assetName", asset.getName()));
         element.add(TransferGlobals.createAttribute(element, "amount", Double.toString(amount)));
         element.add(TransferGlobals.createAttribute(element, "valuetime", TimeTools.formatTimeStamp(valuetime)));
     }

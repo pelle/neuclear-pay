@@ -1,17 +1,11 @@
 package org.neuclear.asset.contracts.builders;
 
 import org.dom4j.Element;
-import org.neuclear.id.builders.NamedObjectBuilder;
-import org.neuclear.id.Identity;
-import org.neuclear.id.NSTools;
-import org.neuclear.asset.contracts.TransferGlobals;
-import org.neuclear.asset.contracts.Asset;
-import org.neuclear.asset.NegativeTransferException;
 import org.neuclear.asset.InvalidTransferException;
-import org.neuclear.commons.time.TimeTools;
-import org.neuclear.commons.Utility;
-
-import java.util.Date;
+import org.neuclear.asset.NegativeTransferException;
+import org.neuclear.asset.contracts.Asset;
+import org.neuclear.asset.contracts.TransferGlobals;
+import org.neuclear.id.builders.NamedObjectBuilder;
 
 /*
 NeuClear Distributed Transaction Clearing Platform
@@ -31,8 +25,12 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: CancelHeldTransferBuilder.java,v 1.2 2003/11/11 21:17:19 pelle Exp $
+$Id: CancelHeldTransferBuilder.java,v 1.3 2003/11/12 23:47:04 pelle Exp $
 $Log: CancelHeldTransferBuilder.java,v $
+Revision 1.3  2003/11/12 23:47:04  pelle
+Much work done in creating good test environment.
+PaymentReceiverTest works, but needs a abit more work in its environment to succeed testing.
+
 Revision 1.2  2003/11/11 21:17:19  pelle
 Further vital reshuffling.
 org.neudist.crypto.* and org.neudist.utils.* have been moved to respective areas under org.neuclear.commons
@@ -74,19 +72,20 @@ TransferReceiptBuilder has been created for use by Transfer processors. It is us
  * Time: 3:13:27 PM
  */
 public abstract class CancelHeldTransferBuilder extends NamedObjectBuilder {
-    protected CancelHeldTransferBuilder(String tagname, String name, Asset asset,String holdid) throws InvalidTransferException, NegativeTransferException {
+    protected CancelHeldTransferBuilder(String tagname, String name, Asset asset, String holdid) throws InvalidTransferException, NegativeTransferException {
         super(name, TransferGlobals.createQName(tagname));
-        if (asset==null)
-            throw new InvalidTransferException("asset");
-        if (holdid==null)
+        if (asset == null)
+            throw new InvalidTransferException("assetName");
+        if (holdid == null)
             throw new InvalidTransferException("holdid");
 
-        this.asset=asset;
+        this.asset = asset;
         Element element = getElement();
-        element.add(TransferGlobals.createAttribute(element, "asset", asset.getName()));
+        element.add(TransferGlobals.createAttribute(element, "assetName", asset.getName()));
         element.add(TransferGlobals.createAttribute(element, "holdid", holdid));
     }
-  public final Asset getAsset() {
+
+    public final Asset getAsset() {
         return asset;
     }
 

@@ -1,19 +1,18 @@
 package org.neuclear.asset.contracts;
 
-import org.neuclear.commons.NeuClearException;
-import org.neuclear.id.Identity;
-import org.neuclear.id.SignedNamedObject;
-import org.neuclear.id.NamedObjectReader;
-import org.neuclear.id.NSTools;
-import org.neuclear.id.builders.NamedObjectBuilder;
-import org.neuclear.asset.contracts.builders.TransferReceiptBuilder;
-import org.neuclear.senders.SoapSender;
-import org.dom4j.Element;
 import org.dom4j.DocumentHelper;
-import org.neuclear.xml.xmlsec.XMLSecurityException;
+import org.dom4j.Element;
+import org.neuclear.commons.NeuClearException;
+import org.neuclear.commons.Utility;
+import org.neuclear.id.Identity;
+import org.neuclear.id.NSTools;
+import org.neuclear.id.NamedObjectReader;
+import org.neuclear.id.SignedNamedObject;
+import org.neuclear.id.builders.NamedObjectBuilder;
+import org.neuclear.senders.SoapSender;
 import org.neuclear.xml.xmlsec.KeyInfo;
 import org.neuclear.xml.xmlsec.XMLSecTools;
-import org.neuclear.commons.Utility;
+import org.neuclear.xml.xmlsec.XMLSecurityException;
 
 import java.security.PublicKey;
 import java.sql.Timestamp;
@@ -36,8 +35,12 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: Asset.java,v 1.5 2003/11/11 21:17:19 pelle Exp $
+$Id: Asset.java,v 1.6 2003/11/12 23:47:04 pelle Exp $
 $Log: Asset.java,v $
+Revision 1.6  2003/11/12 23:47:04  pelle
+Much work done in creating good test environment.
+PaymentReceiverTest works, but needs a abit more work in its environment to succeed testing.
+
 Revision 1.5  2003/11/11 21:17:19  pelle
 Further vital reshuffling.
 org.neudist.crypto.* and org.neudist.utils.* have been moved to respective areas under org.neuclear.commons
@@ -68,32 +71,35 @@ SOAPTools was changed to return a stream. This is required by the VerifyingReade
 */
 
 /**
- * The asset contains information about a tradeable Asset. The Asset is in itself a subclass of Identity, which
+ * The assetName contains information about a tradeable Asset. The Asset is in itself a subclass of Identity, which
  * means that any transactions signed by it must be in the format of <tt>neu://assetname/1231q145452452345</tt>
  * where assetname is the unique NeuClear wide AssetCertificate.<p>
  * As a subclass of Identity you cant instantiate these classes your self, but must be gotten in this form:<p>
  * <tt>(Asset)NSResolver.resolveIdentity("neu://assetname");</tt><p>
  * To create your own assets use AssetBuilder sign it using a valid NeuClear signer and post its description
  * to your default online repository. Then anyone can access your Assets through the above interface.
+ * 
  * @see org.neuclear.asset.contracts.builders.AssetBuilder
  */
 public class Asset extends Identity {
-    private Asset(String name, Identity signatory, Timestamp timestamp, String digest, String repository, String signer, String logger, String receiver, PublicKey pub, String assetController,int decimalpoint,double minimumTransaction) throws NeuClearException {
+    private Asset(String name, Identity signatory, Timestamp timestamp, String digest, String repository, String signer, String logger, String receiver, PublicKey pub, String assetController, int decimalpoint, double minimumTransaction) throws NeuClearException {
         super(name, signatory, timestamp, digest, repository, signer, logger, receiver, pub);
         this.assetController = assetController;
-        this.decimal=decimalpoint;
-        this.multiplier=(int)Math.round(Math.pow(10,-decimalpoint));
-        this.minimumTransaction=minimumTransaction;
+        this.decimal = decimalpoint;
+        this.multiplier = (int) Math.round(Math.pow(10, -decimalpoint));
+        this.minimumTransaction = minimumTransaction;
     }
 
     public String getControllerURL() {
         return assetController;
     }
+
     /**
      * Sends a contract to the Assets controller.
+     * 
      * @param obj NamedObjectBuilder
      * @return The receipt
-     * @throws NeuClearException
+     * @throws NeuClearException 
      */
     public SignedNamedObject send(NamedObjectBuilder obj) throws NeuClearException {
         if (obj.isSigned())
@@ -102,40 +108,41 @@ public class Asset extends Identity {
     }
 
     /**
-     * Checks if an amount is valid within the boundaries of the asset.
-     * @param amount
-     * @return
+     * Checks if an amount is valid within the boundaries of the assetName.
+     * 
+     * @param amount 
+     * @return 
      */
     public boolean isValidAmount(double amount) {
-        return amount>=minimumTransaction;
+        return amount >= minimumTransaction;
     }
 
     /**
      * Rounds a given value to fit within the valid numbers of the
-     * @param amount
-     * @return
+     * 
+     * @param amount 
+     * @return 
      */
     public double round(double amount) {
-        if (amount<minimumTransaction)
+        if (amount < minimumTransaction)
             return minimumTransaction;
-        if (decimal==0)
+        if (decimal == 0)
             return amount;
-        return Math.round(amount*multiplier)/multiplier;
+        return Math.round(amount * multiplier) / multiplier;
     }
-
 
 
     public static final class Reader implements NamedObjectReader {
         /**
          * Read object from Element and fill in its details
-         *
-         * @param elem
-         * @return
+         * 
+         * @param elem 
+         * @return 
          */
         public SignedNamedObject read(Element elem, String name, Identity signatory, String digest, Timestamp timestamp) throws NeuClearException, XMLSecurityException {
             if (!elem.getNamespace().equals(AssetGlobals.createNameSpace()))
                 throw new UnsupportedOperationException("");
-            String assetController=elem.attributeValue("controller");
+            String assetController = elem.attributeValue("controller");
             String repository = elem.attributeValue(DocumentHelper.createQName("repository", NSTools.NS_NEUID));
             String signer = elem.attributeValue(DocumentHelper.createQName("signer", NSTools.NS_NEUID));
             String logger = elem.attributeValue(DocumentHelper.createQName("logger", NSTools.NS_NEUID));
@@ -145,15 +152,16 @@ public class Asset extends Identity {
             KeyInfo ki = new KeyInfo(allowElement.element(XMLSecTools.createQName("KeyInfo")));
             PublicKey pub = ki.getPublicKey();
             String dec = elem.attributeValue("decimalpoints");
-            int decimal=(!Utility.isEmpty(dec))?Integer.parseInt(dec):0;
-            String min=elem.attributeValue("minimumxact");
-            double minimum=(!Utility.isEmpty(min))?Double.parseDouble(min):0;
+            int decimal = (!Utility.isEmpty(dec)) ? Integer.parseInt(dec) : 0;
+            String min = elem.attributeValue("minimumxact");
+            double minimum = (!Utility.isEmpty(min)) ? Double.parseDouble(min) : 0;
 
-            return new Asset(name,signatory, timestamp, digest, repository,signer, logger, receiver, pub,assetController,decimal,minimum);
+            return new Asset(name, signatory, timestamp, digest, repository, signer, logger, receiver, pub, assetController, decimal, minimum);
         }
 
 
     }
+
     private final String assetController;
     private final int decimal;
     private final int multiplier;

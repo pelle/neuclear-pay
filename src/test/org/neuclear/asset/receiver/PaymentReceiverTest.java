@@ -1,19 +1,31 @@
 package org.neuclear.asset.receiver;
 
 import org.dom4j.DocumentException;
-import org.neuclear.asset.AssetController;
-import org.neuclear.commons.NeuClearException;
-import org.neuclear.commons.configuration.Configuration;
-import org.neuclear.commons.configuration.ConfigurationException;
-import org.neuclear.id.SignedNamedObject;
-import org.neuclear.ledger.BookExistsException;
-import org.neuclear.ledger.LedgerCreationException;
-import org.neuclear.ledger.LowlevelLedgerException;
-import org.neuclear.ledger.UnknownBookException;
+import org.neuclear.asset.InvalidTransferException;
+import org.neuclear.asset.contracts.Asset;
+import org.neuclear.asset.contracts.TransferRequest;
+import org.neuclear.asset.contracts.builders.TransferRequestBuilder;
 import org.neuclear.asset.controllers.currency.CurrencyController;
-import org.neuclear.tests.AbstractReceiverTest;
+import org.neuclear.commons.NeuClearException;
+import org.neuclear.commons.sql.DefaultConnectionSource;
+import org.neuclear.commons.time.TimeTools;
+import org.neuclear.id.Identity;
+import org.neuclear.id.SignedNamedObject;
+import org.neuclear.id.resolver.NSResolver;
+import org.neuclear.ledger.BookExistsException;
+import org.neuclear.ledger.LowlevelLedgerException;
+import org.neuclear.ledger.UnknownLedgerException;
+import org.neuclear.ledger.implementations.SQLLedger;
 import org.neuclear.receiver.Receiver;
+import org.neuclear.tests.AbstractReceiverTest;
 import org.neuclear.xml.XMLException;
+import org.neuclear.xml.XMLTools;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.OutputStream;
+import java.security.GeneralSecurityException;
 
 /*
 NeuClear Distributed Transaction Clearing Platform
@@ -33,8 +45,12 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: PaymentReceiverTest.java,v 1.3 2003/11/11 21:17:20 pelle Exp $
+$Id: PaymentReceiverTest.java,v 1.4 2003/11/12 23:47:05 pelle Exp $
 $Log: PaymentReceiverTest.java,v $
+Revision 1.4  2003/11/12 23:47:05  pelle
+Much work done in creating good test environment.
+PaymentReceiverTest works, but needs a abit more work in its environment to succeed testing.
+
 Revision 1.3  2003/11/11 21:17:20  pelle
 Further vital reshuffling.
 org.neudist.crypto.* and org.neudist.utils.* have been moved to respective areas under org.neuclear.commons
@@ -91,14 +107,26 @@ CreateTestPayments is a command line utility to create signed payment requests
  * Time: 11:20:31 AM
  */
 public class PaymentReceiverTest extends AbstractReceiverTest {
-    public PaymentReceiverTest(String string) throws LowlevelLedgerException, LedgerCreationException, ConfigurationException {
+    public PaymentReceiverTest(String string) throws NeuClearException, GeneralSecurityException, UnknownLedgerException, LowlevelLedgerException, BookExistsException, FileNotFoundException, InvalidTransferException, XMLException {
         super(string);
-        proc = (AssetController) Configuration.getComponent(CurrencyController.class, "neuclear-pay");
-        receiver = (AssetControllerReceiver) Configuration.getComponent(AssetControllerReceiver.class, "neuclear-pay");
+        asset = (Asset) NSResolver.resolveIdentity(assetName);
+
+        proc = new CurrencyController(
+                new SQLLedger(
+                        new DefaultConnectionSource(),
+                        assetName
+                )
+                , assetName
+        );
+        receiver = new AssetControllerReceiver(proc, getSigner());
+        directory = new File("target/testdata/payments");
+        directory.mkdirs();
+        createPayments(getBob(), getAlice(), 100);
+        createPayments(getAlice(), getBob(), 100);
     }
 
     public void testSimple() throws Exception, DocumentException, NeuClearException, XMLException {
-        runDirectoryTest("src/testdata/payments");
+        runDirectoryTest(directory.getAbsolutePath());
     }
 
     public Receiver getReceiver() {
@@ -109,43 +137,48 @@ public class PaymentReceiverTest extends AbstractReceiverTest {
         return ".xml";
     }
 
+    public final Asset getAsset() {
+        return asset;
+    }
 
     public Object getPreTransactionState(SignedNamedObject obj) throws Exception {
 
-/*
-        if (obj instanceof AssetTransactionContract) {
-            AssetTransactionContract transfer = (AssetTransactionContract) obj;
-            Account fromAccount = createNewAccount(transfer.getSignatory().getName());
-            double fromBalance = (fromAccount != null) ? fromAccount.getBalance(transfer.getTimeStamp()) : 0;
-            Account toAccount = createNewAccount(transfer.getRecipient());
-            double toBalance = (toAccount != null) ? toAccount.getBalance(transfer.getTimeStamp()) : 0;
-            ;
+        if (obj instanceof TransferRequest) {
+            TransferRequest transfer = (TransferRequest) obj;
+            double fromBalance = proc.getBalance(transfer.getFrom(), transfer.getTimeStamp());
+            double toBalance = proc.getBalance(transfer.getTo(), transfer.getTimeStamp());
+
             return new double[]{fromBalance, toBalance};
 
         }
-*/
         return null; //No state to report
     }
 
     public boolean verifyTransaction(final SignedNamedObject obj, final Object state) throws Exception {
-/*
-        if (obj instanceof AssetTransactionContract && state != null) {
-            TransferContract transfer = (TransferContract) obj;
+        if (obj instanceof TransferRequest) {
+            TransferRequest transfer = (TransferRequest) obj;
+            double fromBalance = proc.getBalance(transfer.getFrom(), transfer.getTimeStamp());
+            double toBalance = proc.getBalance(transfer.getTo(), transfer.getTimeStamp());
             final double prebalances[] = (double[]) state;
-            Account fromAccount = createNewAccount(transfer.getSignatory().getName());
-            Account toAccount = createNewAccount(transfer.getRecipient());
-            double fromBalance = (fromAccount != null) ? fromAccount.getBalance(transfer.getTimeStamp()) : 0;
-            double toBalance = (toAccount != null) ? toAccount.getBalance(transfer.getTimeStamp()) : 0;
-            ;
 
             return (fromBalance == prebalances[0] - transfer.getAmount()) &&
                     (toBalance == prebalances[1] + transfer.getAmount());
         }
-*/
         return false;
     }
 
-    private Receiver receiver;
-    private AssetController proc;
+    public void createPayments(Identity from, Identity to, double amount) throws InvalidTransferException, XMLException, NeuClearException, FileNotFoundException {
+        TransferRequestBuilder transfer = new TransferRequestBuilder(asset, from, to, 100, TimeTools.now(), "Test One");
+        transfer.sign(getSigner());
+        OutputStream out = new FileOutputStream(directory.getAbsolutePath() + "/" + transfer.getLocalName() + ".xml");
+        XMLTools.writeFile(out, transfer.getElement());
+    }
+
+    protected final String assetName = "neu://test/bux";
+
+    private final Asset asset;
+    private final File directory;
+    private final Receiver receiver;
+    private final CurrencyController proc;
     private double balance = 0.0;
 }
