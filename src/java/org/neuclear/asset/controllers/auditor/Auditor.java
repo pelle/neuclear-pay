@@ -34,8 +34,11 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: Auditor.java,v 1.2 2004/05/11 22:52:48 pelle Exp $
+$Id: Auditor.java,v 1.3 2004/05/14 16:24:07 pelle Exp $
 $Log: Auditor.java,v $
+Revision 1.3  2004/05/14 16:24:07  pelle
+Added PortfolioBrowser to LedgerController and it's implementations.
+
 Revision 1.2  2004/05/11 22:52:48  pelle
 The update to ledger expectedly broke a few things around CurrencyController and friends. Most but not all is now fixed.
 
@@ -196,7 +199,7 @@ public class Auditor implements Receiver {
     }
 
     public boolean canProcess(final Service asset) {
-        return this.asset.getName().equals(asset.getName());
+        return true;
     }
 
     public final void process(final TransferReceipt receipt) throws InvalidTransferException, LowLevelPaymentException, TransferDeniedException, NeuClearException {
