@@ -5,14 +5,11 @@ import org.dom4j.Element;
 import org.neuclear.commons.NeuClearException;
 import org.neuclear.commons.Utility;
 import org.neuclear.id.*;
-import org.neuclear.id.verifier.VerifyingReader;
-import org.neuclear.senders.SoapSender;
 import org.neuclear.xml.xmlsec.KeyInfo;
 import org.neuclear.xml.xmlsec.XMLSecTools;
 import org.neuclear.xml.xmlsec.XMLSecurityException;
 
 import java.security.PublicKey;
-import java.sql.Timestamp;
 
 /*
 NeuClear Distributed Transaction Clearing Platform
@@ -32,8 +29,15 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: Asset.java,v 1.9 2003/11/21 04:43:04 pelle Exp $
+$Id: Asset.java,v 1.10 2003/12/10 23:52:39 pelle Exp $
 $Log: Asset.java,v $
+Revision 1.10  2003/12/10 23:52:39  pelle
+Did some cleaning up in the builders
+Fixed some stuff in IdentityCreator
+New maven goal to create executable jarapp
+We are close to 0.8 final of ID, 0.11 final of XMLSIG and 0.5 of commons.
+Will release shortly.
+
 Revision 1.9  2003/11/21 04:43:04  pelle
 EncryptedFileStore now works. It uses the PBECipher with DES3 afair.
 Otherwise You will Finaliate.
@@ -47,7 +51,7 @@ Revision 1.7  2003/11/19 23:32:19  pelle
 Signers now can generatekeys via the generateKey() method.
 Refactored the relationship between SignedNamedObject and NamedObjectBuilder a bit.
 SignedNamedObject now contains the full xml which is returned with getEncoded()
-This means that it is now possible to further send on or process a SignedNamedObject, leaving
+This means that it is now possible to further receive on or process a SignedNamedObject, leaving
 NamedObjectBuilder for its original purposes of purely generating new Contracts.
 NamedObjectBuilder.sign() now returns a SignedNamedObject which is the prefered way of processing it.
 Updated all major interfaces that used the old model to use the new model.
@@ -97,29 +101,13 @@ SOAPTools was changed to return a stream. This is required by the VerifyingReade
  * @see org.neuclear.asset.contracts.builders.AssetBuilder
  */
 public final class Asset extends Identity {
-    protected Asset(final SignedNamedCore core, final String repository, final String signer, final String logger, final String receiver, final PublicKey pub, final String assetController, final int decimal, final double minimumTransaction) throws NeuClearException {
+    protected Asset(final SignedNamedCore core, final String repository, final String signer, final String logger, final String receiver, final PublicKey pub, final int decimal, final double minimumTransaction) throws NeuClearException {
         super(core, repository, signer, logger, receiver, pub);
-        this.assetController = assetController;
         this.decimal = decimal;
         this.multiplier = (int) Math.round(Math.pow(10, -decimal));
-        this.minimumTransaction=minimumTransaction;
+        this.minimumTransaction = minimumTransaction;
     }
 
-
-    public final String getControllerURL() {
-        return assetController;
-    }
-
-    /**
-     * Sends a contract to the Assets controller.
-     * 
-     * @param obj NamedObjectBuilder
-     * @return The receipt
-     * @throws NeuClearException 
-     */
-    public final SignedNamedObject send(final SignedNamedObject obj) throws NeuClearException {
-        return SoapSender.quickSend(assetController, obj);
-    }
 
     /**
      * Checks if an amount is valid within the boundaries of the assetName.
@@ -156,7 +144,6 @@ public final class Asset extends Identity {
         public final SignedNamedObject read(final SignedNamedCore core, final Element elem) throws NeuClearException, XMLSecurityException {
             if (!elem.getNamespace().equals(AssetGlobals.createNameSpace()))
                 throw new UnsupportedOperationException("");
-            final String assetController = elem.attributeValue("controller");
             final String repository = elem.attributeValue(DocumentHelper.createQName("repository", NSTools.NS_NEUID));
             final String signer = elem.attributeValue(DocumentHelper.createQName("signer", NSTools.NS_NEUID));
             final String logger = elem.attributeValue(DocumentHelper.createQName("logger", NSTools.NS_NEUID));
@@ -170,14 +157,12 @@ public final class Asset extends Identity {
             final String min = elem.attributeValue("minimumxact");
             final double minimum = (!Utility.isEmpty(min)) ? Double.parseDouble(min) : 0;
 
-            return new Asset(core, repository, signer, logger, receiver, pub, assetController, decimal, minimum);
+            return new Asset(core, repository, signer, logger, receiver, pub, decimal, minimum);
         }
-
 
 
     }
 
-    private final String assetController;
     private final int decimal;
     private final int multiplier;
     private final double minimumTransaction;

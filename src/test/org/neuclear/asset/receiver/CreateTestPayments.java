@@ -4,14 +4,15 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.neuclear.asset.contracts.Asset;
 import org.neuclear.asset.contracts.builders.TransferRequestBuilder;
+import org.neuclear.commons.NeuClearException;
 import org.neuclear.commons.configuration.ConfigurationException;
 import org.neuclear.id.builders.NamedObjectBuilder;
 import org.neuclear.id.resolver.NSResolver;
 import org.neuclear.id.tools.commandline.CommandLineSigner;
 
 import java.io.IOException;
+import java.security.GeneralSecurityException;
 import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
 import java.util.Date;
 
@@ -33,8 +34,15 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: CreateTestPayments.java,v 1.5 2003/12/09 18:11:30 pelle Exp $
+$Id: CreateTestPayments.java,v 1.6 2003/12/10 23:52:39 pelle Exp $
 $Log: CreateTestPayments.java,v $
+Revision 1.6  2003/12/10 23:52:39  pelle
+Did some cleaning up in the builders
+Fixed some stuff in IdentityCreator
+New maven goal to create executable jarapp
+We are close to 0.8 final of ID, 0.11 final of XMLSIG and 0.5 of commons.
+Will release shortly.
+
 Revision 1.5  2003/12/09 18:11:30  pelle
 Moved Command Line tools to org.neuclear.id.tools.commandline
 
@@ -87,8 +95,9 @@ CreateTestPayments is a command line utility to create signed payment requests
  * Time: 11:50:47 AM
  */
 public final class CreateTestPayments extends CommandLineSigner {
-    public CreateTestPayments(final String[] args) throws ParseException, NoSuchAlgorithmException, CertificateException, IOException, KeyStoreException, ConfigurationException {
+    public CreateTestPayments(final String[] args) throws ParseException, GeneralSecurityException, CertificateException, IOException, KeyStoreException, ConfigurationException, NeuClearException {
         super(args);
+
     }
 
     public final NamedObjectBuilder build() throws Exception {

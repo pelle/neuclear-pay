@@ -32,8 +32,15 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: AssetControllerServlet.java,v 1.4 2003/11/22 00:22:28 pelle Exp $
+$Id: AssetControllerServlet.java,v 1.5 2003/12/10 23:52:39 pelle Exp $
 $Log: AssetControllerServlet.java,v $
+Revision 1.5  2003/12/10 23:52:39  pelle
+Did some cleaning up in the builders
+Fixed some stuff in IdentityCreator
+New maven goal to create executable jarapp
+We are close to 0.8 final of ID, 0.11 final of XMLSIG and 0.5 of commons.
+Will release shortly.
+
 Revision 1.4  2003/11/22 00:22:28  pelle
 All unit tests in commons, id and xmlsec now work.
 AssetController now successfully processes payments in the unit test.
@@ -50,7 +57,7 @@ Revision 1.2  2003/11/19 23:32:20  pelle
 Signers now can generatekeys via the generateKey() method.
 Refactored the relationship between SignedNamedObject and NamedObjectBuilder a bit.
 SignedNamedObject now contains the full xml which is returned with getEncoded()
-This means that it is now possible to further send on or process a SignedNamedObject, leaving
+This means that it is now possible to further receive on or process a SignedNamedObject, leaving
 NamedObjectBuilder for its original purposes of purely generating new Contracts.
 NamedObjectBuilder.sign() now returns a SignedNamedObject which is the prefered way of processing it.
 Updated all major interfaces that used the old model to use the new model.

@@ -18,11 +18,18 @@ import java.util.Date;
  * User: pelleb
  * Date: Nov 10, 2003
  * Time: 11:06:37 AM
- * $Id: AssetTransactionContract.java,v 1.8 2003/11/28 00:11:50 pelle Exp $
+ * $Id: AssetTransactionContract.java,v 1.9 2003/12/10 23:52:39 pelle Exp $
  * $Log: AssetTransactionContract.java,v $
+ * Revision 1.9  2003/12/10 23:52:39  pelle
+ * Did some cleaning up in the builders
+ * Fixed some stuff in IdentityCreator
+ * New maven goal to create executable jarapp
+ * We are close to 0.8 final of ID, 0.11 final of XMLSIG and 0.5 of commons.
+ * Will release shortly.
+ *
  * Revision 1.8  2003/11/28 00:11:50  pelle
  * Getting the NeuClear web transactions working.
- *
+ * <p/>
  * Revision 1.7  2003/11/22 00:22:28  pelle
  * All unit tests in commons, id and xmlsec now work.
  * AssetController now successfully processes payments in the unit test.
@@ -42,7 +49,7 @@ import java.util.Date;
  * Signers now can generatekeys via the generateKey() method.
  * Refactored the relationship between SignedNamedObject and NamedObjectBuilder a bit.
  * SignedNamedObject now contains the full xml which is returned with getEncoded()
- * This means that it is now possible to further send on or process a SignedNamedObject, leaving
+ * This means that it is now possible to further receive on or process a SignedNamedObject, leaving
  * NamedObjectBuilder for its original purposes of purely generating new Contracts.
  * NamedObjectBuilder.sign() now returns a SignedNamedObject which is the prefered way of processing it.
  * Updated all major interfaces that used the old model to use the new model.
