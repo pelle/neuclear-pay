@@ -33,8 +33,15 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: AssetControllerServlet.java,v 1.11 2004/04/27 15:24:54 pelle Exp $
+$Id: AssetControllerServlet.java,v 1.12 2004/04/28 00:22:28 pelle Exp $
 $Log: AssetControllerServlet.java,v $
+Revision 1.12  2004/04/28 00:22:28  pelle
+Fixed the strange verification error
+Added bunch of new unit tests to support this.
+Updated Signer's dependencies and version number to be a 0.9 release.
+Implemented ThreadLocalSession session management for Hibernate ledger.
+Various other minor changes.
+
 Revision 1.11  2004/04/27 15:24:54  pelle
 Due to a new API change in 0.5 I have changed the name of Ledger and it's implementers to LedgerController.
 
@@ -167,7 +174,7 @@ public final class AssetControllerServlet extends ReceiverServlet {
     }
 
     protected void printHTMLSuccess(PrintWriter writer, SignedNamedObject receipt, HttpServletRequest request) {
-        ServletTools.printHeader(writer, request, getTitle(), "Transaction Successfull");
+        ServletTools.printHeader(writer, request, getTitle(), "Transaction Successful");
         writer.print("<hr/><h3 onclick=\"if (receipt.style.display=='none')receipt.style.display='block'; else receipt.style.display='none'\">Click to toggle display of raw receipt</h3>");
 
 //        writer.print("<div style=\"font-size:small\" onclick=\"receipt.style.display=block;\">View Receipt</div></br>");

@@ -1,8 +1,10 @@
 package org.neuclear.asset.orders.builders;
 
 import org.neuclear.asset.InvalidTransferException;
+import org.neuclear.asset.contracts.AssetGlobals;
 import org.neuclear.asset.contracts.builders.AssetBuilder;
 import org.neuclear.asset.orders.Amount;
+import org.neuclear.asset.orders.TransferGlobals;
 import org.neuclear.asset.orders.TransferOrder;
 import org.neuclear.commons.NeuClearException;
 import org.neuclear.commons.crypto.signers.NonExistingSignerException;
@@ -32,8 +34,15 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: TransferOrderBuilderTest.java,v 1.9 2004/04/23 23:33:15 pelle Exp $
+$Id: TransferOrderBuilderTest.java,v 1.10 2004/04/28 00:22:29 pelle Exp $
 $Log: TransferOrderBuilderTest.java,v $
+Revision 1.10  2004/04/28 00:22:29  pelle
+Fixed the strange verification error
+Added bunch of new unit tests to support this.
+Updated Signer's dependencies and version number to be a 0.9 release.
+Implemented ThreadLocalSession session management for Hibernate ledger.
+Various other minor changes.
+
 Revision 1.9  2004/04/23 23:33:15  pelle
 Major update. Added an original url and nickname to Identity and friends.
 
@@ -79,6 +88,8 @@ Started the unit tests for the new payment message format.
 public class TransferOrderBuilderTest extends AbstractObjectCreationTest {
     public TransferOrderBuilderTest(String string) throws NeuClearException, GeneralSecurityException {
         super(string);
+        AssetGlobals.registerReaders();
+        TransferGlobals.registerReaders();
         asset = createTestAsset();
     }
 

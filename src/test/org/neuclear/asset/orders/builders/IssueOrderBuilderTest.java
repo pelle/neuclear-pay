@@ -32,8 +32,15 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: IssueOrderBuilderTest.java,v 1.3 2004/04/23 23:33:15 pelle Exp $
+$Id: IssueOrderBuilderTest.java,v 1.4 2004/04/28 00:22:29 pelle Exp $
 $Log: IssueOrderBuilderTest.java,v $
+Revision 1.4  2004/04/28 00:22:29  pelle
+Fixed the strange verification error
+Added bunch of new unit tests to support this.
+Updated Signer's dependencies and version number to be a 0.9 release.
+Implemented ThreadLocalSession session management for Hibernate ledger.
+Various other minor changes.
+
 Revision 1.3  2004/04/23 23:33:15  pelle
 Major update. Added an original url and nickname to Identity and friends.
 
@@ -100,6 +107,10 @@ public class IssueOrderBuilderTest extends AbstractObjectCreationTest {
 
     protected Class getRequiredClass() {
         return IssueOrder.class;
+    }
+
+    protected String getSignersAlias() {
+        return "neu://alice@test";    //To change body of overridden methods use File | Settings | File Templates.
     }
 
     protected Builder createBuilder() throws NeuClearException, InvalidTransferException, XMLException {

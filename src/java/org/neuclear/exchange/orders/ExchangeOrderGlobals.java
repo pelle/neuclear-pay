@@ -1,11 +1,11 @@
 package org.neuclear.exchange.orders;
 
 import org.dom4j.*;
+import org.neuclear.asset.contracts.Asset;
 import org.neuclear.asset.orders.TransferGlobals;
 import org.neuclear.exchange.contracts.ExchangeAgent;
 import org.neuclear.id.InvalidNamedObjectException;
 import org.neuclear.id.NameResolutionException;
-import org.neuclear.id.Service;
 import org.neuclear.id.resolver.Resolver;
 import org.neuclear.id.verifier.VerifyingReader;
 
@@ -27,8 +27,15 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: ExchangeOrderGlobals.java,v 1.1 2004/04/05 16:31:43 pelle Exp $
+$Id: ExchangeOrderGlobals.java,v 1.2 2004/04/28 00:22:29 pelle Exp $
 $Log: ExchangeOrderGlobals.java,v $
+Revision 1.2  2004/04/28 00:22:29  pelle
+Fixed the strange verification error
+Added bunch of new unit tests to support this.
+Updated Signer's dependencies and version number to be a 0.9 release.
+Implemented ThreadLocalSession session management for Hibernate ledger.
+Various other minor changes.
+
 Revision 1.1  2004/04/05 16:31:43  pelle
 Created new ServiceBuilder class for creating services. A service is an identity that has a seperate service URL and Service Public Key.
 
@@ -167,10 +174,10 @@ public final class ExchangeOrderGlobals {
 
     }
 
-    public static final Service parseAssetTag(final Element elem, final String tag) throws InvalidNamedObjectException {
+    public static final Asset parseAssetTag(final Element elem, final String tag) throws InvalidNamedObjectException {
         final String name = getElementValue(elem, tag);
         try {
-            return (Service) Resolver.resolveIdentity(name);
+            return (Asset) Resolver.resolveIdentity(name);
         } catch (ClassCastException e) {
             throw new InvalidNamedObjectException(name, e);
         } catch (NameResolutionException e) {

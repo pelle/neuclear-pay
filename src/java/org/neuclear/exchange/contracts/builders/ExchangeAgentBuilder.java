@@ -1,9 +1,18 @@
 package org.neuclear.exchange.contracts.builders;
 
 import org.neuclear.commons.NeuClearException;
+import org.neuclear.commons.crypto.signers.JCESigner;
+import org.neuclear.commons.crypto.signers.TestCaseSigner;
+import org.neuclear.exchange.contracts.ExchangeAgent;
 import org.neuclear.exchange.contracts.ExchangeAgentGlobals;
 import org.neuclear.id.builders.ServiceBuilder;
+import org.neuclear.id.verifier.VerifyingReader;
+import org.neuclear.xml.XMLTools;
 
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
 import java.security.PublicKey;
 
 /*
@@ -24,8 +33,15 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: ExchangeAgentBuilder.java,v 1.3 2004/04/23 23:33:13 pelle Exp $
+$Id: ExchangeAgentBuilder.java,v 1.4 2004/04/28 00:22:28 pelle Exp $
 $Log: ExchangeAgentBuilder.java,v $
+Revision 1.4  2004/04/28 00:22:28  pelle
+Fixed the strange verification error
+Added bunch of new unit tests to support this.
+Updated Signer's dependencies and version number to be a 0.9 release.
+Implemented ThreadLocalSession session management for Hibernate ledger.
+Various other minor changes.
+
 Revision 1.3  2004/04/23 23:33:13  pelle
 Major update. Added an original url and nickname to Identity and friends.
 
@@ -131,5 +147,32 @@ public final class ExchangeAgentBuilder extends ServiceBuilder {
     public ExchangeAgentBuilder(final String title, final String original, final String serviceUrl, final PublicKey serviceKey) throws NeuClearException {
         super(ExchangeAgentGlobals.EXCHANGEAGENT_TAGNAME, title, original, serviceUrl, serviceKey);
     }
+
+    public static void main(final String[] args) {
+        try {
+            final JCESigner signer = new TestCaseSigner();
+
+            ExchangeAgentGlobals.registerReaders();
+            final ExchangeAgentBuilder earaw = new ExchangeAgentBuilder("Tradex",
+                    "http://tradex.neuclear.org/rules.html",
+                    "http://bux.neuclear.org/Exchange",
+                    signer.getPublicKey("exchange"));
+            earaw.getDescription().setText("NeuClear Test ExchangeAgent which does nothing.");
+            earaw.getRules().setText("You know the rules, there are no rules!!! No, really this is for testing purposes only. There" +
+                    "are no implied rights or promises involved by this Exchange Agent.");
+
+            earaw.sign("exchange", signer);
+            File out = new File("src/webapp/rules.html");
+            out.getParentFile().mkdirs();
+            XMLTools.writeFile(out, earaw.getElement().getDocument());
+            final InputStream is = new BufferedInputStream(new FileInputStream(out));
+            final ExchangeAgent asset = (ExchangeAgent) VerifyingReader.getInstance().read(is);
+
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
 
 }
