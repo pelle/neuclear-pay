@@ -2,6 +2,7 @@ package org.neuclear.asset.controllers.receivers;
 
 import org.neuclear.asset.InvalidTransferException;
 import org.neuclear.asset.NegativeTransferException;
+import org.neuclear.asset.contracts.Asset;
 import org.neuclear.commons.NeuClearException;
 import org.neuclear.commons.crypto.signers.Signer;
 import org.neuclear.exchange.orders.ExchangeOrder;
@@ -14,8 +15,11 @@ import org.neuclear.id.receiver.UnsupportedTransaction;
 import org.neuclear.ledger.*;
 
 /*
-$Id: ExchangeOrderReceiver.java,v 1.2 2004/07/23 18:58:39 pelle Exp $
+$Id: ExchangeOrderReceiver.java,v 1.3 2004/09/08 23:17:23 pelle Exp $
 $Log: ExchangeOrderReceiver.java,v $
+Revision 1.3  2004/09/08 23:17:23  pelle
+Fees now work for everything but Exchange Completion.
+
 Revision 1.2  2004/07/23 18:58:39  pelle
 Updated to use the new complete method in ledger.
 
@@ -41,8 +45,16 @@ public class ExchangeOrderReceiver extends SigningLedgerReceiver implements Hand
     public SignedNamedObject receive(SignedNamedObject obj) throws UnsupportedTransaction, NeuClearException {
         try {
             ExchangeOrder order = (ExchangeOrder) obj;
-            String name = order.getAsset().getServiceId();
-            final PostedTransaction posted = ledger.hold(name, order.getDigest(), order.getSignatory().getName(), order.getAgent().getServiceId(), order.getExpiry(), order.getAmount().getAmount(), order.getComment());
+            Asset asset = order.getAsset();
+            String name = asset.getServiceId();
+            double amount = order.getAmount().getAmount();
+            double fee = asset.getFeeStructure().calculateFee(amount);
+            final PostedTransaction posted = ledger.hold(name, order.getDigest(), order.getSignatory().getName(), order.getAgent().getServiceId(), order.getExpiry(), asset.round(amount - fee), order.getComment());
+            if (fee > 0) {
+                String req = "-" + order.getDigest().substring(1);
+                PostedTransaction postedFee = ledger.transfer(name, req, order.getSignatory().getName(), asset.getFeeAccount().getName(), fee, "Exchange " + order.getDigest());
+                ledger.setReceiptId(req, order.getDigest());
+            }
             if (!signer.canSignFor(name))
                 return null;
             final ExchangeOrderReceipt receipt = (ExchangeOrderReceipt) new ExchangeOrderReceiptBuilder(order, posted.getTransactionTime()).convert(name, signer);

@@ -2,6 +2,7 @@ package org.neuclear.asset.controllers.receivers;
 
 import org.neuclear.asset.contracts.Asset;
 import org.neuclear.asset.contracts.builders.AssetBuilder;
+import org.neuclear.asset.fees.FeeStructureBuilder;
 import org.neuclear.commons.NeuClearException;
 import org.neuclear.exchange.contracts.ExchangeAgent;
 import org.neuclear.exchange.contracts.builders.ExchangeAgentBuilder;
@@ -14,8 +15,11 @@ import java.security.GeneralSecurityException;
 import java.security.PublicKey;
 
 /*
-$Id: AbstractExchangeReceiverTest.java,v 1.2 2004/08/18 09:42:56 pelle Exp $
+$Id: AbstractExchangeReceiverTest.java,v 1.3 2004/09/08 23:17:39 pelle Exp $
 $Log: AbstractExchangeReceiverTest.java,v $
+Revision 1.3  2004/09/08 23:17:39  pelle
+Fees now work for everything but Exchange Completion.
+
 Revision 1.2  2004/08/18 09:42:56  pelle
 Many fixes to the various Signing and SigningRequest Servlets etc.
 
@@ -63,6 +67,15 @@ public abstract class AbstractExchangeReceiverTest extends AbstractSigningTest {
     protected void generatePrimaryTestAsset() throws NeuClearException {
         PublicKey pub = signer.generateKey();
         asset = (Asset) new AssetBuilder("test", "http://localhost:8080/rules.html", "http://localhost:8080/Asset", pub, signer.getPublicKey("carol"), 2, 0, "t").convert("bux", signer);
+        assetalias = new Signatory(pub).getName();
+    }
+
+    protected void generatePrimaryTestAssetWithFees() throws NeuClearException {
+        PublicKey pub = signer.generateKey();
+        AssetBuilder assetBuilder = new AssetBuilder("test", "http://localhost:8080/rules.html", "http://localhost:8080/Asset", pub, signer.getPublicKey("carol"), 2, 0, "t");
+        assetBuilder.addFeeStructure(new FeeStructureBuilder(0.01));
+        assetBuilder.addFeeAccount(signer.getPublicKey("eve"));
+        asset = (Asset) assetBuilder.convert("bux", signer);
         assetalias = new Signatory(pub).getName();
     }
 

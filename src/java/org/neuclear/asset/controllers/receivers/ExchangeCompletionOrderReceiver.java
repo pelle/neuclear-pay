@@ -2,6 +2,7 @@ package org.neuclear.asset.controllers.receivers;
 
 import org.neuclear.asset.InvalidTransferException;
 import org.neuclear.asset.NegativeTransferException;
+import org.neuclear.asset.contracts.Asset;
 import org.neuclear.commons.NeuClearException;
 import org.neuclear.commons.crypto.signers.Signer;
 import org.neuclear.exchange.orders.ExchangeCompletedReceipt;
@@ -14,8 +15,11 @@ import org.neuclear.id.receiver.UnsupportedTransaction;
 import org.neuclear.ledger.*;
 
 /*
-$Id: ExchangeCompletionOrderReceiver.java,v 1.2 2004/07/23 18:58:39 pelle Exp $
+$Id: ExchangeCompletionOrderReceiver.java,v 1.3 2004/09/08 23:17:23 pelle Exp $
 $Log: ExchangeCompletionOrderReceiver.java,v $
+Revision 1.3  2004/09/08 23:17:23  pelle
+Fees now work for everything but Exchange Completion.
+
 Revision 1.2  2004/07/23 18:58:39  pelle
 Updated to use the new complete method in ledger.
 
@@ -41,12 +45,14 @@ public class ExchangeCompletionOrderReceiver extends SigningLedgerReceiver imple
     public SignedNamedObject receive(SignedNamedObject obj) throws UnsupportedTransaction, NeuClearException {
         try {
             ExchangeCompletionOrder complete = (ExchangeCompletionOrder) obj;
-            String name = complete.getAsset().getServiceId();
+            final Asset asset = complete.getAsset();
+            String name = asset.getServiceId();
             if (!complete.getSignatory().getName().equals(complete.getReceipt().getOrder().getAgent().getServiceId()))
                 throw new InvalidTransferException("Only Agent is allowed to Sign Completion Order");
-            if (complete.getAmount().getAmount() > complete.getReceipt().getOrder().getAmount().getAmount())
+            final double amount = complete.getAmount().getAmount();
+            if (amount > complete.getReceipt().getOrder().getAmount().getAmount())
                 throw new InvalidTransferException("Attempting to complete larger than authorized amount");
-            PostedTransaction tran = ledger.complete(complete.getReceipt().getOrder().getDigest(), complete.getSignatory().getName(), complete.getCounterparty(), complete.getAmount().getAmount(), complete.getComment());
+            PostedTransaction tran = ledger.complete(complete.getReceipt().getOrder().getDigest(), complete.getSignatory().getName(), complete.getCounterparty(), asset.round(amount - asset.getFeeStructure().calculateFee(amount)), complete.getComment());
             if (!signer.canSignFor(name))
                 return null;
             ExchangeCompletedReceipt receipt = (ExchangeCompletedReceipt) new ExchangeCompletedReceiptBuilder(complete, tran.getTransactionTime()).convert(name, signer);

@@ -33,8 +33,11 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: Asset.java,v 1.24 2004/09/08 20:07:42 pelle Exp $
+$Id: Asset.java,v 1.25 2004/09/08 23:17:22 pelle Exp $
 $Log: Asset.java,v $
+Revision 1.25  2004/09/08 23:17:22  pelle
+Fees now work for everything but Exchange Completion.
+
 Revision 1.24  2004/09/08 20:07:42  pelle
 Added support for fees to TransferOrderReceiver
 
@@ -165,7 +168,7 @@ public final class Asset extends Service {
         super(core, nickname, original, serviceUrl, servicekey, targets);
         this.issuer = new Signatory(issuerKey);
         this.decimal = decimal;
-        this.multiplier = (int) Math.round(Math.pow(10, -decimal));
+        this.multiplier = (int) Math.round(Math.pow(10, decimal));
         this.minimumTransaction = minimumTransaction;
         this.units = units;
         this.fees = fees;
@@ -204,7 +207,7 @@ public final class Asset extends Service {
             return minimumTransaction;
         if (decimal == 0)
             return amount;
-        return Math.round(amount * multiplier) / multiplier;
+        return ((double) Math.round(amount * multiplier)) / multiplier;
     }
 
     public final Signatory getIssuer() {

@@ -34,8 +34,11 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: AssetBuilder.java,v 1.21 2004/09/07 18:47:33 pelle Exp $
+$Id: AssetBuilder.java,v 1.22 2004/09/08 23:17:22 pelle Exp $
 $Log: AssetBuilder.java,v $
+Revision 1.22  2004/09/08 23:17:22  pelle
+Fees now work for everything but Exchange Completion.
+
 Revision 1.21  2004/09/07 18:47:33  pelle
 Added support for dom4j 1.5 and added a new XPP3Reader
 
@@ -177,7 +180,7 @@ public final class AssetBuilder extends ServiceBuilder {
         super(AssetGlobals.ASSET_TAGNAME, title, originalurl, serviceUrl, serviceKey);
         addKeyInfo("asset.issuer.publickey", issuerKey, "Issuers Key");
         addFeature("asset.decimalpoints", "Decimal Points", Integer.toString(decimal), "Decimal Points");
-        addFeature("asset.miminmum", "Minimum Transaction", Double.toString(minimum), "The Minumum Transaction size");
+        addFeature("asset.minimum", "Minimum Transaction", Double.toString(minimum), "The Minimum Transaction size");
         addFeature("asset.units", "Units", units, "Asset Units");
 
     }
