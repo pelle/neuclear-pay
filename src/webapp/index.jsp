@@ -18,24 +18,19 @@
 NeuClear Bux
 </title></head>
 <body>
-<h1>NeuClear Sample Electronic Currency</h1>
+<h1>NeuClear Bux Electronic Currency</h1>
 <%
     if(!loggedin){
 %>
 <form action="Authorize" method="POST">
 <table bgcolor="#FFFFE0"><tr><td valign="top">
-    <input name="identity" value="<%=(userns!=null)?userns.getName():""%>" type="text" size="30">
     </td><td valign="top">
     <input type="submit" name="submit" value="Login">
     </td>
 </tr>
 <tr><td colspan="2" bgcolor="#F0F0FF">
-Try logging in using the example neu's below:<br>
-<pre>
-neu://bob@test
-neu://alice@test
-</pre>
-Use the passphrase: "<tt>neuclear</tt>" when asked.
+You need to be running the NeuClear Personal Signer to log in.
+<a href="http://old.neuclear.org/signer/jnlp/neuclear-signer.jnlp">Start with Java Web Start</a>
 </td></tr></table>
 </form>
 <%
@@ -44,17 +39,15 @@ Use the passphrase: "<tt>neuclear</tt>" when asked.
         <%=userns.getName()%> is Logged In<br><hr>
         <ul>
             <li><a href="SECURE/transfer.jsp">Transfer Funds</a></li>
-            <li><a href="SECURE/statement.jsp">Statement</a></li>
 
             <li><a href="<%=ServletTools.getAbsoluteURL(request,"/")%>?logout=1">Log Out</a></li>
 
         </ul>
-
-
         <%
     }
 %>
-
+<hr/><a href="bux.html">NeuClear Bux Rules</a><hr>
+For more information about what this is visit <a href="http://neuclear.org">NeuClear.org</a>
 
 </body>
 </html>
