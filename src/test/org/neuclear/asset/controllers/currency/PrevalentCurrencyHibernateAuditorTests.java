@@ -1,10 +1,10 @@
 package org.neuclear.asset.controllers.currency;
 
 import org.neuclear.commons.NeuClearException;
-import org.neuclear.ledger.Ledger;
+import org.neuclear.ledger.LedgerController;
 import org.neuclear.ledger.LowlevelLedgerException;
-import org.neuclear.ledger.hibernate.HibernateLedger;
-import org.neuclear.ledger.prevalent.PrevalentLedger;
+import org.neuclear.ledger.hibernate.HibernateLedgerController;
+import org.neuclear.ledger.prevalent.PrevalentLedgerController;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
@@ -27,8 +27,11 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: PrevalentCurrencyHibernateAuditorTests.java,v 1.1 2004/04/12 19:29:53 pelle Exp $
+$Id: PrevalentCurrencyHibernateAuditorTests.java,v 1.2 2004/04/27 15:24:55 pelle Exp $
 $Log: PrevalentCurrencyHibernateAuditorTests.java,v $
+Revision 1.2  2004/04/27 15:24:55  pelle
+Due to a new API change in 0.5 I have changed the name of Ledger and it's implementers to LedgerController.
+
 Revision 1.1  2004/04/12 19:29:53  pelle
 Hibernate and Pervayler implementations of the Ledger all pass now for both currency and ledger tests.
 
@@ -51,12 +54,12 @@ public class PrevalentCurrencyHibernateAuditorTests extends CurrencyTests {
         super(s);
     }
 
-    protected Ledger createControllerLedger() throws IOException, ClassNotFoundException {
-        return new PrevalentLedger("asset");
+    protected LedgerController createControllerLedger() throws IOException, ClassNotFoundException {
+        return new PrevalentLedgerController("asset");
     }
 
-    protected Ledger createAuditLedger() throws LowlevelLedgerException {
-        return new HibernateLedger("audit", true);
+    protected LedgerController createAuditLedger() throws LowlevelLedgerException {
+        return new HibernateLedgerController("audit", true);
     }
 
 }

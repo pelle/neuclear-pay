@@ -24,10 +24,10 @@ import org.neuclear.id.SignedNamedObject;
 import org.neuclear.id.builders.Builder;
 import org.neuclear.id.receiver.Receiver;
 import org.neuclear.ledger.InvalidTransactionException;
-import org.neuclear.ledger.Ledger;
+import org.neuclear.ledger.LedgerController;
 import org.neuclear.ledger.LowlevelLedgerException;
 import org.neuclear.ledger.UnknownBookException;
-import org.neuclear.ledger.simple.SimpleLedger;
+import org.neuclear.ledger.simple.SimpleLedgerController;
 import org.neuclear.tests.AbstractSigningTest;
 
 import java.io.IOException;
@@ -61,12 +61,12 @@ public class CurrencyTests extends AbstractSigningTest {
         auditor = new Auditor(asset, auditLedger);
     }
 
-    protected Ledger createControllerLedger() throws IOException, ClassNotFoundException, LowlevelLedgerException {
-        return new SimpleLedger("asset");
+    protected LedgerController createControllerLedger() throws IOException, ClassNotFoundException, LowlevelLedgerException {
+        return new SimpleLedgerController("asset");
     }
 
-    protected Ledger createAuditLedger() throws LowlevelLedgerException {
-        return new SimpleLedger("audit");
+    protected LedgerController createAuditLedger() throws LowlevelLedgerException {
+        return new SimpleLedgerController("audit");
     }
 
     /**
@@ -320,8 +320,8 @@ public class CurrencyTests extends AbstractSigningTest {
     }
 
     private Receiver proc;
-    private Ledger ledger;
-    private Ledger auditLedger;
+    private LedgerController ledger;
+    private LedgerController auditLedger;
     private Auditor auditor;
     private ExchangeAgent agent;
     private Asset asset;

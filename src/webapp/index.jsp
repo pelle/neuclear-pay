@@ -6,7 +6,7 @@
                  org.neuclear.id.Identity,
                  org.neuclear.id.resolver.Resolver,
                  org.neuclear.id.Signatory,
-                 org.neuclear.ledger.Ledger,
+                 org.neuclear.ledger.LedgerController,
                  org.neuclear.ledger.servlets.ServletLedgerFactory,
                  org.neuclear.asset.AssetController,
                  org.neuclear.asset.servlet.ServletAssetControllerFactory,
@@ -22,7 +22,7 @@
     AssetStatistics stats=controller.getStats();
     Asset asset=controller.getAsset();
 
-    Ledger ledger=ServletLedgerFactory.getInstance().createLedger(config);
+    LedgerController ledger=ServletLedgerFactory.getInstance().createLedger(config);
     if (loggedin){
         Book book=(Book) session.getAttribute("book");
         if (book==null){

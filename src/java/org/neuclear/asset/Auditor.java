@@ -31,8 +31,11 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: Auditor.java,v 1.5 2004/04/23 19:09:35 pelle Exp $
+$Id: Auditor.java,v 1.6 2004/04/27 15:24:55 pelle Exp $
 $Log: Auditor.java,v $
+Revision 1.6  2004/04/27 15:24:55  pelle
+Due to a new API change in 0.5 I have changed the name of Ledger and it's implementers to LedgerController.
+
 Revision 1.5  2004/04/23 19:09:35  pelle
 Lots of cleanups and improvements to the userinterface and look of the bux application.
 
@@ -138,7 +141,7 @@ SOAPTools was changed to return a stream. This is required by the VerifyingReade
  * Time: 3:53:17 PM
  */
 public class Auditor implements Receiver {
-    public Auditor(Asset asset, Ledger ledger) {
+    public Auditor(Asset asset, LedgerController ledger) {
         this.ledger = ledger;
         this.asset = asset;
     }
@@ -301,7 +304,7 @@ public class Auditor implements Receiver {
         }
     }
 
-    private final Ledger ledger;
+    private final LedgerController ledger;
     private final Asset asset;
 
 }

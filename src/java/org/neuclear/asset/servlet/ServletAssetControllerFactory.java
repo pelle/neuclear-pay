@@ -7,7 +7,7 @@ import org.neuclear.commons.crypto.CryptoTools;
 import org.neuclear.commons.crypto.signers.ServletSignerFactory;
 import org.neuclear.commons.servlets.ServletTools;
 import org.neuclear.id.verifier.VerifyingReader;
-import org.neuclear.ledger.Ledger;
+import org.neuclear.ledger.LedgerController;
 import org.neuclear.ledger.LowlevelLedgerException;
 import org.neuclear.ledger.servlets.ServletLedgerFactory;
 
@@ -62,7 +62,7 @@ public final class ServletAssetControllerFactory {
                 is = new URL(asseturl).openStream();
             }
             Asset asset = (Asset) VerifyingReader.getInstance().read(is);
-            Ledger ledger = ServletLedgerFactory.getInstance().createLedger(config);
+            LedgerController ledger = ServletLedgerFactory.getInstance().createLedger(config);
 
             assetController = new CurrencyController(ledger, asset, ServletSignerFactory.getInstance().createSigner(config), serviceid);
         } catch (Exception e) {

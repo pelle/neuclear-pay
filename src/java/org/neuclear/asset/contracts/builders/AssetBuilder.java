@@ -33,8 +33,11 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: AssetBuilder.java,v 1.18 2004/04/26 23:57:39 pelle Exp $
+$Id: AssetBuilder.java,v 1.19 2004/04/27 15:24:54 pelle Exp $
 $Log: AssetBuilder.java,v $
+Revision 1.19  2004/04/27 15:24:54  pelle
+Due to a new API change in 0.5 I have changed the name of Ledger and it's implementers to LedgerController.
+
 Revision 1.18  2004/04/26 23:57:39  pelle
 Trying to find the verifying error
 
@@ -188,9 +191,9 @@ public final class AssetBuilder extends ServiceBuilder {
             assetraw.getDescription().setText("NeuClear Test Currency of no value.");
             assetraw.getRules().setText("You know the rules, there are no rules!!! No, really this is for testing purposes only. There" +
                     "are no implied rights or promises involved in this asset.");
-            assetraw.sign("neu://test", signer);
 
-            File out = new File("target/testdata/assets/bux.html");
+            assetraw.sign("ivan", signer);
+            File out = new File("src/webapp/bux.html");
             out.getParentFile().mkdirs();
             XMLTools.writeFile(out, assetraw.getElement().getDocument());
             final InputStream is = new BufferedInputStream(new FileInputStream(out));

@@ -15,7 +15,7 @@
                  org.neuclear.commons.crypto.signers.Signer,
                  org.neuclear.asset.AssetController,
                  org.neuclear.asset.servlet.ServletAssetControllerFactory,
-                 org.neuclear.ledger.Ledger,
+                 org.neuclear.ledger.LedgerController,
                  org.neuclear.ledger.servlets.ServletLedgerFactory,
                  org.neuclear.ledger.Book,
                  org.neuclear.ledger.LowlevelLedgerException,
@@ -34,7 +34,7 @@
     String service=ServletTools.getInitParam("serviceid",config);
 //    String asseturl=ServletTools.getInitParam("asset",config);
     AssetController controller=ServletAssetControllerFactory.getInstance().createAssetController(config);
-    Ledger ledger=ServletLedgerFactory.getInstance().createLedger(config);
+    LedgerController ledger=ServletLedgerFactory.getInstance().createLedger(config);
     Asset asset=controller.getAsset();
     String recipient=Utility.denullString(request.getParameter("recipient"));
     double amount=Double.parseDouble(Utility.denullString(request.getParameter("amount"),"0"));

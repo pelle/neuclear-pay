@@ -14,9 +14,9 @@ import org.neuclear.id.SignedNamedObject;
 import org.neuclear.id.builders.Builder;
 import org.neuclear.id.receiver.Receiver;
 import org.neuclear.ledger.InvalidTransactionException;
-import org.neuclear.ledger.Ledger;
+import org.neuclear.ledger.LedgerController;
 import org.neuclear.ledger.LowlevelLedgerException;
-import org.neuclear.ledger.simple.SimpleLedger;
+import org.neuclear.ledger.simple.SimpleLedgerController;
 import org.neuclear.tests.AbstractSigningTest;
 
 import java.security.GeneralSecurityException;
@@ -30,9 +30,9 @@ public final class IssuanceTests extends AbstractSigningTest {
         AssetGlobals.registerReaders();
 
         asset = createTestAsset();
-        ledger = new SimpleLedger("test");
+        ledger = new SimpleLedgerController("test");
         proc = new CurrencyController(ledger, asset, getSigner(), "neu://test/bux");
-        auditLedger = new SimpleLedger("auditor");
+        auditLedger = new SimpleLedgerController("auditor");
         auditor = new Auditor(asset, auditLedger);
     }
 
@@ -187,8 +187,8 @@ public final class IssuanceTests extends AbstractSigningTest {
     }
 
     private Receiver proc;
-    private Ledger ledger;
-    private Ledger auditLedger;
+    private LedgerController ledger;
+    private LedgerController auditLedger;
     private Auditor auditor;
     private Asset asset;
 

@@ -31,7 +31,7 @@ public final class CurrencyController extends AssetController {
 //    public CurrencyController(String ledgername,String title,String reserve) throws LedgerCreationException, LowlevelLedgerException, BookExistsException {
 //        this(LedgerFactory.getInstance().getLedger(ledgername),title,reserve);
 //    }
-    public CurrencyController(final Ledger ledger, final Asset asset, final Signer signer, final String alias) throws LowlevelLedgerException, NeuClearException {
+    public CurrencyController(final LedgerController ledger, final Asset asset, final Signer signer, final String alias) throws LowlevelLedgerException, NeuClearException {
         super();
         this.ledger = ledger;
         this.signer = signer;
@@ -191,7 +191,7 @@ public final class CurrencyController extends AssetController {
     }
 
 
-    private final Ledger ledger;
+    private final LedgerController ledger;
     private final Asset asset;
     private final String issuerBook;
     private final Signer signer;
