@@ -10,8 +10,11 @@ import org.neuclear.tests.AbstractObjectCreationTest;
 import java.security.GeneralSecurityException;
 
 /*
-$Id: AbstractExchangeOrderTest.java,v 1.1 2004/04/05 16:31:44 pelle Exp $
+$Id: AbstractExchangeOrderTest.java,v 1.2 2004/04/14 23:51:12 pelle Exp $
 $Log: AbstractExchangeOrderTest.java,v $
+Revision 1.2  2004/04/14 23:51:12  pelle
+Fixed Exchange tests and Cactus tests working on web app.
+
 Revision 1.1  2004/04/05 16:31:44  pelle
 Created new ServiceBuilder class for creating services. A service is an identity that has a seperate service URL and Service Public Key.
 
@@ -32,30 +35,31 @@ public abstract class AbstractExchangeOrderTest extends AbstractObjectCreationTe
 
     public Asset createTestAsset() throws NeuClearException {
         AssetBuilder builder = new AssetBuilder("http://bux.neuclear.org",
-                getSigner().getPublicKey("neu://test/bux"),
-                getAlice().getPublicKey(),
+                getSigner().getPublicKey("bux"),
+                getSigner().getPublicKey("buxissuer"),
                 2, 0);
-        return (Asset) builder.convert(NAME, getSigner());
+        return (Asset) builder.convert(PROMOTER, getSigner());
 
     }
 
     public Asset createShoeAsset() throws NeuClearException {
         AssetBuilder builder = new AssetBuilder("http://shoes.neuclear.org",
-                getSigner().getPublicKey("neu://test"),
-                getAlice().getPublicKey(),
+                getSigner().getPublicKey("shoes"),
+                getSigner().getPublicKey("shoesissuer"),
                 2, 0);
-        return (Asset) builder.convert(NAME, getSigner());
+        return (Asset) builder.convert(PROMOTER, getSigner());
 
     }
 
     public ExchangeAgent createTestExchangeAgent() throws NeuClearException {
         ExchangeAgentBuilder builder = new ExchangeAgentBuilder("http://tradex.neuclear.org",
-                getSigner().getPublicKey("neu://bob@test"));
-        return (ExchangeAgent) builder.convert(NAME, getSigner());
+                getSigner().getPublicKey("exchange"));
+        return (ExchangeAgent) builder.convert("carol", getSigner());
 
     }
 
     protected Asset bux;
     protected Asset shoes;
     protected ExchangeAgent agent;
+    public static String PROMOTER = "ivan";
 }

@@ -1,24 +1,26 @@
 <%@ page import="org.neuclear.id.Identity,
                  org.neuclear.commons.Utility,
-                 org.neuclear.asset.orders.builders.TransferRequestBuilder,
+                 org.neuclear.asset.orders.builders.TransferOrderBuilder,
                  org.neuclear.id.resolver.Resolver,
                  org.neuclear.asset.contracts.Asset,
                  org.neuclear.commons.time.TimeTools,
                  org.neuclear.id.builders.SignatureRequestBuilder,
                  org.neuclear.asset.contracts.AssetGlobals,
-                 org.neuclear.asset.orders.transfers.TransferGlobals,
+
                  org.neuclear.asset.servlet.AssetControllerServlet,
                  org.neuclear.id.SignedNamedObject,
                  org.neuclear.commons.crypto.Base64,
                  org.neuclear.commons.servlets.ServletTools,
-                 org.neuclear.asset.orders.transfers.TransferGlobals,
-                 org.neuclear.id.Service"%>
+                 org.neuclear.id.Service,
+                 org.neuclear.asset.orders.TransferGlobals,
+                 org.neuclear.id.Signatory,
+                 org.neuclear.asset.orders.Amount"%>
 <%
     AssetGlobals.registerReaders();
     TransferGlobals.registerReaders();
-    Identity userns=(Identity) request.getUserPrincipal();
+    Signatory userns=(Signatory) request.getUserPrincipal();
     String service=ServletTools.getInitParam("service",config);
-    Service asset=(Service)Resolver.resolveIdentity(service);
+//    Service asset=(Service)Resolver.resolveIdentity(service);
     String recipient=Utility.denullString(request.getParameter("recipient"));
     double amount=Double.parseDouble(Utility.denullString(request.getParameter("amount"),"0"));
     boolean submit=!Utility.isEmpty(request.getParameter("submit"));
@@ -48,19 +50,17 @@ if (!submit){
 </form>
 </p>
 <% } else {
-    TransferRequestBuilder transfer=new TransferRequestBuilder(
-            asset,
-            userns,
-            Resolver.resolveIdentity(recipient),
-            amount,
-            TimeTools.now(),
+    TransferOrderBuilder transfer=new TransferOrderBuilder(
+            service,
+            recipient,
+            new Amount(amount),
             comment
     ) ;
-    SignatureRequestBuilder sigreq=new SignatureRequestBuilder(service,userns.getName(),transfer,comment);
-    SignedNamedObject sig=sigreq.sign(getSigner());
+    SignatureRequestBuilder sigreq=new SignatureRequestBuilder(transfer,comment);
+    SignedNamedObject sig=sigreq.sign();
 
 %>
-<form action="<%=userns.getSigner()%>" method="POST">
+<form action="http://localhost:11870/Signer" method="POST">
 <input name="neuclear-request" value="<%=Base64.encode(sig.getEncoded().getBytes())%>" type="hidden">
 <input name="endpoint" value="<%=ServletTools.getAbsoluteURL(request, "/Asset")%>" type="hidden">
 </form>

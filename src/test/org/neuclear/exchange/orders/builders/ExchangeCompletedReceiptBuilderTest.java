@@ -30,8 +30,11 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: ExchangeCompletedReceiptBuilderTest.java,v 1.1 2004/04/05 16:31:45 pelle Exp $
+$Id: ExchangeCompletedReceiptBuilderTest.java,v 1.2 2004/04/14 23:51:13 pelle Exp $
 $Log: ExchangeCompletedReceiptBuilderTest.java,v $
+Revision 1.2  2004/04/14 23:51:13  pelle
+Fixed Exchange tests and Cactus tests working on web app.
+
 Revision 1.1  2004/04/05 16:31:45  pelle
 Created new ServiceBuilder class for creating services. A service is an identity that has a seperate service URL and Service Public Key.
 
@@ -73,23 +76,27 @@ public class ExchangeCompletedReceiptBuilderTest extends AbstractExchangeOrderTe
         assertNotNull(obj);
         assertTrue(obj instanceof ExchangeCompletedReceipt);
         ExchangeCompletedReceipt cr = (ExchangeCompletedReceipt) obj;
-        assertEquals(getSigner().getPublicKey("neu://test").getEncoded(), cr.getSignatory().getPublicKey().getEncoded());
+        assertEquals(getPublicKeyName("bux"), cr.getSignatory().getName());
         assertNotNull(cr.getOrder());
         assertNotNull(cr.getValueTime());
 
         ExchangeCompletionOrder complete = cr.getOrder();
-        assertEquals(getSigner().getPublicKey("neu://test/bux").getEncoded(), complete.getSignatory().getPublicKey().getEncoded());
+        assertEquals(getPublicKeyName("exchange"), complete.getSignatory().getName());
         assertEquals("done", complete.getComment());
         assertEquals(19.0, complete.getAmount().getAmount(), 0);
         assertNotNull(complete.getExchangeTime());
         assertNotNull(complete.getReceipt());
+
         ExchangeOrderReceipt receipt = complete.getReceipt();
-        assertEquals(getSigner().getPublicKey("neu://test/bux").getEncoded(), receipt.getSignatory().getPublicKey().getEncoded());
+        assertEquals(getPublicKeyName("bux"), receipt.getSignatory().getName());
+//        assertEquals(getSigner().getPublicKey("neu://test/bux").getEncoded(), receipt.getSignatory().getPublicKey().getEncoded());
         assertNotNull(receipt.getValuetime());
         assertNotNull(receipt.getOrder());
+
         ExchangeOrder order = receipt.getOrder();
         assertEquals(bux.getDigest(), order.getAsset().getDigest());
-        assertEquals(getSigner().getPublicKey("neu://test/bux").getEncoded(), order.getSignatory().getPublicKey().getEncoded());
+        assertEquals(getPublicKeyName("bob"), order.getSignatory().getName());
+//      assertEquals(getSigner().getPublicKey("neu://test/bux").getEncoded(), order.getSignatory().getPublicKey().getEncoded());
 //        assertEquals(getBob().getPublicKey().getEncoded(), order.getRecipient().getSignatory().getPublicKey().getEncoded());
         assertEquals("Test", order.getComment());
         assertEquals(20.0, order.getAmount().getAmount(), 0);
@@ -102,11 +109,15 @@ public class ExchangeCompletedReceiptBuilderTest extends AbstractExchangeOrderTe
     protected Builder createBuilder() throws NeuClearException, InvalidTransferException, XMLException {
         BidItem bids[] = new BidItem[]{new BidItem(shoes, new Amount(5))};
         Builder ob = new ExchangeOrderBuilder(bux, agent, new Amount(20), new Date(System.currentTimeMillis() + 10000), bids, "Test");
-        ExchangeOrderReceiptBuilder rb = new ExchangeOrderReceiptBuilder((ExchangeOrder) ob.convert("neu://test/bux", getSigner()), new Date());
+        ExchangeOrderReceiptBuilder rb = new ExchangeOrderReceiptBuilder((ExchangeOrder) ob.convert("bob", getSigner()), new Date());
 
-        ExchangeCompletionOrderBuilder cb = new ExchangeCompletionOrderBuilder((ExchangeOrderReceipt) rb.convert("neu://test/bux", getSigner()), new Date(), "neu://alice@test", new Amount(19), "done");
-        ExchangeCompletedReceiptBuilder builder = new ExchangeCompletedReceiptBuilder((ExchangeCompletionOrder) cb.convert("neu://test/bux", getSigner()), new Date());
+        ExchangeCompletionOrderBuilder cb = new ExchangeCompletionOrderBuilder((ExchangeOrderReceipt) rb.convert("bux", getSigner()), new Date(), "neu://alice@test", new Amount(19), "done");
+        ExchangeCompletedReceiptBuilder builder = new ExchangeCompletedReceiptBuilder((ExchangeCompletionOrder) cb.convert("exchange", getSigner()), new Date());
         return builder;
+    }
+
+    protected String getSignersAlias() {
+        return "bux";
     }
 
 }
