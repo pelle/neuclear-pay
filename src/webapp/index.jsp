@@ -1,6 +1,6 @@
 <%@ page import="org.neuclear.commons.Utility,
                  org.neuclear.id.SignedNamedObject,
-                 org.neuclear.auth.AuthenticationTicket,
+                 org.neuclear.id.auth.AuthenticationTicket,
                  org.neuclear.id.NSTools,
                  org.neuclear.commons.servlets.ServletTools        ,
                  org.neuclear.id.Identity,

@@ -20,7 +20,7 @@ import org.neuclear.ledger.BookExistsException;
 import org.neuclear.ledger.LowlevelLedgerException;
 import org.neuclear.ledger.UnknownLedgerException;
 import org.neuclear.ledger.implementations.SQLLedger;
-import org.neuclear.receiver.Receiver;
+import org.neuclear.id.receiver.Receiver;
 import org.neuclear.tests.AbstractSigningTest;
 import org.neuclear.xml.XMLException;
 
@@ -48,8 +48,11 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: PaymentReceiverTest.java,v 1.15 2004/01/13 15:11:18 pelle Exp $
+$Id: PaymentReceiverTest.java,v 1.16 2004/03/02 18:58:35 pelle Exp $
 $Log: PaymentReceiverTest.java,v $
+Revision 1.16  2004/03/02 18:58:35  pelle
+Further cleanups in neuclear-id. Moved everything under id.
+
 Revision 1.15  2004/01/13 15:11:18  pelle
 Now builds.
 Now need to do unit tests

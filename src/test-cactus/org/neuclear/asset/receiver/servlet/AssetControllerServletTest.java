@@ -3,7 +3,7 @@ package org.neuclear.asset.receiver.servlet;
 import com.meterware.httpunit.WebForm;
 import org.apache.cactus.ServletTestCase;
 import org.apache.cactus.WebRequest;
-import org.neuclear.auth.AuthenticationServlet;
+import org.neuclear.id.auth.AuthenticationServlet;
 import org.neuclear.commons.NeuClearException;
 import org.neuclear.commons.Utility;
 import org.neuclear.commons.crypto.Base64;
@@ -39,8 +39,11 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: AssetControllerServletTest.java,v 1.2 2004/01/13 23:37:30 pelle Exp $
+$Id: AssetControllerServletTest.java,v 1.3 2004/03/02 18:58:35 pelle Exp $
 $Log: AssetControllerServletTest.java,v $
+Revision 1.3  2004/03/02 18:58:35  pelle
+Further cleanups in neuclear-id. Moved everything under id.
+
 Revision 1.2  2004/01/13 23:37:30  pelle
 Refactoring parts of the core of XMLSignature. There shouldnt be any real API changes.
 

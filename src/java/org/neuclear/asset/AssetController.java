@@ -7,8 +7,8 @@ import org.neuclear.asset.orders.TransferReceipt;
 import org.neuclear.commons.NeuClearException;
 import org.neuclear.exchange.orders.*;
 import org.neuclear.id.SignedNamedObject;
-import org.neuclear.receiver.Receiver;
-import org.neuclear.receiver.UnsupportedTransaction;
+import org.neuclear.id.receiver.Receiver;
+import org.neuclear.id.receiver.UnsupportedTransaction;
 
 /*
 NeuClear Distributed Transaction Clearing Platform
@@ -28,8 +28,11 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: AssetController.java,v 1.13 2004/01/13 15:11:17 pelle Exp $
+$Id: AssetController.java,v 1.14 2004/03/02 18:58:35 pelle Exp $
 $Log: AssetController.java,v $
+Revision 1.14  2004/03/02 18:58:35  pelle
+Further cleanups in neuclear-id. Moved everything under id.
+
 Revision 1.13  2004/01/13 15:11:17  pelle
 Now builds.
 Now need to do unit tests

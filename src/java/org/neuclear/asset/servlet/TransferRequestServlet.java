@@ -11,7 +11,7 @@ import org.neuclear.id.Identity;
 import org.neuclear.id.InvalidNamedObjectException;
 import org.neuclear.id.builders.Builder;
 import org.neuclear.id.resolver.NSResolver;
-import org.neuclear.signers.servlet.SignatureRequestServlet;
+import org.neuclear.id.signers.SignatureRequestServlet;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -33,8 +33,11 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: TransferRequestServlet.java,v 1.1 2004/01/13 15:11:17 pelle Exp $
+$Id: TransferRequestServlet.java,v 1.2 2004/03/02 18:58:35 pelle Exp $
 $Log: TransferRequestServlet.java,v $
+Revision 1.2  2004/03/02 18:58:35  pelle
+Further cleanups in neuclear-id. Moved everything under id.
+
 Revision 1.1  2004/01/13 15:11:17  pelle
 Now builds.
 Now need to do unit tests
