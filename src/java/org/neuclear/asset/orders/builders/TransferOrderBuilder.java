@@ -9,6 +9,7 @@ import org.neuclear.asset.orders.Value;
 import org.neuclear.commons.NeuClearException;
 import org.neuclear.commons.Utility;
 import org.neuclear.id.Identity;
+import org.neuclear.id.builders.Builder;
 import org.neuclear.xml.xmlsec.SignedElement;
 
 /*
@@ -29,8 +30,12 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: TransferOrderBuilder.java,v 1.2 2004/01/12 22:39:14 pelle Exp $
+$Id: TransferOrderBuilder.java,v 1.3 2004/01/13 15:11:17 pelle Exp $
 $Log: TransferOrderBuilder.java,v $
+Revision 1.3  2004/01/13 15:11:17  pelle
+Now builds.
+Now need to do unit tests
+
 Revision 1.2  2004/01/12 22:39:14  pelle
 Completed all the builders and contracts.
 Added a new abstract Value class to contain either an amount or a list of serial numbers.
@@ -123,8 +128,8 @@ TransferReceiptBuilder has been created for use by Transfer processors. It is us
  * Date: Oct 3, 2003
  * Time: 3:13:27 PM
  */
-public class TransferOrderBuilder extends SignedElement {
-    protected TransferOrderBuilder(final Asset asset, final Identity recipient, final Value amount, final String comment) throws InvalidTransferException, NegativeTransferException, NeuClearException {
+public class TransferOrderBuilder extends Builder {
+    public TransferOrderBuilder(final Asset asset, final Identity recipient, final Value amount, final String comment) throws InvalidTransferException, NegativeTransferException, NeuClearException {
         super(TransferGlobals.createQName(TransferGlobals.XFER_TAGNAME));
         if (amount.getAmount() < 0)
             throw new NegativeTransferException(amount);

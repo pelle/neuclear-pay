@@ -52,7 +52,7 @@ public final class TransferOrder extends AssetTransactionContract {
                     TransferGlobals.parseAssetTag(elem),
                     TransferGlobals.parseRecipientTag(elem),
                     TransferGlobals.parseValueTag(elem),
-                    TransferGlobals.getCommentElement(elem)
+                    TransferGlobals.parseCommentElement(elem)
                     );
         }
     }

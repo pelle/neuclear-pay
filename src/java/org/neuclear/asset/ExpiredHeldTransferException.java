@@ -20,6 +20,6 @@ public final class ExpiredHeldTransferException extends InvalidTransferException
     }
 
     public String getSubMessage() {
-        return "Not possible to complete held payment at this time: " + held.getValuetime();
+        return "Not possible to complete held payment at this time: " + held.getExchangeTime();
     }
 }

@@ -6,8 +6,12 @@ import org.neuclear.asset.contracts.AssetGlobals;
 import org.neuclear.asset.controllers.currency.CurrencyController;
 import org.neuclear.asset.orders.TransferGlobals;
 import org.neuclear.asset.orders.TransferOrder;
+import org.neuclear.asset.orders.Amount;
+import org.neuclear.asset.orders.builders.TransferOrderBuilder;
 import org.neuclear.commons.NeuClearException;
+import org.neuclear.commons.crypto.signers.TestCaseSigner;
 import org.neuclear.commons.sql.DefaultConnectionSource;
+import org.neuclear.commons.sql.statements.SimpleStatementFactory;
 import org.neuclear.commons.time.TimeTools;
 import org.neuclear.id.Identity;
 import org.neuclear.id.SignedNamedObject;
@@ -44,8 +48,12 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: PaymentReceiverTest.java,v 1.14 2004/01/11 00:39:06 pelle Exp $
+$Id: PaymentReceiverTest.java,v 1.15 2004/01/13 15:11:18 pelle Exp $
 $Log: PaymentReceiverTest.java,v $
+Revision 1.15  2004/01/13 15:11:18  pelle
+Now builds.
+Now need to do unit tests
+
 Revision 1.14  2004/01/11 00:39:06  pelle
 Cleaned up the schemas even more they now all verifiy.
 The Order/Receipt pairs for neuclear pay, should now work. They all have Readers using the latest
@@ -175,12 +183,13 @@ public final class PaymentReceiverTest extends AbstractSigningTest {
 
         proc = new CurrencyController(
                 new SQLLedger(
-                        new DefaultConnectionSource(),
+                        new SimpleStatementFactory(new DefaultConnectionSource()),
                         assetName
-                )
-                , assetName
+                ),
+                new TestCaseSigner(),
+                assetName
         );
-        receiver = new AssetControllerReceiver(proc, getSigner());
+        receiver=proc;
     }
 
 
@@ -203,7 +212,7 @@ public final class PaymentReceiverTest extends AbstractSigningTest {
 
     public void performTransaction(SignedNamedObject obj) throws Exception {
         Object pre = getPreTransactionState(obj);
-        org.neuclear.xml.ElementProxy receipt = receiver.receive(obj);
+        SignedNamedObject receipt = receiver.receive(obj);
         assertTrue(verifyTransaction(obj, pre));
     }
 
@@ -211,7 +220,7 @@ public final class PaymentReceiverTest extends AbstractSigningTest {
 
         if (obj instanceof TransferOrder) {
             final TransferOrder transfer = (TransferOrder) obj;
-            final double fromBalance = proc.getBalance(transfer.getFrom(), transfer.getTimeStamp());
+            final double fromBalance = proc.getBalance(transfer.getSignatory(), transfer.getTimeStamp());
             final double toBalance = proc.getBalance(transfer.getRecipient(), transfer.getTimeStamp());
 
             return new double[]{fromBalance, toBalance};
@@ -223,19 +232,19 @@ public final class PaymentReceiverTest extends AbstractSigningTest {
     public final boolean verifyTransaction(final SignedNamedObject obj, final Object state) throws Exception {
         if (obj instanceof TransferOrder) {
             final TransferOrder transfer = (TransferOrder) obj;
-            final double fromBalance = proc.getBalance(transfer.getFrom(), transfer.getTimeStamp());
+            final double fromBalance = proc.getBalance(transfer.getSignatory(), transfer.getTimeStamp());
             final double toBalance = proc.getBalance(transfer.getRecipient(), transfer.getTimeStamp());
             final double prebalances[] = (double[]) state;
 
-            return (fromBalance == prebalances[0] - transfer.getAmount()) &&
-                    (toBalance == prebalances[1] + transfer.getAmount());
+            return (fromBalance == prebalances[0] - transfer.getAmount().getAmount()) &&
+                    (toBalance == prebalances[1] + transfer.getAmount().getAmount());
         }
         return false;
     }
 
     public final SignedNamedObject createPayments(final Identity from, final Identity to, final double amount) throws InvalidTransferException, XMLException, NeuClearException, IOException, UnsupportedEncodingException {
-        final TransferRequestBuilder transfer = new TransferRequestBuilder(asset, from, to, amount, TimeTools.now(), "Test One");
-        return transfer.sign(getSigner());
+        final TransferOrderBuilder transfer = new TransferOrderBuilder(asset, to, new Amount(amount), "Test One");
+        return transfer.convert(from.getName(),getSigner());
     }
 
     protected final String assetName = "neu://test/bux";

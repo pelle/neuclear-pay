@@ -34,7 +34,7 @@
     </filter-mapping>
     <servlet>
         <servlet-name>assetcontroller</servlet-name>
-        <servlet-class>org.neuclear.asset.receiver.servlet.AssetControllerServlet</servlet-class>
+        <servlet-class>org.neuclear.asset.servlet.AssetControllerServlet</servlet-class>
         <init-param>
             <param-name>datasource</param-name>
             <param-value>jdbc/AssetDS</param-value>

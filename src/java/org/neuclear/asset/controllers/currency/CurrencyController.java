@@ -11,6 +11,7 @@ import org.neuclear.commons.time.TimeTools;
 import org.neuclear.exchange.orders.*;
 import org.neuclear.exchange.orders.builders.CancelExchangeReceiptBuilder;
 import org.neuclear.exchange.orders.builders.ExchangeOrderReceiptBuilder;
+import org.neuclear.exchange.orders.builders.ExchangeCompletedReceiptBuilder;
 import org.neuclear.id.Identity;
 import org.neuclear.id.resolver.NSResolver;
 import org.neuclear.ledger.*;
@@ -55,7 +56,7 @@ public final class CurrencyController extends AssetController {
             final Book to = getBook(req.getRecipient());
 
             final Timestamp valuetime =TimeTools.now();
-            final PostedTransaction posted = from.transfer(to, req.getAmount(), req.getComment(), valuetime);
+            final PostedTransaction posted = from.transfer(to, req.getAmount().getAmount(), req.getComment(), valuetime);
             return (TransferReceipt) new TransferReceiptBuilder(req, valuetime).convert(asset.getName(),signer);
         } catch (UnknownBookException e) {
             throw new InvalidTransferException(e.getSubMessage());
@@ -102,7 +103,7 @@ public final class CurrencyController extends AssetController {
             final Book to = getBook(req.getAgent());
             final Timestamp valuetime = TimeTools.now();
 
-            final PostedHeldTransaction posted = from.hold(to, req.getAmount(), req.getComment(), valuetime,req.getExpiry());
+            final PostedHeldTransaction posted = from.hold(to, req.getAmount().getAmount(), req.getComment(), valuetime,req.getExpiry());
 
             return (ExchangeOrderReceipt) new ExchangeOrderReceiptBuilder(req, valuetime).convert(asset.getName(),signer);
         } catch (UnknownBookException e) { //TODO Implement something like this eg. AccountNotValidException
@@ -125,17 +126,17 @@ public final class CurrencyController extends AssetController {
             if (heldTran == null)
                 throw new InvalidTransferException("holdid");
             final double amount = getTransactionAmount(heldTran);
-            if (amount > complete.getAmount())
+            if (amount > complete.getAmount().getAmount())
                 throw new TransferLargerThanHeldException(complete, amount);
-            if (complete.getAmount() < 0)
+            if (complete.getAmount().getAmount() < 0)
                 throw new NegativeTransferException(complete.getAmount());
-            if (heldTran.getExpiryTime().before(complete.getValueTime()) || heldTran.getTransactionTime().after(complete.getValueTime()))
+            if (heldTran.getExpiryTime().before(complete.getExchangeTime()) || heldTran.getTransactionTime().after(complete.getExchangeTime()))
                 throw new ExpiredHeldTransferException(complete);
 
-            final PostedTransaction tran = heldTran.complete(complete.getAmount(), complete.getValueTime(), complete.getComment());
-            return new ExchangeCompletedReceiptBuilder(complete, tran.getXid());
+            final PostedTransaction tran = heldTran.complete(complete.getAmount().getAmount(), complete.getExchangeTime(), complete.getComment());
+            return (ExchangeCompletedReceipt) new ExchangeCompletedReceiptBuilder(complete,TimeTools.now()).convert(asset.getName(),signer);
         } catch (UnknownTransactionException e) {
-            throw new NonExistantHoldException(complete.getHoldId());
+            throw new NonExistantHoldException(complete.getReceipt().getOrder().getDigest());
         } catch (TransactionExpiredException e) {
             throw new ExpiredHeldTransferException(complete);
         } catch (InvalidTransactionException e) {
@@ -147,13 +148,13 @@ public final class CurrencyController extends AssetController {
 
     public final CancelExchangeReceipt process(final CancelExchangeOrder cancel) throws InvalidTransferException, LowLevelPaymentException, TransferDeniedException, NeuClearException {
         try {
-            final PostedHeldTransaction heldTran = ledger.findHeldTransaction(cancel.getHoldId());
+            final PostedHeldTransaction heldTran = ledger.findHeldTransaction(cancel.getReceipt().getOrder().getDigest());
             if (!isRecipient(cancel.getSignatory(), heldTran))
                 throw new TransferDeniedException(cancel);
             heldTran.cancel();
-            return new CancelExchangeReceiptBuilder(cancel);
+            return (CancelExchangeReceipt) new CancelExchangeReceiptBuilder(cancel,TimeTools.now()).convert(asset.getName(),signer);
         } catch (UnknownTransactionException e) {
-            throw new NonExistantHoldException(cancel.getHoldId());
+            throw new NonExistantHoldException(cancel.getReceipt().getOrder().getDigest());
         } catch (LowlevelLedgerException e) {
             throw new LowLevelPaymentException(e);
         }

@@ -7,6 +7,8 @@ import org.neuclear.asset.orders.TransferReceipt;
 import org.neuclear.commons.NeuClearException;
 import org.neuclear.exchange.orders.*;
 import org.neuclear.id.SignedNamedObject;
+import org.neuclear.receiver.Receiver;
+import org.neuclear.receiver.UnsupportedTransaction;
 
 /*
 NeuClear Distributed Transaction Clearing Platform
@@ -26,8 +28,12 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: AssetController.java,v 1.12 2004/01/12 22:39:14 pelle Exp $
+$Id: AssetController.java,v 1.13 2004/01/13 15:11:17 pelle Exp $
 $Log: AssetController.java,v $
+Revision 1.13  2004/01/13 15:11:17  pelle
+Now builds.
+Now need to do unit tests
+
 Revision 1.12  2004/01/12 22:39:14  pelle
 Completed all the builders and contracts.
 Added a new abstract Value class to contain either an amount or a list of serial numbers.
@@ -106,26 +112,31 @@ SOAPTools was changed to return a stream. This is required by the VerifyingReade
  * Date: Nov 6, 2003
  * Time: 3:53:17 PM
  */
-public abstract class AssetController {
+public abstract class AssetController implements Receiver {
 
     /**
      * Process the the request and returns and unsigned object for signing and sending.
      * 
      * @param contract 
      * @return 
-     * @throws TransferDeniedException  
-     * @throws LowLevelPaymentException 
-     * @throws InvalidTransferException 
      */
-    public final SignedNamedObject process(final AssetTransactionContract contract) throws TransferDeniedException, LowLevelPaymentException, InvalidTransferException, NeuClearException {
-        if (contract instanceof TransferOrder)
-            return process((TransferOrder) contract);
-        if (contract instanceof org.neuclear.exchange.orders.ExchangeOrder)
-            return process((ExchangeOrder) contract);
-        if (contract instanceof ExchangeCompletionOrder)
-            return process((ExchangeCompletionOrder) contract);
-        if (contract instanceof CancelExchangeOrder)
-            return process((CancelExchangeOrder) contract);
+    public final SignedNamedObject receive(final SignedNamedObject contract) throws UnsupportedTransaction , NeuClearException {
+        try {
+            if (contract instanceof TransferOrder)
+                return process((TransferOrder) contract);
+            if (contract instanceof ExchangeOrder)
+                return process((ExchangeOrder) contract);
+            if (contract instanceof ExchangeCompletionOrder)
+                return process((ExchangeCompletionOrder) contract);
+            if (contract instanceof CancelExchangeOrder)
+                return process((CancelExchangeOrder) contract);
+        } catch (LowLevelPaymentException e) {
+            throw new NeuClearException(e);
+        } catch (TransferDeniedException e) {
+            throw new NeuClearException(e);
+        } catch (InvalidTransferException e) {
+            throw new NeuClearException(e);
+        }
 
         return null;
     }

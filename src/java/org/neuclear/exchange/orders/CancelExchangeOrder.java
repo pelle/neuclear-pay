@@ -21,7 +21,7 @@ public final class CancelExchangeOrder extends ExchangeTransactionContract{
         super(core, receipt.getAsset(), receipt.getAgent());
         this.receipt=receipt;
     }
-    public ExchangeOrderReceipt getExchangeReceipt(){
+    public ExchangeOrderReceipt getReceipt(){
         return receipt;
     }
 

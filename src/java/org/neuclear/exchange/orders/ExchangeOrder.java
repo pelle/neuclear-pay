@@ -90,7 +90,7 @@ public final class ExchangeOrder extends ExchangeTransactionContract {
                         ExchangeGlobals.parseAgentTag(elem),
                         TransferGlobals.parseValueTag(elem),
                         parseBidItems(elem),
-                        TransferGlobals.getCommentElement(elem),
+                        TransferGlobals.parseCommentElement(elem),
                         TransferGlobals.parseTimeStampElement(elem,ExchangeGlobals.createQName(ExchangeGlobals.EXPIRY_TAG))
                         );
             throw new InvalidNamedObjectException(core.getName(),"Not Matched");

@@ -34,8 +34,12 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: TransferGlobals.java,v 1.5 2004/01/12 22:39:14 pelle Exp $
+$Id: TransferGlobals.java,v 1.6 2004/01/13 15:11:17 pelle Exp $
 $Log: TransferGlobals.java,v $
+Revision 1.6  2004/01/13 15:11:17  pelle
+Now builds.
+Now need to do unit tests
+
 Revision 1.5  2004/01/12 22:39:14  pelle
 Completed all the builders and contracts.
 Added a new abstract Value class to contain either an amount or a list of serial numbers.
@@ -160,7 +164,7 @@ public final class TransferGlobals {
         return text;
     }
 
-    public static String getCommentElement(final Element element) {
+    public static String parseCommentElement(final Element element) {
         final Element value=element.element(createQName(COMMENT_TAG));
         if (value==null)
             return "";

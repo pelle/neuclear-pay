@@ -3,6 +3,7 @@ package org.neuclear.exchange.orders;
 import org.neuclear.asset.contracts.Asset;
 import org.neuclear.asset.contracts.AssetGlobals;
 import org.neuclear.asset.orders.TransferGlobals;
+import org.neuclear.asset.orders.Value;
 import org.neuclear.exchange.contracts.ExchangeAgent;
 import org.neuclear.id.*;
 import org.dom4j.Element;
@@ -16,19 +17,20 @@ import java.util.Date;
  * Time: 5:35:26 PM
  */
 public final class ExchangeCompletionOrder extends ExchangeTransactionContract {
-    private ExchangeCompletionOrder(final SignedNamedCore core, final ExchangeOrderReceipt receipt, final Identity counterparty, final double amount, final Date exchangetime) {
+    private ExchangeCompletionOrder(final SignedNamedCore core, final ExchangeOrderReceipt receipt, final Identity counterparty, final Value amount, final Date exchangetime,final String comment) {
         super(core,receipt.getAsset(), receipt.getAgent());
         this.exchangetime = exchangetime.getTime();
         this.amount = amount;
         this.counterparty=counterparty;
         this.receipt=receipt;
+        this.comment=comment;
     }
 
     public final Timestamp getExchangeTime() {
         return new Timestamp(exchangetime);
     }
 
-    public final double getAmount() {
+    public final Value getAmount() {
         return amount;
     }
 
@@ -40,10 +42,15 @@ public final class ExchangeCompletionOrder extends ExchangeTransactionContract {
         return receipt;
     }
 
+    public String getComment() {
+        return comment;
+    }
+
     private final long exchangetime;
-    private final double amount;
+    private final Value amount;
     private final Identity counterparty;
     private final ExchangeOrderReceipt receipt;
+    private final String comment;
 
     public static final class Reader implements NamedObjectReader {
         /**
@@ -61,7 +68,8 @@ public final class ExchangeCompletionOrder extends ExchangeTransactionContract {
                         (ExchangeOrderReceipt)TransferGlobals.parseEmbedded(elem,ExchangeGlobals.createQName(ExchangeGlobals.EXCHANGE_RCPT_TAGNAME)),
                         TransferGlobals.parseRecipientTag(elem),
                         TransferGlobals.parseValueTag(elem),
-                        TransferGlobals.parseTimeStampElement(elem,ExchangeGlobals.createQName(ExchangeGlobals.EXCHANGE_TIME_TAGNAME))
+                        TransferGlobals.parseTimeStampElement(elem,ExchangeGlobals.createQName(ExchangeGlobals.EXCHANGE_TIME_TAGNAME)),
+                        TransferGlobals.parseCommentElement(elem)
                         );
             }
             throw new InvalidNamedObjectException(core.getName(),"Not Matched");

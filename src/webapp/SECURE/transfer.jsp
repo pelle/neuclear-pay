@@ -7,7 +7,7 @@
                  org.neuclear.id.builders.SignatureRequestBuilder,
                  org.neuclear.asset.contracts.AssetGlobals,
                  org.neuclear.asset.orders.transfers.TransferGlobals,
-                 org.neuclear.asset.receiver.servlet.AssetControllerServlet,
+                 org.neuclear.asset.servlet.AssetControllerServlet,
                  org.neuclear.id.SignedNamedObject,
                  org.neuclear.commons.crypto.Base64,
                  org.neuclear.commons.servlets.ServletTools,

@@ -6,15 +6,22 @@ import org.neuclear.asset.orders.TransferGlobals;
 import org.neuclear.asset.orders.builders.ReceiptBuilder;
 import org.neuclear.commons.NeuClearException;
 import org.neuclear.exchange.orders.CancelExchangeOrder;
+import org.neuclear.exchange.orders.ExchangeGlobals;
 import org.neuclear.id.NSTools;
+
+import java.util.Date;
 
 /**
  * (C) 2003 Antilles Software Ventures SA
  * User: pelleb
  * Date: Nov 10, 2003
  * Time: 10:46:12 AM
- * $Id: CancelExchangeReceiptBuilder.java,v 1.3 2004/01/12 22:39:14 pelle Exp $
+ * $Id: CancelExchangeReceiptBuilder.java,v 1.4 2004/01/13 15:11:17 pelle Exp $
  * $Log: CancelExchangeReceiptBuilder.java,v $
+ * Revision 1.4  2004/01/13 15:11:17  pelle
+ * Now builds.
+ * Now need to do unit tests
+ *
  * Revision 1.3  2004/01/12 22:39:14  pelle
  * Completed all the builders and contracts.
  * Added a new abstract Value class to contain either an amount or a list of serial numbers.
@@ -56,8 +63,8 @@ import org.neuclear.id.NSTools;
  * AssetControlClient implementes a remote client for communicating with AssetControllers
  */
 public final class CancelExchangeReceiptBuilder extends ReceiptBuilder {
-    public CancelExchangeReceiptBuilder(final CancelExchangeOrder req) throws InvalidTransferException, NegativeTransferException, NeuClearException {
-        super(NSTools.createUniqueTransactionID(req.getAsset().getName(), req.getSignatory().getName()), TransferGlobals.CANCEL_RCPT_TAGNAME, req.getAsset(), req.getHoldId());
+    public CancelExchangeReceiptBuilder(final CancelExchangeOrder req,Date time) throws InvalidTransferException, NegativeTransferException, NeuClearException {
+        super(ExchangeGlobals.createQName(ExchangeGlobals.CANCEL_RCPT_TAGNAME), req,time);
     }
 
 }
