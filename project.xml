@@ -138,7 +138,7 @@
         <dependency>
             <id>hibernate</id>
             <name>hibernate</name>
-            <version>2.1.2</version>
+            <version>2.1.6</version>
             <properties>
                 <war.bundle>true</war.bundle>
             </properties>
@@ -152,14 +152,14 @@
         </dependency>
         <dependency>
             <id>cglib</id>
-            <version>2.0-rc2</version>
+            <version>full-2.0.2</version>
             <properties>
                 <war.bundle>true</war.bundle>
             </properties>
         </dependency>
         <dependency>
             <id>commons-collections</id>
-            <version>2.1</version>
+            <version>2.1.1</version>
             <properties>
                 <war.bundle>true</war.bundle>
             </properties>
@@ -180,18 +180,19 @@
         </dependency>
         <dependency>
             <id>ehcache</id>
-            <version>0.7</version>
+            <version>0.9</version>
             <properties>
                 <war.bundle>true</war.bundle>
             </properties>
         </dependency>
-        <dependency>
-            <id>asm</id>
-            <version>1.4</version>
-            <properties>
-                <war.bundle>true</war.bundle>
-            </properties>
-        </dependency>
+        <!--        <dependency>
+                    <id>asm</id>
+                    <version>1.4</version>
+                    <properties>
+                        <war.bundle>true</war.bundle>
+                    </properties>
+                </dependency>
+        -->
         <dependency>
             <id>jta-spec</id>
             <version>1.0.1</version>
@@ -246,7 +247,7 @@
         <dependency>
             <groupId>aspirin</groupId>
             <artifactId>aspirin</artifactId>
-            <version>0.6</version>
+            <version>0.6.6</version>
             <properties>
                 <war.bundle>true</war.bundle>
             </properties>
@@ -254,15 +255,7 @@
         <dependency>
             <groupId>dnsjava</groupId>
             <artifactId>dnsjava</artifactId>
-            <version>1.2.3</version>
-            <properties>
-                <war.bundle>true</war.bundle>
-            </properties>
-        </dependency>
-        <dependency>
-            <groupId>jdom</groupId>
-            <artifactId>jdom</artifactId>
-            <version>b10</version>
+            <version>1.6.4</version>
             <properties>
                 <war.bundle>true</war.bundle>
             </properties>
