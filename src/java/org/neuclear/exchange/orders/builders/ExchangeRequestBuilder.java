@@ -6,10 +6,9 @@ import org.neuclear.asset.NegativeTransferException;
 import org.neuclear.asset.contracts.Asset;
 import org.neuclear.asset.orders.builders.TransferBuilder;
 import org.neuclear.asset.orders.transfers.TransferGlobals;
-import org.neuclear.asset.orders.builders.TransferBuilder;
-import org.neuclear.id.Identity;
-import org.neuclear.commons.time.TimeTools;
 import org.neuclear.commons.NeuClearException;
+import org.neuclear.commons.time.TimeTools;
+import org.neuclear.id.Identity;
 
 import java.util.Date;
 
@@ -31,8 +30,15 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: ExchangeRequestBuilder.java,v 1.1 2004/01/05 23:47:10 pelle Exp $
+$Id: ExchangeRequestBuilder.java,v 1.2 2004/01/10 00:00:46 pelle Exp $
 $Log: ExchangeRequestBuilder.java,v $
+Revision 1.2  2004/01/10 00:00:46  pelle
+Implemented new Schema for Transfer*
+Working on it for Exchange*, so far all Receipts are implemented.
+Added SignedNamedDocument which is a generic SignedNamedObject that works with all Signed XML.
+Changed SignedNamedObject.getDigest() from byte array to String.
+The whole malarchy in neuclear-pay does not build yet. The refactoring is a big job, but getting there.
+
 Revision 1.1  2004/01/05 23:47:10  pelle
 Create new Document classification "order", which is really just inherint in the new
 package layout.

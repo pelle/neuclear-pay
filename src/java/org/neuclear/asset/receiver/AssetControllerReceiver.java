@@ -2,11 +2,12 @@ package org.neuclear.asset.receiver;
 
 import org.neuclear.asset.AssetController;
 import org.neuclear.asset.TransferException;
-import org.neuclear.asset.orders.transfers.TransferGlobals;
+import org.neuclear.asset.contracts.Asset;
+import org.neuclear.asset.contracts.AssetGlobals;
 import org.neuclear.asset.orders.AssetTransactionContract;
 import org.neuclear.asset.orders.TransferContract;
-import org.neuclear.asset.orders.*;
-import org.neuclear.asset.contracts.*;
+import org.neuclear.asset.orders.TransferGlobals;
+import org.neuclear.asset.orders.transfers.TransferGlobals;
 import org.neuclear.commons.NeuClearException;
 import org.neuclear.commons.crypto.signers.Signer;
 import org.neuclear.id.SignedNamedObject;

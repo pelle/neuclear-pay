@@ -1,21 +1,17 @@
 package org.neuclear.asset.remote;
 
-import org.neuclear.exchange.orders.CancelExchangeReceipt;
-import org.neuclear.exchange.orders.ExchangeOrderReceipt;
-import org.neuclear.asset.orders.TransferReceipt;
-import org.neuclear.asset.contracts.builders.*;
-import org.neuclear.exchange.orders.CancelExchangeReceipt;
 import org.neuclear.asset.orders.TransferReceipt;
 import org.neuclear.asset.orders.builders.TransferBuilder;
 import org.neuclear.asset.orders.builders.TransferRequestBuilder;
 import org.neuclear.commons.NeuClearException;
 import org.neuclear.commons.crypto.signers.Signer;
-import org.neuclear.id.SignedNamedObject;
-import org.neuclear.xml.XMLException;
 import org.neuclear.exchange.orders.CancelExchangeReceipt;
+import org.neuclear.exchange.orders.ExchangeOrderReceipt;
 import org.neuclear.exchange.orders.builders.CancelExchangeRequestBuilder;
 import org.neuclear.exchange.orders.builders.CompleteExchangeRequestBuilder;
 import org.neuclear.exchange.orders.builders.ExchangeRequestBuilder;
+import org.neuclear.id.SignedNamedObject;
+import org.neuclear.xml.XMLException;
 
 /*
 NeuClear Distributed Transaction Clearing Platform
@@ -35,8 +31,15 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: AssetControlClient.java,v 1.10 2004/01/05 23:47:10 pelle Exp $
+$Id: AssetControlClient.java,v 1.11 2004/01/10 00:00:45 pelle Exp $
 $Log: AssetControlClient.java,v $
+Revision 1.11  2004/01/10 00:00:45  pelle
+Implemented new Schema for Transfer*
+Working on it for Exchange*, so far all Receipts are implemented.
+Added SignedNamedDocument which is a generic SignedNamedObject that works with all Signed XML.
+Changed SignedNamedObject.getDigest() from byte array to String.
+The whole malarchy in neuclear-pay does not build yet. The refactoring is a big job, but getting there.
+
 Revision 1.10  2004/01/05 23:47:10  pelle
 Create new Document classification "order", which is really just inherint in the new
 package layout.

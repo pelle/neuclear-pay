@@ -1,20 +1,9 @@
 package org.neuclear.asset.orders;
 
-import org.neuclear.commons.NeuClearException;
-import org.neuclear.commons.Utility;
-import org.neuclear.commons.time.TimeTools;
-import org.neuclear.id.*;
-import org.neuclear.id.resolver.NSResolver;
-import org.neuclear.asset.orders.TransferContract;
-import org.neuclear.asset.orders.exchanges.*;
-import org.neuclear.asset.orders.AssetTransactionContract;
+import org.dom4j.Element;
 import org.neuclear.asset.contracts.Asset;
 import org.neuclear.asset.contracts.AssetGlobals;
-import org.dom4j.Element;
-
-import java.sql.Timestamp;
-import java.util.Date;
-import java.text.ParseException;
+import org.neuclear.id.*;
 
 /**
  * User: pelleb
@@ -23,19 +12,15 @@ import java.text.ParseException;
  */
 public class TransferOrder extends AssetTransactionContract {
 
-    private TransferOrder(final SignedNamedCore core, final Asset asset, final Identity to, final double amount, final String comment)  {
+    private TransferOrder(final SignedNamedCore core, final Asset asset, final Identity recipient, final double amount, final String comment)  {
         super(core, asset);
         this.amount = amount;
-        this.comment = (comment != null) ? comment : "";
-        this.to=to;
+        this.comment = comment;
+        this.recipient=recipient;
     }
 
-    public final Identity getFrom() {
-        return getSignatory();
-    }
-
-    public final Identity getTo() {
-        return to;
+    public final Identity getRecipient() {
+        return recipient;
     }
     public final double getAmount() {
             return amount;
@@ -45,7 +30,7 @@ public class TransferOrder extends AssetTransactionContract {
         return comment;
     }
 
-    private final Identity to;
+    private final Identity recipient;
 
     private final double amount;
     private final String comment;
@@ -63,20 +48,12 @@ public class TransferOrder extends AssetTransactionContract {
             if (elem.getName().equals(TransferGlobals.XFER_TAGNAME))
                 throw new InvalidNamedObjectException(core.getName(),"Incorrect XML Tagname for reader: "+TransferGlobals.XFER_TAGNAME);
 
-            try {
-                //TODO Validate properly
-                final Asset asset = (Asset) NSResolver.resolveIdentity(elem.attributeValue("assetName"));
-
-
-                final double amount = Double.parseDouble(elem.attributeValue("amount"));
-                final Identity to = NSResolver.resolveIdentity(elem.attributeValue("recipient"));
-                final Element commentElement = elem.element(TransferGlobals.createQName("comment"));
-
-                final String comment = (commentElement != null) ? commentElement.getText() : "";
-                return new TransferOrder(core, asset, to, amount,  comment);
-            } catch (NameResolutionException e) {
-                throw new InvalidNamedObjectException(core.getName(),e);
-            }
+            return new TransferOrder(core,
+                    TransferGlobals.parseAssetTag(elem),
+                    TransferGlobals.parseRecipientTag(elem),
+                    TransferGlobals.parseAmountTag(elem),
+                    TransferGlobals.getCommentElement(elem)
+                    );
         }
     }
 

@@ -2,14 +2,12 @@ package org.neuclear.asset.receiver.servlet;
 
 import org.neuclear.asset.contracts.Asset;
 import org.neuclear.asset.contracts.AssetGlobals;
-import org.neuclear.asset.orders.transfers.TransferGlobals;
 import org.neuclear.asset.controllers.currency.CurrencyController;
-import org.neuclear.asset.receiver.AssetControllerReceiver;
 import org.neuclear.asset.orders.transfers.TransferGlobals;
-import org.neuclear.commons.crypto.signers.TestCaseSigner;
+import org.neuclear.asset.receiver.AssetControllerReceiver;
+import org.neuclear.commons.servlets.ServletTools;
 import org.neuclear.commons.sql.JNDIConnectionSource;
 import org.neuclear.commons.sql.statements.SimpleStatementFactory;
-import org.neuclear.commons.servlets.ServletTools;
 import org.neuclear.id.resolver.NSResolver;
 import org.neuclear.ledger.implementations.SQLLedger;
 import org.neuclear.receiver.ReceiverServlet;
@@ -35,8 +33,15 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: AssetControllerServlet.java,v 1.9 2004/01/05 23:47:09 pelle Exp $
+$Id: AssetControllerServlet.java,v 1.10 2004/01/10 00:00:45 pelle Exp $
 $Log: AssetControllerServlet.java,v $
+Revision 1.10  2004/01/10 00:00:45  pelle
+Implemented new Schema for Transfer*
+Working on it for Exchange*, so far all Receipts are implemented.
+Added SignedNamedDocument which is a generic SignedNamedObject that works with all Signed XML.
+Changed SignedNamedObject.getDigest() from byte array to String.
+The whole malarchy in neuclear-pay does not build yet. The refactoring is a big job, but getting there.
+
 Revision 1.9  2004/01/05 23:47:09  pelle
 Create new Document classification "order", which is really just inherint in the new
 package layout.

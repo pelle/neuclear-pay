@@ -1,9 +1,9 @@
 package org.neuclear.exchange.orders;
 
-import org.neuclear.asset.orders.AssetTransactionContract;
 import org.neuclear.asset.contracts.Asset;
-import org.neuclear.id.SignedNamedCore;
+import org.neuclear.asset.orders.AssetTransactionContract;
 import org.neuclear.exchange.contracts.ExchangeAgent;
+import org.neuclear.id.SignedNamedCore;
 
 /*
 NeuClear Distributed Transaction Clearing Platform
@@ -23,8 +23,15 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: ExchangeTransactionContract.java,v 1.1 2004/01/06 23:26:48 pelle Exp $
+$Id: ExchangeTransactionContract.java,v 1.2 2004/01/10 00:00:46 pelle Exp $
 $Log: ExchangeTransactionContract.java,v $
+Revision 1.2  2004/01/10 00:00:46  pelle
+Implemented new Schema for Transfer*
+Working on it for Exchange*, so far all Receipts are implemented.
+Added SignedNamedDocument which is a generic SignedNamedObject that works with all Signed XML.
+Changed SignedNamedObject.getDigest() from byte array to String.
+The whole malarchy in neuclear-pay does not build yet. The refactoring is a big job, but getting there.
+
 Revision 1.1  2004/01/06 23:26:48  pelle
 Started restructuring the original xml schemas.
 Updated the Exchange and transfer orders.

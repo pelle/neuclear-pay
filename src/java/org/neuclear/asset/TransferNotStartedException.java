@@ -1,7 +1,6 @@
 package org.neuclear.asset;
 
 import org.neuclear.asset.orders.TransferReceipt;
-import org.neuclear.asset.orders.TransferReceipt;
 
 import java.util.Date;
 

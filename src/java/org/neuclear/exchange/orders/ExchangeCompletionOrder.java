@@ -1,12 +1,8 @@
 package org.neuclear.exchange.orders;
 
-import org.neuclear.commons.NeuClearException;
-import org.neuclear.id.Identity;
-import org.neuclear.id.SignedNamedCore;
-import org.neuclear.asset.orders.TransferContract;
-import org.neuclear.asset.orders.AssetTransactionContract;
 import org.neuclear.asset.contracts.Asset;
 import org.neuclear.exchange.contracts.ExchangeAgent;
+import org.neuclear.id.SignedNamedCore;
 
 import java.sql.Timestamp;
 import java.util.Date;

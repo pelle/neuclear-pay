@@ -1,21 +1,13 @@
 package org.neuclear.exchange.orders.builders;
 
 import org.dom4j.Element;
-import org.neuclear.asset.orders.TransferReceipt;
-import org.neuclear.asset.orders.transfers.TransferGlobals;
-import org.neuclear.asset.orders.TransferOrder;
-import org.neuclear.asset.orders.builders.TransferBuilder;
-import org.neuclear.exchange.orders.ExchangeOrderReceipt;
 import org.neuclear.asset.InvalidTransferException;
 import org.neuclear.asset.NegativeTransferException;
 import org.neuclear.asset.orders.builders.TransferBuilder;
-import org.neuclear.exchange.orders.ExchangeOrderReceipt;
 import org.neuclear.asset.orders.transfers.TransferGlobals;
-import org.neuclear.id.Identity;
 import org.neuclear.commons.NeuClearException;
 import org.neuclear.exchange.orders.ExchangeOrderReceipt;
-
-import java.util.Date;
+import org.neuclear.id.Identity;
 
 /*
 NeuClear Distributed Transaction Clearing Platform
@@ -35,8 +27,15 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: CompleteExchangeRequestBuilder.java,v 1.1 2004/01/05 23:47:10 pelle Exp $
+$Id: CompleteExchangeRequestBuilder.java,v 1.2 2004/01/10 00:00:46 pelle Exp $
 $Log: CompleteExchangeRequestBuilder.java,v $
+Revision 1.2  2004/01/10 00:00:46  pelle
+Implemented new Schema for Transfer*
+Working on it for Exchange*, so far all Receipts are implemented.
+Added SignedNamedDocument which is a generic SignedNamedObject that works with all Signed XML.
+Changed SignedNamedObject.getDigest() from byte array to String.
+The whole malarchy in neuclear-pay does not build yet. The refactoring is a big job, but getting there.
+
 Revision 1.1  2004/01/05 23:47:10  pelle
 Create new Document classification "order", which is really just inherint in the new
 package layout.

@@ -1,22 +1,21 @@
 package org.neuclear.asset.controllers.currency;
 
 import org.neuclear.asset.*;
-import org.neuclear.exchange.orders.CancelExchangeOrder;
-import org.neuclear.exchange.orders.ExchangeCompletionOrder;
-import org.neuclear.exchange.orders.ExchangeCompletionOrder;
-import org.neuclear.exchange.orders.ExchangeOrder;
+import org.neuclear.asset.contracts.Asset;
 import org.neuclear.asset.orders.TransferOrder;
 import org.neuclear.asset.orders.builders.TransferReceiptBuilder;
-import org.neuclear.asset.contracts.*;
+import org.neuclear.commons.NeuClearException;
+import org.neuclear.commons.time.TimeTools;
+import org.neuclear.exchange.orders.CancelExchangeOrder;
+import org.neuclear.exchange.orders.ExchangeCompletionOrder;
+import org.neuclear.exchange.orders.ExchangeOrder;
 import org.neuclear.exchange.orders.builders.CancelExchangeReceiptBuilder;
 import org.neuclear.exchange.orders.builders.ExchangeReceiptBuilder;
-import org.neuclear.exchange.orders.builders.ExchangeReceiptBuilder;
-import org.neuclear.asset.orders.builders.TransferReceiptBuilder;
-import org.neuclear.commons.NeuClearException;
 import org.neuclear.id.Identity;
 import org.neuclear.id.resolver.NSResolver;
 import org.neuclear.ledger.*;
 
+import java.sql.Timestamp;
 import java.util.Date;
 import java.util.Iterator;
 
@@ -54,9 +53,10 @@ public final class CurrencyController extends AssetController {
             if (!req.getSignatory().equals(req.getFrom()))
                 throw new TransferDeniedException(req);
             final Book from = getBook(req.getFrom());
-            final Book to = getBook(req.getTo());
+            final Book to = getBook(req.getRecipient());
 
-            final PostedTransaction posted = from.transfer(to, req.getAmount(), req.getComment(), req.getValueTime());
+            final Timestamp valuetime =TimeTools.now();
+            final PostedTransaction posted = from.transfer(to, req.getAmount(), req.getComment(), valuetime);
             return new TransferReceiptBuilder(req, createTransactionId(req, posted));
         } catch (UnknownBookException e) {
             throw new InvalidTransferException(e.getSubMessage());

@@ -1,15 +1,11 @@
 package org.neuclear.exchange.orders;
 
-import org.neuclear.commons.NeuClearException;
-import org.neuclear.id.Identity;
-import org.neuclear.id.SignedNamedCore;
-import org.neuclear.asset.orders.exchanges.Exchange;
-import org.neuclear.asset.orders.TransferContract;
-import org.neuclear.asset.orders.TransferContract;
-import org.neuclear.asset.orders.AssetTransactionContract;
+import org.dom4j.Element;
 import org.neuclear.asset.contracts.Asset;
+import org.neuclear.asset.contracts.AssetGlobals;
+import org.neuclear.asset.orders.TransferGlobals;
 import org.neuclear.exchange.contracts.ExchangeAgent;
-import org.neuclear.exchange.contracts.ExchangeAgent;
+import org.neuclear.id.*;
 
 import java.sql.Timestamp;
 import java.util.Date;
@@ -60,5 +56,31 @@ public final class ExchangeOrder extends ExchangeTransactionContract {
     private final double bidAmount;
     private final String comment;
     private final long expires;
+    public static final class Reader implements NamedObjectReader {
+        /**
+         * Read object from Element and fill in its details
+         *
+         * @param elem
+         * @return
+         */
+        public final SignedNamedObject read(final SignedNamedCore core, final Element elem) throws InvalidNamedObjectException {
+            if (!elem.getNamespace().equals(AssetGlobals.NS_ASSET))
+                throw new InvalidNamedObjectException(core.getName(),"Not in XML NameSpace: "+AssetGlobals.NS_ASSET.getURI());
+
+            if (elem.getName().equals(ExchangeGlobals.EXCHANGE_TAGNAME))
+                return new ExchangeOrder(core,
+                        ExchangeGlobals.parseBidAssetTag(elem),
+                        ExchangeGlobals.parseAgentTag(elem),
+                        TransferGlobals.parseAmountTag(elem),
+                        ExchangeGlobals.parseSettlementAssetTag(elem),
+                        TransferGlobals.parseAmountTag(elem),
+                        TransferGlobals.getCommentElement(elem),
+                        null//TODO getExpiryTime
+                        );
+            throw new InvalidNamedObjectException(core.getName(),"Not Matched");
+        }
+
+
+    }
 
 }

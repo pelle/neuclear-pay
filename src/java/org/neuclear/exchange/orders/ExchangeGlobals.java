@@ -1,10 +1,12 @@
 package org.neuclear.exchange.orders;
 
 import org.dom4j.*;
-import org.neuclear.id.verifier.VerifyingReader;
-import org.neuclear.asset.orders.AssetTransactionContract;
-import org.neuclear.asset.orders.AssetTransactionContract;
+import org.neuclear.asset.contracts.Asset;
 import org.neuclear.asset.orders.TransferGlobals;
+import org.neuclear.exchange.contracts.ExchangeAgent;
+import org.neuclear.id.InvalidNamedObjectException;
+import org.neuclear.id.NameResolutionException;
+import org.neuclear.id.resolver.NSResolver;
 
 /*
 NeuClear Distributed Transaction Clearing Platform
@@ -24,8 +26,15 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: ExchangeGlobals.java,v 1.1 2004/01/06 23:26:48 pelle Exp $
+$Id: ExchangeGlobals.java,v 1.2 2004/01/10 00:00:46 pelle Exp $
 $Log: ExchangeGlobals.java,v $
+Revision 1.2  2004/01/10 00:00:46  pelle
+Implemented new Schema for Transfer*
+Working on it for Exchange*, so far all Receipts are implemented.
+Added SignedNamedDocument which is a generic SignedNamedObject that works with all Signed XML.
+Changed SignedNamedObject.getDigest() from byte array to String.
+The whole malarchy in neuclear-pay does not build yet. The refactoring is a big job, but getting there.
+
 Revision 1.1  2004/01/06 23:26:48  pelle
 Started restructuring the original xml schemas.
 Updated the Exchange and transfer orders.
@@ -119,13 +128,52 @@ public final class ExchangeGlobals {
         return DocumentHelper.createElement(createQName(name));
     }
 
+    public static String getElementValue(final Element element, final String name) throws InvalidNamedObjectException {
+           return TransferGlobals.getElementValue(element,createQName(name));
+    }
+    public static String parseExchangeOrderId(final Element element) throws InvalidNamedObjectException {
+        return getElementValue(element,EXCHANGE_REF_TAG);
+    }
+
+    public static final ExchangeAgent parseAgentTag(Element elem) throws InvalidNamedObjectException {
+        final String name = getElementValue(elem,AGENT_TAG);
+        try {
+            return (ExchangeAgent) NSResolver.resolveIdentity(name);
+        } catch (ClassCastException e) {
+            throw new InvalidNamedObjectException(name,e);
+        } catch (NameResolutionException e) {
+            throw new InvalidNamedObjectException(name,e);
+        }
+
+    }
+
+    public static final Asset parseBidAssetTag(final Element elem) throws InvalidNamedObjectException {
+        return parseAssetTag(elem,BID_ASSET_TAG);
+    }
+    public static final Asset parseSettlementAssetTag(final Element elem) throws InvalidNamedObjectException {
+        return parseAssetTag(elem,SETTLEMENT_ASSET_TAG);
+    }
+    public static final Asset parseAssetTag(final Element elem,final String tag) throws InvalidNamedObjectException {
+        final String name = getElementValue(elem,tag);
+        try {
+            return (Asset) NSResolver.resolveIdentity(name);
+        } catch (ClassCastException e) {
+            throw new InvalidNamedObjectException(name,e);
+        } catch (NameResolutionException e) {
+            throw new InvalidNamedObjectException(name,e);
+        }
+
+    }
+
+
+    
     public static void registerReaders() {
-        VerifyingReader.getInstance().registerReader(ExchangeGlobals.CANCEL_TAGNAME, new AssetTransactionContract.Reader());
-        VerifyingReader.getInstance().registerReader(ExchangeGlobals.CANCEL_RCPT_TAGNAME, new AssetTransactionContract.Reader());
-        VerifyingReader.getInstance().registerReader(ExchangeGlobals.EXCHANGE_TAGNAME, new AssetTransactionContract.Reader());
-        VerifyingReader.getInstance().registerReader(ExchangeGlobals.EXCHANGE_RCPT_TAGNAME, new AssetTransactionContract.Reader());
-        VerifyingReader.getInstance().registerReader(ExchangeGlobals.COMPLETE_TAGNAME, new AssetTransactionContract.Reader());
-        VerifyingReader.getInstance().registerReader(ExchangeGlobals.COMPLETE_RCPT_TAGNAME, new AssetTransactionContract.Reader());
+//        VerifyingReader.getInstance().registerReader(ExchangeGlobals.CANCEL_TAGNAME, new AssetTransactionContract.Reader());
+//        VerifyingReader.getInstance().registerReader(ExchangeGlobals.CANCEL_RCPT_TAGNAME, new AssetTransactionContract.Reader());
+//        VerifyingReader.getInstance().registerReader(ExchangeGlobals.EXCHANGE_TAGNAME, new AssetTransactionContract.Reader());
+//        VerifyingReader.getInstance().registerReader(ExchangeGlobals.EXCHANGE_RCPT_TAGNAME, new AssetTransactionContract.Reader());
+//        VerifyingReader.getInstance().registerReader(ExchangeGlobals.COMPLETE_TAGNAME, new AssetTransactionContract.Reader());
+//        VerifyingReader.getInstance().registerReader(ExchangeGlobals.COMPLETE_RCPT_TAGNAME, new AssetTransactionContract.Reader());
 
     }
 
@@ -142,4 +190,8 @@ public final class ExchangeGlobals {
 
     public static final String EX_NSPREFIX = "ex";
     public static final String EX_NSURI = "http://neuclear.org/neu/exch";
+    public static final String EXCHANGE_REF_TAG = "ExchangeOrderRef";
+    private static final String AGENT_TAG = "ExchangeAgent";
+    public static final String SETTLEMENT_ASSET_TAG = "SettlementAsset";
+    public static final String BID_ASSET_TAG = "BidAsset";
 }

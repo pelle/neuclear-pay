@@ -1,15 +1,12 @@
 package org.neuclear.asset.receiver;
 
 import org.neuclear.asset.InvalidTransferException;
-import org.neuclear.asset.orders.transfers.TransferGlobals;
 import org.neuclear.asset.contracts.Asset;
 import org.neuclear.asset.contracts.AssetGlobals;
+import org.neuclear.asset.controllers.currency.CurrencyController;
 import org.neuclear.asset.orders.TransferGlobals;
 import org.neuclear.asset.orders.TransferOrder;
-import org.neuclear.asset.orders.TransferOrder;
 import org.neuclear.asset.orders.builders.TransferRequestBuilder;
-import org.neuclear.asset.orders.builders.TransferRequestBuilder;
-import org.neuclear.asset.controllers.currency.CurrencyController;
 import org.neuclear.commons.NeuClearException;
 import org.neuclear.commons.sql.DefaultConnectionSource;
 import org.neuclear.commons.time.TimeTools;
@@ -48,8 +45,15 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: PaymentReceiverTest.java,v 1.12 2004/01/05 23:47:10 pelle Exp $
+$Id: PaymentReceiverTest.java,v 1.13 2004/01/10 00:00:46 pelle Exp $
 $Log: PaymentReceiverTest.java,v $
+Revision 1.13  2004/01/10 00:00:46  pelle
+Implemented new Schema for Transfer*
+Working on it for Exchange*, so far all Receipts are implemented.
+Added SignedNamedDocument which is a generic SignedNamedObject that works with all Signed XML.
+Changed SignedNamedObject.getDigest() from byte array to String.
+The whole malarchy in neuclear-pay does not build yet. The refactoring is a big job, but getting there.
+
 Revision 1.12  2004/01/05 23:47:10  pelle
 Create new Document classification "order", which is really just inherint in the new
 package layout.
@@ -199,7 +203,7 @@ public final class PaymentReceiverTest extends AbstractSigningTest {
         if (obj instanceof TransferOrder) {
             final TransferOrder transfer = (TransferOrder) obj;
             final double fromBalance = proc.getBalance(transfer.getFrom(), transfer.getTimeStamp());
-            final double toBalance = proc.getBalance(transfer.getTo(), transfer.getTimeStamp());
+            final double toBalance = proc.getBalance(transfer.getRecipient(), transfer.getTimeStamp());
 
             return new double[]{fromBalance, toBalance};
 
@@ -211,7 +215,7 @@ public final class PaymentReceiverTest extends AbstractSigningTest {
         if (obj instanceof TransferOrder) {
             final TransferOrder transfer = (TransferOrder) obj;
             final double fromBalance = proc.getBalance(transfer.getFrom(), transfer.getTimeStamp());
-            final double toBalance = proc.getBalance(transfer.getTo(), transfer.getTimeStamp());
+            final double toBalance = proc.getBalance(transfer.getRecipient(), transfer.getTimeStamp());
             final double prebalances[] = (double[]) state;
 
             return (fromBalance == prebalances[0] - transfer.getAmount()) &&

@@ -1,8 +1,6 @@
 package org.neuclear.asset;
 
 
-import org.neuclear.exchange.orders.ExchangeOrderReceipt;
-import org.neuclear.exchange.orders.ExchangeCompletionOrder;
 import org.neuclear.exchange.orders.ExchangeCompletionOrder;
 
 /**

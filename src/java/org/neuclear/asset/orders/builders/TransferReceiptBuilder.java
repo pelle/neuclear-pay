@@ -1,19 +1,14 @@
 package org.neuclear.asset.orders.builders;
 
 import org.dom4j.Element;
-import org.neuclear.asset.contracts.*;
 import org.neuclear.asset.InvalidTransferException;
 import org.neuclear.asset.NegativeTransferException;
-import org.neuclear.exchange.orders.ExchangeCompletionOrder;
 import org.neuclear.asset.orders.TransferGlobals;
 import org.neuclear.asset.orders.TransferOrder;
-import org.neuclear.asset.orders.TransferOrder;
-import org.neuclear.asset.orders.builders.TransferBuilder;
 import org.neuclear.commons.NeuClearException;
 import org.neuclear.commons.time.TimeTools;
 import org.neuclear.exchange.orders.ExchangeCompletionOrder;
 
-import java.util.Date;
 import java.sql.Timestamp;
 
 /*
@@ -34,8 +29,15 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: TransferReceiptBuilder.java,v 1.1 2004/01/05 23:47:09 pelle Exp $
+$Id: TransferReceiptBuilder.java,v 1.2 2004/01/10 00:00:45 pelle Exp $
 $Log: TransferReceiptBuilder.java,v $
+Revision 1.2  2004/01/10 00:00:45  pelle
+Implemented new Schema for Transfer*
+Working on it for Exchange*, so far all Receipts are implemented.
+Added SignedNamedDocument which is a generic SignedNamedObject that works with all Signed XML.
+Changed SignedNamedObject.getDigest() from byte array to String.
+The whole malarchy in neuclear-pay does not build yet. The refactoring is a big job, but getting there.
+
 Revision 1.1  2004/01/05 23:47:09  pelle
 Create new Document classification "order", which is really just inherint in the new
 package layout.
@@ -107,7 +109,7 @@ public class TransferReceiptBuilder extends TransferBuilder {
         super(TransferGlobals.XFER_RCPT_TAGNAME,
                 req.getAsset(),
                 req.getAsset(),
-                req.getTo(),
+                req.getRecipient(),
                 req.getAmount(),
                 req.getComment());
         final Element element = getElement();

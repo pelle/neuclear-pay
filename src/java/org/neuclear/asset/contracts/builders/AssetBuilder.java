@@ -7,12 +7,9 @@ import org.neuclear.commons.NeuClearException;
 import org.neuclear.commons.crypto.signers.JCESigner;
 import org.neuclear.commons.crypto.signers.TestCaseSigner;
 import org.neuclear.id.builders.IdentityBuilder;
-import org.neuclear.id.SignedNamedObject;
 import org.neuclear.store.FileStore;
 import org.neuclear.store.Store;
-import org.neuclear.xml.XMLException;
 
-import java.security.GeneralSecurityException;
 import java.security.PublicKey;
 
 /*
@@ -33,8 +30,15 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: AssetBuilder.java,v 1.5 2003/12/19 00:30:49 pelle Exp $
+$Id: AssetBuilder.java,v 1.6 2004/01/10 00:00:44 pelle Exp $
 $Log: AssetBuilder.java,v $
+Revision 1.6  2004/01/10 00:00:44  pelle
+Implemented new Schema for Transfer*
+Working on it for Exchange*, so far all Receipts are implemented.
+Added SignedNamedDocument which is a generic SignedNamedObject that works with all Signed XML.
+Changed SignedNamedObject.getDigest() from byte array to String.
+The whole malarchy in neuclear-pay does not build yet. The refactoring is a big job, but getting there.
+
 Revision 1.5  2003/12/19 00:30:49  pelle
 Lots of usability changes through out all the passphrase agents and end user tools.
 

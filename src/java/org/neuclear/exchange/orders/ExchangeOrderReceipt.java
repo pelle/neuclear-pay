@@ -1,8 +1,12 @@
 package org.neuclear.exchange.orders;
 
+import org.dom4j.Element;
+import org.neuclear.asset.contracts.AssetGlobals;
+import org.neuclear.asset.orders.TransferGlobals;
+import org.neuclear.id.InvalidNamedObjectException;
+import org.neuclear.id.NamedObjectReader;
 import org.neuclear.id.SignedNamedCore;
-import org.neuclear.asset.contracts.Asset;
-import org.neuclear.exchange.contracts.ExchangeAgent;
+import org.neuclear.id.SignedNamedObject;
 
 import java.sql.Timestamp;
 import java.util.Date;
@@ -14,56 +18,40 @@ import java.util.Date;
  */
 public final class ExchangeOrderReceipt extends ExchangeTransactionContract {
 
-    private ExchangeOrderReceipt(final SignedNamedCore core, final Asset asset, final ExchangeAgent agent, final String orderid, final Date valuetime, Asset neededAsset, double neededAmount, double bidAmount, final String comment, final Date expires) {
-        super(core, asset,agent);
-        this.orderid = orderid;
+    private ExchangeOrderReceipt(final SignedNamedCore core, final ExchangeOrder order,final Date valuetime) {
+        super(core, order.getAsset(), order.getAgent());
         this.valuetime = valuetime.getTime();
-        this.neededAsset = neededAsset;
-        this.neededAmount = neededAmount;
-        this.bidAmount = bidAmount;
-        this.comment = comment;
-        this.expires = expires.getTime();
+        this.order=order;
     }
     public ExchangeOrder getExchangeOrder(){
-        //TODO Implement
-        return null;
-    }
-
-
-    public String getOrderid() {
-        return orderid;
+        return order;
     }
 
     public Timestamp getValuetime() {
         return new Timestamp(valuetime);
     }
 
-    public Asset getNeededAsset() {
-        return neededAsset;
-    }
-
-    public double getNeededAmount() {
-        return neededAmount;
-    }
-
-    public double getBidAmount() {
-        return bidAmount;
-    }
-
-    public String getComment() {
-        return comment;
-    }
-
-    public Timestamp getExpires() {
-        return new Timestamp(expires);
-    }
-
-    private final String orderid;
     private final long valuetime;
-    private final Asset neededAsset;
-    private final double neededAmount;
-    private final double bidAmount;
-    private final String comment;
-    private final long expires;
+    private final ExchangeOrder order;
+
+    public static final class Reader implements NamedObjectReader {
+        /**
+         * Read object from Element and fill in its details
+         *
+         * @param elem
+         * @return
+         */
+        public final SignedNamedObject read(final SignedNamedCore core, final Element elem) throws InvalidNamedObjectException {
+            if (!elem.getNamespace().equals(AssetGlobals.NS_ASSET))
+                throw new InvalidNamedObjectException(core.getName(),"Not in XML NameSpace: "+AssetGlobals.NS_ASSET.getURI());
+
+            if (elem.getName().equals(ExchangeGlobals.EXCHANGE_RCPT_TAGNAME)){
+                return new ExchangeOrderReceipt(core,
+                        (ExchangeOrder) TransferGlobals.parseEmbedded(elem,ExchangeGlobals.createQName(ExchangeGlobals.EXCHANGE_TAGNAME)),
+                        TransferGlobals.parseValueTimeElement(elem));
+            }
+            throw new InvalidNamedObjectException(core.getName(),"Not Matched");
+        }
+    }
 
 }

@@ -1,10 +1,10 @@
 package org.neuclear.asset.contracts;
 
-import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
 import org.neuclear.commons.NeuClearException;
 import org.neuclear.commons.Utility;
 import org.neuclear.id.*;
+import org.neuclear.senders.Sender;
 import org.neuclear.xml.xmlsec.KeyInfo;
 import org.neuclear.xml.xmlsec.XMLSecTools;
 import org.neuclear.xml.xmlsec.XMLSecurityException;
@@ -29,8 +29,15 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: Asset.java,v 1.11 2003/12/19 18:02:35 pelle Exp $
+$Id: Asset.java,v 1.12 2004/01/10 00:00:44 pelle Exp $
 $Log: Asset.java,v $
+Revision 1.12  2004/01/10 00:00:44  pelle
+Implemented new Schema for Transfer*
+Working on it for Exchange*, so far all Receipts are implemented.
+Added SignedNamedDocument which is a generic SignedNamedObject that works with all Signed XML.
+Changed SignedNamedObject.getDigest() from byte array to String.
+The whole malarchy in neuclear-pay does not build yet. The refactoring is a big job, but getting there.
+
 Revision 1.11  2003/12/19 18:02:35  pelle
 Revamped a lot of exception handling throughout the framework, it has been simplified in most places:
 - For most cases the main exception to worry about now is InvalidNamedObjectException.
@@ -109,8 +116,9 @@ SOAPTools was changed to return a stream. This is required by the VerifyingReade
  * @see org.neuclear.asset.contracts.builders.AssetBuilder
  */
 public final class Asset extends Identity {
-    protected Asset(final SignedNamedCore core, final String repository, final String signer, final String logger, final String receiver, final PublicKey pub, final int decimal, final double minimumTransaction) {
-        super(core, repository, signer, logger, receiver, pub);
+    protected Asset(final SignedNamedCore core, final String serviceurl,final PublicKey pub, final int decimal, final double minimumTransaction) {
+        super(core, pub);
+        this.serviceurl=serviceurl;
         this.decimal = decimal;
         this.multiplier = (int) Math.round(Math.pow(10, -decimal));
         this.minimumTransaction = minimumTransaction;
@@ -141,6 +149,13 @@ public final class Asset extends Identity {
         return Math.round(amount * multiplier) / multiplier;
     }
 
+    public final String getServiceurl() {
+        return serviceurl;
+    }
+
+    public final SignedNamedObject send(SignedNamedObject object) throws NeuClearException {
+        return Sender.quickSend(serviceurl,object);
+    }
 
     public static final class Reader implements NamedObjectReader {
         /**
@@ -152,10 +167,7 @@ public final class Asset extends Identity {
         public final SignedNamedObject read(final SignedNamedCore core, final Element elem) throws InvalidNamedObjectException {
             if (!elem.getNamespace().equals(AssetGlobals.NS_ASSET))
                 throw new InvalidNamedObjectException(core.getName(),"Not in XML NameSpace: "+AssetGlobals.NS_ASSET.getURI());
-            final String repository = elem.attributeValue(createNEUIDQName("repository"));
-            final String signer = elem.attributeValue(createNEUIDQName("signer"));
-            final String logger = elem.attributeValue(createNEUIDQName("logger"));
-            final String receiver = elem.attributeValue(createNEUIDQName("receiver"));
+            final String serviceurl = elem.attributeValue(createNEUIDQName("serviceurl"));
 
             final Element allowElement = InvalidNamedObjectException.assertContainsElementQName(core,elem,createNEUIDQName("allow"));
             try {
@@ -165,7 +177,7 @@ public final class Asset extends Identity {
                 final int decimal = (!Utility.isEmpty(dec)) ? Integer.parseInt(dec) : 0;
                 final String min = elem.attributeValue("minimumxact");
                 final double minimum = (!Utility.isEmpty(min)) ? Double.parseDouble(min) : 0;
-                return new Asset(core, repository, signer, logger, receiver, pub, decimal, minimum);
+                return new Asset(core, serviceurl, pub, decimal, minimum);
             } catch (XMLSecurityException e) {
                 throw new InvalidNamedObjectException(core.getName(),e);
             }
@@ -174,6 +186,7 @@ public final class Asset extends Identity {
 
     }
 
+    private final String serviceurl;
     private final int decimal;
     private final int multiplier;
     private final double minimumTransaction;

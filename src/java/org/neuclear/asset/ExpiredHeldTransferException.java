@@ -1,11 +1,6 @@
 package org.neuclear.asset;
 
-import org.neuclear.asset.orders.exchanges.Exchange;
 import org.neuclear.exchange.orders.ExchangeCompletionOrder;
-import org.neuclear.exchange.orders.ExchangeCompletionOrder;
-import org.neuclear.exchange.orders.ExchangeCompletionOrder;
-
-import java.util.Date;
 
 /**
  * User: pelleb
@@ -25,6 +20,6 @@ public final class ExpiredHeldTransferException extends InvalidTransferException
     }
 
     public String getSubMessage() {
-        return "Not possible to complete held payment at this time: " + held.getValueTime();
+        return "Not possible to complete held payment at this time: " + held.getValuetime();
     }
 }

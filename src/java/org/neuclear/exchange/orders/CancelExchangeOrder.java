@@ -1,15 +1,14 @@
 package org.neuclear.exchange.orders;
 
-import org.neuclear.commons.NeuClearException;
-import org.neuclear.id.Identity;
-import org.neuclear.id.SignedNamedObject;
-import org.neuclear.id.SignedNamedCore;
-import org.neuclear.asset.orders.AssetTransactionContract;
+import org.dom4j.Element;
 import org.neuclear.asset.contracts.Asset;
+import org.neuclear.asset.contracts.AssetGlobals;
+import org.neuclear.asset.orders.TransferGlobals;
 import org.neuclear.exchange.contracts.ExchangeAgent;
-
-import java.sql.Timestamp;
-import java.util.Date;
+import org.neuclear.id.InvalidNamedObjectException;
+import org.neuclear.id.NamedObjectReader;
+import org.neuclear.id.SignedNamedCore;
+import org.neuclear.id.SignedNamedObject;
 
 /**
  * User: pelleb
@@ -32,4 +31,25 @@ public final class CancelExchangeOrder extends ExchangeTransactionContract{
     }
 
     private final String exchangeid;
+
+    public static final class Reader implements NamedObjectReader {
+        /**
+         * Read object from Element and fill in its details
+         *
+         * @param elem
+         * @return
+         */
+        public final SignedNamedObject read(final SignedNamedCore core, final Element elem) throws InvalidNamedObjectException {
+            if (!elem.getNamespace().equals(AssetGlobals.NS_ASSET))
+                throw new InvalidNamedObjectException(core.getName(),"Not in XML NameSpace: "+AssetGlobals.NS_ASSET.getURI());
+
+            if (elem.getName().equals(ExchangeGlobals.CANCEL_TAGNAME))
+                return new CancelExchangeOrder(core,
+                        TransferGlobals.parseAssetTag(elem),
+                        ExchangeGlobals.parseAgentTag(elem),
+                        ExchangeGlobals.parseExchangeOrderId(elem));
+
+            throw new InvalidNamedObjectException(core.getName(),"Not Matched");
+        }
+    }
 }

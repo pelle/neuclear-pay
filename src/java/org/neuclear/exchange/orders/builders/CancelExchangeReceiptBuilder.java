@@ -2,12 +2,9 @@ package org.neuclear.exchange.orders.builders;
 
 import org.neuclear.asset.InvalidTransferException;
 import org.neuclear.asset.NegativeTransferException;
-import org.neuclear.exchange.orders.CancelExchangeOrder;
-import org.neuclear.exchange.orders.CancelExchangeOrder;
-import org.neuclear.exchange.orders.builders.CancelExchangeBuilder;
 import org.neuclear.asset.orders.TransferGlobals;
-import org.neuclear.asset.orders.transfers.TransferGlobals;
 import org.neuclear.commons.NeuClearException;
+import org.neuclear.exchange.orders.CancelExchangeOrder;
 import org.neuclear.id.NSTools;
 
 /**
@@ -15,8 +12,15 @@ import org.neuclear.id.NSTools;
  * User: pelleb
  * Date: Nov 10, 2003
  * Time: 10:46:12 AM
- * $Id: CancelExchangeReceiptBuilder.java,v 1.1 2004/01/05 23:47:10 pelle Exp $
+ * $Id: CancelExchangeReceiptBuilder.java,v 1.2 2004/01/10 00:00:46 pelle Exp $
  * $Log: CancelExchangeReceiptBuilder.java,v $
+ * Revision 1.2  2004/01/10 00:00:46  pelle
+ * Implemented new Schema for Transfer*
+ * Working on it for Exchange*, so far all Receipts are implemented.
+ * Added SignedNamedDocument which is a generic SignedNamedObject that works with all Signed XML.
+ * Changed SignedNamedObject.getDigest() from byte array to String.
+ * The whole malarchy in neuclear-pay does not build yet. The refactoring is a big job, but getting there.
+ *
  * Revision 1.1  2004/01/05 23:47:10  pelle
  * Create new Document classification "order", which is really just inherint in the new
  * package layout.

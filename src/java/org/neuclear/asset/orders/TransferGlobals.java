@@ -1,9 +1,18 @@
 package org.neuclear.asset.orders;
 
 import org.dom4j.*;
+import org.neuclear.asset.contracts.Asset;
+import org.neuclear.commons.Utility;
+import org.neuclear.commons.time.TimeTools;
+import org.neuclear.id.Identity;
+import org.neuclear.id.InvalidNamedObjectException;
+import org.neuclear.id.NameResolutionException;
+import org.neuclear.id.SignedNamedObject;
+import org.neuclear.id.resolver.NSResolver;
 import org.neuclear.id.verifier.VerifyingReader;
-import org.neuclear.asset.orders.AssetTransactionContract;
-import org.neuclear.asset.orders.AssetTransactionContract;
+
+import java.sql.Timestamp;
+import java.text.ParseException;
 
 /*
 NeuClear Distributed Transaction Clearing Platform
@@ -23,8 +32,15 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: TransferGlobals.java,v 1.2 2004/01/06 23:26:48 pelle Exp $
+$Id: TransferGlobals.java,v 1.3 2004/01/10 00:00:45 pelle Exp $
 $Log: TransferGlobals.java,v $
+Revision 1.3  2004/01/10 00:00:45  pelle
+Implemented new Schema for Transfer*
+Working on it for Exchange*, so far all Receipts are implemented.
+Added SignedNamedDocument which is a generic SignedNamedObject that works with all Signed XML.
+Changed SignedNamedObject.getDigest() from byte array to String.
+The whole malarchy in neuclear-pay does not build yet. The refactoring is a big job, but getting there.
+
 Revision 1.2  2004/01/06 23:26:48  pelle
 Started restructuring the original xml schemas.
 Updated the Exchange and transfer orders.
@@ -113,6 +129,27 @@ public final class TransferGlobals {
         elem.setText(value);
         return elem;
     }
+    public static String getElementValue(final Element element, final String name) throws InvalidNamedObjectException {
+        return getElementValue(element,createQName(name));
+    }
+
+    public static String getElementValue(final Element element, final QName name) throws InvalidNamedObjectException {
+        final Element value=element.element(name);
+        if (value==null)
+            throw new InvalidNamedObjectException("Missing required element: "+name);
+        final String text=value.getTextTrim();
+        if (Utility.isEmpty(text))
+            throw new InvalidNamedObjectException("Required element: "+name+" is empty");
+        return text;
+    }
+
+    public static String getCommentElement(final Element element) {
+        final Element value=element.element(createQName(COMMENT_TAG));
+        if (value==null)
+            return "";
+        final String text=value.getTextTrim();
+        return Utility.denullString(text);
+    }
 
     public static Element createElement(final String name) {
         return DocumentHelper.createElement(createQName(name));
@@ -123,6 +160,68 @@ public final class TransferGlobals {
         VerifyingReader.getInstance().registerReader(TransferGlobals.XFER_RCPT_TAGNAME, new TransferReceipt.Reader());
     }
 
+    public static final Timestamp parseValueTimeElement(final Element elem) throws InvalidNamedObjectException {
+        return parseTimeStampElement(elem,createQName(VALUE_TIME_TAG));
+    }
+
+    public static final Timestamp parseTimeStampElement(final Element elem,final String name) throws InvalidNamedObjectException {
+        return parseTimeStampElement(elem,createQName(name));
+    }
+    public static final Timestamp parseTimeStampElement(final Element elem,final QName qn) throws InvalidNamedObjectException {
+        try {
+            final Element telem=elem.element(qn);
+            if (telem==null)
+                throw new InvalidNamedObjectException("missing time stamp element");
+            final String value=telem.getTextTrim();
+            if (Utility.isEmpty(value))
+                throw new InvalidNamedObjectException("missing time stamp");
+
+            return TimeTools.parseTimeStamp(value);
+        } catch (ParseException e) {
+            throw new InvalidNamedObjectException("missing or invalid time stamp");
+        }
+
+    }
+
+    public static final Asset parseAssetTag(Element elem) throws InvalidNamedObjectException {
+        final String name = getElementValue(elem,ASSET_TAG);
+        try {
+            return (Asset) NSResolver.resolveIdentity(name);
+        } catch (ClassCastException e) {
+            throw new InvalidNamedObjectException(name,e);
+        } catch (NameResolutionException e) {
+            throw new InvalidNamedObjectException(name,e);
+        }
+
+    }
+    public static final Identity parseRecipientTag(Element elem) throws InvalidNamedObjectException {
+        final String name = getElementValue(elem,RECIPIENT_TAG);
+        try {
+            return  NSResolver.resolveIdentity(name);
+        } catch (NameResolutionException e) {
+            throw new InvalidNamedObjectException(name,e);
+        }
+
+    }
+
+    public static final double parseAmountTag(Element elem) throws InvalidNamedObjectException {
+        final String amount=getElementValue(elem,AMOUNT_TAG);
+        try {
+            return Double.parseDouble(amount);
+        } catch (NumberFormatException e) {
+            throw new InvalidNamedObjectException("Badly formatted number",e);
+        }
+    }
+    public static final SignedNamedObject parseEmbedded(Element elem,QName name) throws InvalidNamedObjectException {
+        Element embedded=elem.element(name);
+        if (embedded==null)
+            throw new InvalidNamedObjectException("Element: "+elem.getName()+" doesnt contain a "+name.getQualifiedName());
+        try {
+            return VerifyingReader.getInstance().read(embedded);
+        } catch (NameResolutionException e) {
+            throw new InvalidNamedObjectException("Element: "+elem.getName()+" had a problem identifying signer",e);
+        }
+    }
     static {
         registerReaders();
     }
@@ -131,4 +230,9 @@ public final class TransferGlobals {
     public static final String XFER_RCPT_TAGNAME = "TransferReceipt";
     public static final String XFER_NSPREFIX = "xfer";
     public static final String XFER_NSURI = "http://neuclear.org/neu/xfer.xsd";
+    public static final String VALUE_TIME_TAG="ValueTime";
+    public static final String COMMENT_TAG="Comment";
+    public static final String ASSET_TAG="Asset";
+    public static final String AMOUNT_TAG="Amount";
+    private static final String RECIPIENT_TAG = "Recipient";
 }

@@ -1,30 +1,23 @@
 package org.neuclear.asset.orders;
 
-import org.dom4j.Element;
-import org.neuclear.commons.NeuClearException;
-import org.neuclear.commons.Utility;
-import org.neuclear.commons.time.TimeTools;
-import org.neuclear.id.*;
-import org.neuclear.id.resolver.NSResolver;
-import org.neuclear.receiver.UnsupportedTransaction;
-import org.neuclear.asset.orders.exchanges.*;
 import org.neuclear.asset.contracts.Asset;
-import org.neuclear.asset.contracts.AssetGlobals;
-import org.neuclear.exchange.orders.CancelExchangeOrder;
-import org.neuclear.exchange.orders.CancelExchangeReceipt;
-import org.neuclear.exchange.orders.ExchangeCompletionOrder;
-import org.neuclear.exchange.orders.ExchangeOrderReceipt;
-
-import java.util.Date;
-import java.text.ParseException;
+import org.neuclear.id.SignedNamedCore;
+import org.neuclear.id.SignedNamedObject;
 
 /**
  * (C) 2003 Antilles Software Ventures SA
  * User: pelleb
  * Date: Nov 10, 2003
  * Time: 11:06:37 AM
- * $Id: AssetTransactionContract.java,v 1.1 2004/01/05 23:47:09 pelle Exp $
+ * $Id: AssetTransactionContract.java,v 1.2 2004/01/10 00:00:45 pelle Exp $
  * $Log: AssetTransactionContract.java,v $
+ * Revision 1.2  2004/01/10 00:00:45  pelle
+ * Implemented new Schema for Transfer*
+ * Working on it for Exchange*, so far all Receipts are implemented.
+ * Added SignedNamedDocument which is a generic SignedNamedObject that works with all Signed XML.
+ * Changed SignedNamedObject.getDigest() from byte array to String.
+ * The whole malarchy in neuclear-pay does not build yet. The refactoring is a big job, but getting there.
+ *
  * Revision 1.1  2004/01/05 23:47:09  pelle
  * Create new Document classification "order", which is really just inherint in the new
  * package layout.
@@ -104,62 +97,5 @@ public abstract class AssetTransactionContract extends SignedNamedObject {
     public final Asset getAsset() {
         return asset;
     }
-
-    public static final class Reader implements NamedObjectReader {
-        /**
-         * Read object from Element and fill in its details
-         * 
-         * @param elem 
-         * @return 
-         */
-        public final SignedNamedObject read(final SignedNamedCore core, final Element elem) throws InvalidNamedObjectException {
-            if (!elem.getNamespace().equals(AssetGlobals.NS_ASSET))
-                throw new InvalidNamedObjectException(core.getName(),"Not in XML NameSpace: "+AssetGlobals.NS_ASSET.getURI());
-
-            try {
-                //TODO Validate properly
-                final Asset asset = (Asset) NSResolver.resolveIdentity(elem.attributeValue("assetName"));
-
-                final String holdid = elem.attributeValue("holdid");
-                if (elem.getName().equals(TransferGlobals.CANCEL_TAGNAME))
-                    return new CancelExchangeOrder(core, asset, holdid);
-                if (elem.getName().equals(TransferGlobals.CANCEL_RCPT_TAGNAME))
-                    return new CancelExchangeReceipt(core, asset, holdid);
-
-                final double amount = Double.parseDouble(elem.attributeValue("amount"));
-                final Date valuetime = TimeTools.parseTimeStamp(elem.attributeValue("valuetime"));
-                final Identity to = NSResolver.resolveIdentity(elem.attributeValue("recipient"));
-                final Element commentElement = elem.element(TransferGlobals.createQName("comment"));
-
-                final String comment = (commentElement != null) ? commentElement.getText() : "";
-                if (elem.getName().equals(TransferGlobals.XFER_TAGNAME))
-                    return new TransferOrder(core, asset, to, amount,  comment);
-
-                Date helduntil = null;
-                if (!Utility.isEmpty(elem.attributeValue("valuetime")))
-                    helduntil = TimeTools.parseTimeStamp(elem.attributeValue("valuetime"));
-                if (elem.getName().equals(TransferGlobals.HELD_XFER_TAGNAME))
-                    return new ExchangeOrder(core, asset, to, amount,  comment, helduntil);
-
-                final Identity from = NSResolver.resolveIdentity(elem.attributeValue("sender"));
-                final String reqid = elem.attributeValue("reqid");
-                if (elem.getName().equals(TransferGlobals.XFER_RCPT_TAGNAME))
-                    return new TransferReceipt(core, asset, from, to, reqid, amount, valuetime, comment);
-
-                if (elem.getName().equals(TransferGlobals.HELD_XFER_RCPT_TAGNAME))
-                    return new ExchangeOrderReceipt(core, asset, from, to, reqid, amount, valuetime, comment, helduntil);
-
-                if (elem.getName().equals(TransferGlobals.COMPLETE_TAGNAME))
-                    return new ExchangeCompletionOrder(core, asset, from, to, amount, valuetime, comment, holdid);
-            } catch (ParseException e) {
-                throw new InvalidNamedObjectException(core.getName(),e);
-            } catch (NameResolutionException e) {
-                throw new InvalidNamedObjectException(core.getName(),e);
-            }
-            throw new InvalidNamedObjectException(core.getName(),"Not Matched");
-        }
-
-    }
-
 
 }

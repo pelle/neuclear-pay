@@ -1,8 +1,15 @@
 package org.neuclear.exchange.orders;
 
+import org.dom4j.Element;
+import org.neuclear.asset.contracts.AssetGlobals;
+import org.neuclear.asset.orders.TransferGlobals;
+import org.neuclear.id.InvalidNamedObjectException;
+import org.neuclear.id.NamedObjectReader;
 import org.neuclear.id.SignedNamedCore;
-import org.neuclear.asset.contracts.Asset;
-import org.neuclear.exchange.contracts.ExchangeAgent;
+import org.neuclear.id.SignedNamedObject;
+
+import java.sql.Timestamp;
+import java.util.Date;
 
 /*
 NeuClear Distributed Transaction Clearing Platform
@@ -22,8 +29,15 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: ExchangeCompletedReceipt.java,v 1.1 2004/01/06 23:26:48 pelle Exp $
+$Id: ExchangeCompletedReceipt.java,v 1.2 2004/01/10 00:00:46 pelle Exp $
 $Log: ExchangeCompletedReceipt.java,v $
+Revision 1.2  2004/01/10 00:00:46  pelle
+Implemented new Schema for Transfer*
+Working on it for Exchange*, so far all Receipts are implemented.
+Added SignedNamedDocument which is a generic SignedNamedObject that works with all Signed XML.
+Changed SignedNamedObject.getDigest() from byte array to String.
+The whole malarchy in neuclear-pay does not build yet. The refactoring is a big job, but getting there.
+
 Revision 1.1  2004/01/06 23:26:48  pelle
 Started restructuring the original xml schemas.
 Updated the Exchange and transfer orders.
@@ -36,12 +50,41 @@ Updated the Exchange and transfer orders.
  * Time: 7:38:36 PM
  */
 public final class ExchangeCompletedReceipt extends ExchangeTransactionContract{
-    public ExchangeCompletedReceipt(SignedNamedCore core, Asset asset, ExchangeAgent agent, double settledAmount, long valuetime) {
-        super(core, asset, agent);
-        this.settledAmount = settledAmount;
-        this.valuetime = valuetime;
+    private ExchangeCompletedReceipt(SignedNamedCore core, ExchangeCompletionOrder order, Date valuetime) {
+        super(core, order.getAsset(), order.getAgent());
+        this.valuetime = valuetime.getTime();
+        this.order=order;
     }
 
-    private final double settledAmount;
+    public ExchangeCompletionOrder getOrder() {
+        return order;
+    }
+
+    public final Timestamp getValueTime(){
+        return new Timestamp(valuetime);
+    }
+
     private final long valuetime;
+    private final ExchangeCompletionOrder order;
+
+    public static final class Reader implements NamedObjectReader {
+        /**
+         * Read object from Element and fill in its details
+         *
+         * @param elem
+         * @return
+         */
+        public final SignedNamedObject read(final SignedNamedCore core, final Element elem) throws InvalidNamedObjectException {
+            if (!elem.getNamespace().equals(AssetGlobals.NS_ASSET))
+                throw new InvalidNamedObjectException(core.getName(),"Not in XML NameSpace: "+AssetGlobals.NS_ASSET.getURI());
+
+            if (elem.getName().equals(ExchangeGlobals.COMPLETE_RCPT_TAGNAME)){
+                return new ExchangeCompletedReceipt(core,
+                        (ExchangeCompletionOrder) TransferGlobals.parseEmbedded(elem,ExchangeGlobals.createQName(ExchangeGlobals.COMPLETE_TAGNAME)),
+                        TransferGlobals.parseValueTimeElement(elem));
+            }
+            throw new InvalidNamedObjectException(core.getName(),"Not Matched");
+        }
+    }
+
 }
