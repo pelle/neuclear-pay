@@ -3,7 +3,7 @@
 
     <name>NeuClear Pay</name>
     <id>neuclear-pay</id>
-    <currentVersion>1.0-beta6</currentVersion>
+    <currentVersion>1.0-beta7</currentVersion>
     <inceptionYear>2003</inceptionYear>
     <package>org.neuclear.asset</package>
     <logo>/images/logo.gif</logo>
@@ -317,7 +317,14 @@
 
     </build>
     <reports>
+        <report>maven-javadoc-plugin</report>
         <report>taglib</report>
+        <report>maven-changelog-plugin</report>
+        <report>maven-changes-plugin</report>
+        <report>maven-developer-activity-plugin</report>
+        <report>maven-file-activity-plugin</report>
+        <report>maven-junit-report-plugin</report>
+        <report>maven-license-plugin</report>
     </reports>
 </project>
 
