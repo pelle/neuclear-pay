@@ -13,7 +13,7 @@ import java.util.Date;
  */
 public class HeldTransferReceipt extends TransferReceipt implements Held {
 
-    public HeldTransferReceipt(String name, Identity signer, Timestamp timestamp, String digest, Asset asset, Identity from, Identity to, String reqid, double amount, Date valuetime, String comment, Date helduntil) throws NeuClearException {
+    HeldTransferReceipt(String name, Identity signer, Timestamp timestamp, String digest, Asset asset, Identity from, Identity to, String reqid, double amount, Date valuetime, String comment, Date helduntil) throws NeuClearException {
         super(name, signer, timestamp, digest, asset, from, to, reqid, amount, valuetime, comment);
         this.helduntil = helduntil;
     }

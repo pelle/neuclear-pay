@@ -3,8 +3,10 @@ package org.neuclear.asset.receiver;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.neuclear.asset.contracts.builders.TransferRequestBuilder;
+import org.neuclear.asset.contracts.Asset;
 import org.neuclear.commons.configuration.ConfigurationException;
 import org.neuclear.id.NSTools;
+import org.neuclear.id.resolver.NSResolver;
 import org.neuclear.id.builders.NamedObjectBuilder;
 import org.neuclear.signers.commandline.CommandLineSigner;
 
@@ -12,6 +14,7 @@ import java.io.IOException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
+import java.util.Date;
 
 /*
 NeuClear Distributed Transaction Clearing Platform
@@ -31,8 +34,13 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: CreateTestPayments.java,v 1.1 2003/11/09 03:26:48 pelle Exp $
+$Id: CreateTestPayments.java,v 1.2 2003/11/10 17:42:08 pelle Exp $
 $Log: CreateTestPayments.java,v $
+Revision 1.2  2003/11/10 17:42:08  pelle
+The AssetController interface has been more or less finalized.
+CurrencyController fully implemented
+AssetControlClient implementes a remote client for communicating with AssetControllers
+
 Revision 1.1  2003/11/09 03:26:48  pelle
 More house keeping and shuffling about mainly pay
 
@@ -75,8 +83,15 @@ public class CreateTestPayments extends CommandLineSigner {
         String to = cmd.getOptionValue("r");
         String asset = cmd.getOptionValue("c");
         double amount = Double.parseDouble(cmd.getOptionValue("x"));
-        String id = NSTools.createUniqueNamedID(alias, to);
-        return new TransferRequestBuilder(id, asset, to, amount);
+
+        return new TransferRequestBuilder(
+                    (Asset)NSResolver.resolveIdentity(asset),
+                    NSResolver.resolveIdentity(alias),
+                    NSResolver.resolveIdentity(to),
+                    amount,
+                    new Date(),
+                    "Test Request"
+                );
     }
 
     public static void main(String args[]) {

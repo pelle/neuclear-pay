@@ -31,8 +31,13 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: TransferBuilder.java,v 1.2 2003/11/09 03:26:47 pelle Exp $
+$Id: TransferBuilder.java,v 1.3 2003/11/10 17:42:07 pelle Exp $
 $Log: TransferBuilder.java,v $
+Revision 1.3  2003/11/10 17:42:07  pelle
+The AssetController interface has been more or less finalized.
+CurrencyController fully implemented
+AssetControlClient implementes a remote client for communicating with AssetControllers
+
 Revision 1.2  2003/11/09 03:26:47  pelle
 More house keeping and shuffling about mainly pay
 
@@ -42,8 +47,8 @@ Major changes that apparently didnt get properly checked in earlier.
 Revision 1.2  2003/11/06 23:47:43  pelle
 Major Refactoring of CurrencyController.
 Factored out AssetController to be new abstract parent class together with most of its support classes.
-Created (Half way) RemoteAssetController, which can perform transactions on external AssetControllers via NeuClear.
-Created the first attempt at the ExchangeAgent. This will need use of the RemoteAssetController.
+Created (Half way) AssetControlClient, which can perform transactions on external AssetControllers via NeuClear.
+Created the first attempt at the ExchangeAgent. This will need use of the AssetControlClient.
 SOAPTools was changed to return a stream. This is required by the VerifyingReader in NeuClear.
 
 Revision 1.1  2003/10/03 23:48:29  pelle
@@ -74,7 +79,7 @@ public abstract class TransferBuilder extends NamedObjectBuilder {
         if (valuetime==null)
             throw new InvalidTransferException("valuetime");
 
-
+        this.asset=asset;
         Element element = getElement();
         element.add(TransferGlobals.createAttribute(element, "recipient", to.getName()));
         element.add(TransferGlobals.createAttribute(element, "asset", asset.getName()));
@@ -82,4 +87,9 @@ public abstract class TransferBuilder extends NamedObjectBuilder {
         element.add(TransferGlobals.createAttribute(element, "valuetime", TimeTools.formatTimeStamp(valuetime)));
     }
 
+    public final Asset getAsset() {
+        return asset;
+    }
+
+    private final Asset asset;
 }

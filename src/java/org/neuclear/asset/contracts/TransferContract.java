@@ -42,11 +42,10 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  * Date: Sep 23, 2003
  * Time: 3:07:54 PM
  */
-public abstract class TransferContract extends SignedNamedObject {
+public abstract class TransferContract extends AssetTransactionContract {
     TransferContract(String name, Identity signer, Timestamp timestamp, String digest,
                      Asset asset, Identity to, double amount,Date valuetime,String comment) throws NeuClearException {
-        super(name, signer, timestamp, digest);
-        this.asset=asset;
+        super(name, signer, timestamp, digest,asset);
         this.to = to;
         this.amount = amount;
         this.valuetime = valuetime;
@@ -55,10 +54,6 @@ public abstract class TransferContract extends SignedNamedObject {
 
     public final double getAmount() {
         return amount;
-    }
-
-    public final Asset getAsset() {
-        return asset;
     }
 
     public final Date getValueTime() {
@@ -78,46 +73,7 @@ public abstract class TransferContract extends SignedNamedObject {
 
     private final double amount;
     private final Identity to;
-    private final Asset asset;
     private final Date valuetime;
     private final String comment;
-
-    public static class Reader implements NamedObjectReader {
-        /**
-         * Read object from Element and fill in its details
-         * @param elem
-         * @return
-         */
-        public SignedNamedObject read(Element elem, String name, Identity signatory, String digest, Timestamp timestamp) throws NeuClearException {
-            if (elem.getNamespaceURI().equals(TransferGlobals.XFER_NSURI))
-                throw new UnsupportedTransaction(null);
-
-
-            double amount = Double.parseDouble(elem.attributeValue("amount"));
-            Asset asset = (Asset) NSResolver.resolveIdentity(elem.attributeValue("asset"));
-            Date valuetime = TimeTools.parseTimeStamp(elem.attributeValue("valuetime"));
-            Identity to=NSResolver.resolveIdentity(elem.attributeValue("recipient"));
-            String comment=elem.attributeValue("comment");
-            if (elem.getName().equals(TransferGlobals.XFER_TAGNAME))
-                return new TransferRequest(name, signatory, timestamp, digest, asset, to, amount,valuetime, comment);
-
-            Date helduntil=null;
-            if (!Utility.isEmpty(elem.attributeValue("valuetime")))
-                helduntil = TimeTools.parseTimeStamp(elem.attributeValue("valuetime"));
-            if (elem.getName().equals(TransferGlobals.HELD_XFER_TAGNAME))
-                return new HeldTransferRequest(name, signatory, timestamp, digest, asset, to, amount,valuetime, comment,helduntil);
-
-            Identity from=NSResolver.resolveIdentity(elem.attributeValue("recipient"));
-            String reqid=elem.attributeValue("reqid");
-            if (elem.getName().equals(TransferGlobals.XFER_RCPT_TAGNAME))
-                return new TransferReceipt(name, signatory, timestamp, digest, asset, from,to, reqid,amount,valuetime, comment);
-
-            if (elem.getName().equals(TransferGlobals.HELD_XFER_RCPT_TAGNAME))
-                return new HeldTransferReceipt(name, signatory, timestamp, digest, asset, from,to, reqid,amount,valuetime, comment,helduntil);
-
-            throw new UnsupportedTransaction(null);
-        }
-
-    }
 
 }

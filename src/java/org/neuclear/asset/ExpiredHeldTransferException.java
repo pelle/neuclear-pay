@@ -1,6 +1,7 @@
 package org.neuclear.asset;
 
 import org.neuclear.asset.contracts.Held;
+import org.neuclear.asset.contracts.CompleteHeldTransferRequest;
 
 import java.util.Date;
 
@@ -9,25 +10,19 @@ import java.util.Date;
  * Date: Jul 23, 2003
  * Time: 11:38:10 AM
  */
-public class ExpiredHeldTransferException extends TransferException {
-    public ExpiredHeldTransferException(AssetController proc, Held held, Date time) {
-        super(proc);
+public class ExpiredHeldTransferException extends InvalidTransferException {
+    public ExpiredHeldTransferException(CompleteHeldTransferRequest held) {
+        super("expired");
         this.held = held;
-        this.time = time;
     }
 
-    private Held held;
-    private Date time;
+    private CompleteHeldTransferRequest held;
 
-    public Held getHeld() {
+    public CompleteHeldTransferRequest getRequest() {
         return held;
     }
 
-    public Date getTime() {
-        return time;
-    }
-
     public String getSubMessage() {
-        return "Not possible to complete held payment at this time: " + time + ". Hold expired at: " + held.getHeldUntil();
+        return "Not possible to complete held payment at this time: " + held.getValueTime();
     }
 }

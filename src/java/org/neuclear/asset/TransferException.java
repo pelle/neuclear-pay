@@ -17,6 +17,10 @@ public abstract class TransferException extends Exception {
         ;
     }
 
+    protected TransferException(Throwable cause) {
+        super(cause);
+    }
+
     public AssetController getProc() {
         return proc;
     }

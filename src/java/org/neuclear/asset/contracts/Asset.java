@@ -34,16 +34,21 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: Asset.java,v 1.1 2003/11/09 03:32:56 pelle Exp $
+$Id: Asset.java,v 1.2 2003/11/10 17:42:07 pelle Exp $
 $Log: Asset.java,v $
+Revision 1.2  2003/11/10 17:42:07  pelle
+The AssetController interface has been more or less finalized.
+CurrencyController fully implemented
+AssetControlClient implementes a remote client for communicating with AssetControllers
+
 Revision 1.1  2003/11/09 03:32:56  pelle
 More missing files from earlier commits. IDEA is acting strangly.
 
 Revision 1.1  2003/11/06 23:47:43  pelle
 Major Refactoring of CurrencyController.
 Factored out AssetController to be new abstract parent class together with most of its support classes.
-Created (Half way) RemoteAssetController, which can perform transactions on external AssetControllers via NeuClear.
-Created the first attempt at the ExchangeAgent. This will need use of the RemoteAssetController.
+Created (Half way) AssetControlClient, which can perform transactions on external AssetControllers via NeuClear.
+Created the first attempt at the ExchangeAgent. This will need use of the AssetControlClient.
 SOAPTools was changed to return a stream. This is required by the VerifyingReader in NeuClear.
 
 */

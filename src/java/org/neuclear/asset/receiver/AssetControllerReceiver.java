@@ -1,13 +1,11 @@
 package org.neuclear.asset.receiver;
 
-import org.neuclear.asset.AssetController;
-import org.neuclear.asset.InsufficientFundsException;
-import org.neuclear.asset.NegativeTransferException;
-import org.neuclear.asset.TransferDeniedException;
+import org.neuclear.asset.*;
 import org.neuclear.asset.contracts.*;
 import org.neuclear.asset.contracts.builders.TransferReceiptBuilder;
 import org.neuclear.asset.contracts.builders.TransferBuilder;
 import org.neuclear.id.SignedNamedObject;
+import org.neuclear.id.builders.NamedObjectBuilder;
 import org.neuclear.id.verifier.VerifyingReader;
 import org.neuclear.ledger.InvalidTransactionException;
 import org.neuclear.ledger.LowlevelLedgerException;
@@ -46,9 +44,8 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 public class AssetControllerReceiver implements Receiver {
 
-    public AssetControllerReceiver(AssetController proc, Signer signer, String asset) {
+    public AssetControllerReceiver(AssetController proc, Signer signer) {
         this.proc = proc;
-        this.asset = asset;
         this.signer = signer;
     }
 
@@ -59,42 +56,39 @@ public class AssetControllerReceiver implements Receiver {
      * @throws UnsupportedTransaction 
      */
     public final ElementProxy receive(SignedNamedObject obj) throws UnsupportedTransaction {
-        if (obj instanceof TransferContract) {
+        if (obj instanceof AssetTransactionContract) {
             TransferContract transfer = (TransferContract) obj;
             if (!proc.canProcess(transfer.getAsset()))
                 throw new UnsupportedTransaction(obj);
 
             try {
-                TransferBuilder sigReceipt = proc.process(transfer);
-                sigReceipt.sign(asset, signer);
+                NamedObjectBuilder sigReceipt = proc.process(transfer);
+                sigReceipt.sign(transfer.getAsset().getName(), signer);
                 return sigReceipt;
                 //TODO do something with receipt
-            } catch (TransferDeniedException e) {
-                e.printStackTrace();  //To change body of catch statement use Options | File Templates.
-            } catch (InvalidTransactionException e) {
-                e.printStackTrace();  //To change body of catch statement use Options | File Templates.
-            } catch (UnknownBookException e) {
-                e.printStackTrace();  //To change body of catch statement use Options | File Templates.
-            } catch (UnBalancedTransactionException e) {
-                e.printStackTrace();  //To change body of catch statement use Options | File Templates.
-            } catch (XMLSecurityException e) {
-                e.printStackTrace();  //To change body of catch statement use Options | File Templates.
-            } catch (LowlevelLedgerException e) {
-                e.printStackTrace();  //To change body of catch statement use Options | File Templates.
-            }
 
+            } catch (InvalidTransferException e) {
+                e.printStackTrace();  //TODO Handle exception
+            } catch (LowLevelPaymentException e) {
+                e.printStackTrace();  //TODO Handle exception
+            } catch (XMLSecurityException e) {
+                e.printStackTrace();  //TODO Handle exception
+            } catch (TransferDeniedException e) {
+                e.printStackTrace();  //TODO Handle exception
+            }
         } else
             throw new UnsupportedTransaction(obj);
         return null;
     }
 
     private final AssetController proc;
-    private final String asset;
-    private Signer signer;
+    private final Signer signer;
 
     {
         // Registers the readers for transfers
         VerifyingReader.getInstance().registerReader(TransferGlobals.XFER_TAGNAME, new TransferContract.Reader());
+        VerifyingReader.getInstance().registerReader(TransferGlobals.COMPLETE_TAGNAME, new TransferContract.Reader());
+        VerifyingReader.getInstance().registerReader(TransferGlobals.CANCEL_TAGNAME, new TransferContract.Reader());
         VerifyingReader.getInstance().registerReader(TransferGlobals.XFER_RCPT_TAGNAME, new TransferContract.Reader());
         VerifyingReader.getInstance().registerReader(TransferGlobals.HELD_XFER_TAGNAME, new TransferContract.Reader());
         VerifyingReader.getInstance().registerReader(TransferGlobals.HELD_XFER_RCPT_TAGNAME, new TransferContract.Reader());

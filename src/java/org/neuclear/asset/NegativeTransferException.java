@@ -6,9 +6,9 @@ package org.neuclear.asset;
  * Date: Jul 23, 2003
  * Time: 11:38:10 AM
  */
-public class NegativeTransferException extends TransferException {
+public class NegativeTransferException extends InvalidTransferException {
     public NegativeTransferException(double amount) {
-        super();
+        super("negative amount");
         this.amount = amount;
     }
 

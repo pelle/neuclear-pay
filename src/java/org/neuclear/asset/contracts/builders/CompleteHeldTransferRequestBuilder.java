@@ -1,11 +1,13 @@
 package org.neuclear.asset.contracts.builders;
 
+import org.dom4j.Element;
+import org.neuclear.asset.contracts.TransferReceipt;
 import org.neuclear.asset.contracts.TransferGlobals;
-import org.neuclear.asset.contracts.Asset;
+import org.neuclear.asset.contracts.TransferRequest;
+import org.neuclear.asset.contracts.HeldTransferReceipt;
 import org.neuclear.asset.InvalidTransferException;
 import org.neuclear.asset.NegativeTransferException;
 import org.neuclear.id.Identity;
-import org.neuclear.id.NSTools;
 
 import java.util.Date;
 
@@ -27,9 +29,9 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: TransferRequestBuilder.java,v 1.3 2003/11/10 17:42:07 pelle Exp $
-$Log: TransferRequestBuilder.java,v $
-Revision 1.3  2003/11/10 17:42:07  pelle
+$Id: CompleteHeldTransferRequestBuilder.java,v 1.1 2003/11/10 17:42:07 pelle Exp $
+$Log: CompleteHeldTransferRequestBuilder.java,v $
+Revision 1.1  2003/11/10 17:42:07  pelle
 The AssetController interface has been more or less finalized.
 CurrencyController fully implemented
 AssetControlClient implementes a remote client for communicating with AssetControllers
@@ -61,13 +63,20 @@ TransferReceiptBuilder has been created for use by Transfer processors. It is us
 /**
  * User: pelleb
  * Date: Oct 3, 2003
- * Time: 6:26:13 PM
+ * Time: 6:28:26 PM
  */
-public class TransferRequestBuilder extends TransferBuilder {
-    public TransferRequestBuilder(Asset asset, Identity signer, Identity to, double amount, Date valuetime, String comment) throws InvalidTransferException, NegativeTransferException {
-        this(TransferGlobals.XFER_TAGNAME, asset, signer, to, amount, valuetime, comment);
+public class CompleteHeldTransferRequestBuilder extends TransferBuilder {
+    public CompleteHeldTransferRequestBuilder(HeldTransferReceipt req,Identity signatory,String id,Date valuetime,double amount, String comment) throws InvalidTransferException, NegativeTransferException {
+        super(TransferGlobals.COMPLETE_TAGNAME,
+                req.getAsset(),
+                signatory,
+                req.getTo(),
+                amount,
+                valuetime,
+                comment);
+        Element element = getElement();
+        element.add(TransferGlobals.createAttribute(element, "sender", req.getFrom().getName()));
+        element.add(TransferGlobals.createAttribute(element, "holdid", req.getName()));
     }
-     TransferRequestBuilder(String tagname,Asset asset, Identity signer, Identity to, double amount, Date valuetime, String comment) throws InvalidTransferException, NegativeTransferException {
-        super(tagname, asset, signer, to, amount, valuetime, comment);
-    }
+
 }

@@ -1,11 +1,15 @@
 package org.neuclear.asset.contracts.builders;
 
-import org.neuclear.asset.contracts.TransferGlobals;
-import org.neuclear.asset.contracts.Asset;
-import org.neuclear.asset.InvalidTransferException;
-import org.neuclear.asset.NegativeTransferException;
+import org.dom4j.Element;
+import org.neuclear.id.builders.NamedObjectBuilder;
 import org.neuclear.id.Identity;
 import org.neuclear.id.NSTools;
+import org.neuclear.asset.contracts.TransferGlobals;
+import org.neuclear.asset.contracts.Asset;
+import org.neuclear.asset.NegativeTransferException;
+import org.neuclear.asset.InvalidTransferException;
+import org.neuclear.time.TimeTools;
+import org.neudist.utils.Utility;
 
 import java.util.Date;
 
@@ -27,9 +31,9 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: TransferRequestBuilder.java,v 1.3 2003/11/10 17:42:07 pelle Exp $
-$Log: TransferRequestBuilder.java,v $
-Revision 1.3  2003/11/10 17:42:07  pelle
+$Id: CancelHeldTransferBuilder.java,v 1.1 2003/11/10 17:42:07 pelle Exp $
+$Log: CancelHeldTransferBuilder.java,v $
+Revision 1.1  2003/11/10 17:42:07  pelle
 The AssetController interface has been more or less finalized.
 CurrencyController fully implemented
 AssetControlClient implementes a remote client for communicating with AssetControllers
@@ -61,13 +65,24 @@ TransferReceiptBuilder has been created for use by Transfer processors. It is us
 /**
  * User: pelleb
  * Date: Oct 3, 2003
- * Time: 6:26:13 PM
+ * Time: 3:13:27 PM
  */
-public class TransferRequestBuilder extends TransferBuilder {
-    public TransferRequestBuilder(Asset asset, Identity signer, Identity to, double amount, Date valuetime, String comment) throws InvalidTransferException, NegativeTransferException {
-        this(TransferGlobals.XFER_TAGNAME, asset, signer, to, amount, valuetime, comment);
+public abstract class CancelHeldTransferBuilder extends NamedObjectBuilder {
+    protected CancelHeldTransferBuilder(String tagname, String name, Asset asset,String holdid) throws InvalidTransferException, NegativeTransferException {
+        super(name, TransferGlobals.createQName(tagname));
+        if (asset==null)
+            throw new InvalidTransferException("asset");
+        if (holdid==null)
+            throw new InvalidTransferException("holdid");
+
+        this.asset=asset;
+        Element element = getElement();
+        element.add(TransferGlobals.createAttribute(element, "asset", asset.getName()));
+        element.add(TransferGlobals.createAttribute(element, "holdid", holdid));
     }
-     TransferRequestBuilder(String tagname,Asset asset, Identity signer, Identity to, double amount, Date valuetime, String comment) throws InvalidTransferException, NegativeTransferException {
-        super(tagname, asset, signer, to, amount, valuetime, comment);
+  public final Asset getAsset() {
+        return asset;
     }
+
+    private final Asset asset;
 }

@@ -23,28 +23,9 @@ import java.util.Random;
 public class CurrencyTests extends TestCase {
     public CurrencyTests(String s) throws SQLException, IOException, LowlevelLedgerException, BookExistsException, LedgerCreationException, ConfigurationException {
         super(s);
-        proc = CurrencyController.getInstance();
+//        proc = CurrencyController.getInstance();
     }
-
-    private Account createNewAccount(String name, String title) throws BookExistsException, LowlevelLedgerException {
-        BigInteger id = new BigInteger(168, new Random());
-        return proc.createAccount(name + id.toString(36), title);
-    }
-
-    private Account createBobAccount() throws LowlevelLedgerException, BookExistsException {
-        return createNewAccount("neu://neuclear-pay/testusers/bob", "Bob");
-    }
-
-    private Account createAliceAccount() throws LowlevelLedgerException, BookExistsException {
-        return createNewAccount("neu://neuclear-pay/testusers/alice", "Alice");
-    }
-
-    public void testCreateAccount() throws LowlevelLedgerException, BookExistsException {
-        Account bob = createBobAccount();
-        assertNotNull(bob);
-        assertEquals(bob.getBalance(), 0.0, 0);
-    }
-
+/*
     public void testFundAccount() throws LowlevelLedgerException, BookExistsException, UnknownBookException, UnBalancedTransactionException, InvalidTransactionException, NegativeTransferException, AssetMismatchException {
         Account bob = createBobAccount();
         assertNotNull(bob);
@@ -191,5 +172,6 @@ public class CurrencyTests extends TestCase {
 
     }
 
+*/
     private CurrencyController proc;
 }

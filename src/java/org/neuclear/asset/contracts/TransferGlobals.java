@@ -20,16 +20,21 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: TransferGlobals.java,v 1.1 2003/11/09 03:32:56 pelle Exp $
+$Id: TransferGlobals.java,v 1.2 2003/11/10 17:42:07 pelle Exp $
 $Log: TransferGlobals.java,v $
+Revision 1.2  2003/11/10 17:42:07  pelle
+The AssetController interface has been more or less finalized.
+CurrencyController fully implemented
+AssetControlClient implementes a remote client for communicating with AssetControllers
+
 Revision 1.1  2003/11/09 03:32:56  pelle
 More missing files from earlier commits. IDEA is acting strangly.
 
 Revision 1.3  2003/11/06 23:47:43  pelle
 Major Refactoring of CurrencyController.
 Factored out AssetController to be new abstract parent class together with most of its support classes.
-Created (Half way) RemoteAssetController, which can perform transactions on external AssetControllers via NeuClear.
-Created the first attempt at the ExchangeAgent. This will need use of the RemoteAssetController.
+Created (Half way) AssetControlClient, which can perform transactions on external AssetControllers via NeuClear.
+Created the first attempt at the ExchangeAgent. This will need use of the AssetControlClient.
 SOAPTools was changed to return a stream. This is required by the VerifyingReader in NeuClear.
 
 Revision 1.2  2003/10/25 00:38:43  pelle
@@ -79,6 +84,9 @@ public final class TransferGlobals {
     public static final String XFER_RCPT_TAGNAME = "TransferReceipt";
     public static final String HELD_XFER_TAGNAME = "HeldTransferRequest";
     public static final String HELD_XFER_RCPT_TAGNAME = "HeldTransferReceipt";
+    public static final String COMPLETE_TAGNAME = "CompleteHoldRequest";
+    public static final String CANCEL_TAGNAME = "CancelHoldRequest";
+    public static final String CANCEL_RCPT_TAGNAME = "CancelHoldReceipt";
     public static final String XFER_NSPREFIX = "xfer";
     public static final String XFER_NSURI = "http://neuclear.org/neu/xfer";
 }

@@ -13,7 +13,7 @@ import java.util.Date;
  */
 public class TransferRequest extends TransferContract {
 
-    public TransferRequest(String name, Identity signer, Timestamp timestamp, String digest, Asset asset, Identity to, double amount, Date valuetime, String comment) throws NeuClearException {
+    TransferRequest(String name, Identity signer, Timestamp timestamp, String digest, Asset asset, Identity to, double amount, Date valuetime, String comment) throws NeuClearException {
         super(name, signer, timestamp, digest, asset, to, amount, valuetime, comment);
     }
 

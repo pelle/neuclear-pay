@@ -1,11 +1,11 @@
 package org.neuclear.asset.contracts.builders;
 
 import org.dom4j.Element;
-import org.neuclear.asset.contracts.TransferReceipt;
-import org.neuclear.asset.contracts.TransferGlobals;
-import org.neuclear.asset.contracts.TransferRequest;
+import org.neuclear.asset.contracts.*;
 import org.neuclear.asset.InvalidTransferException;
 import org.neuclear.asset.NegativeTransferException;
+
+import java.util.Date;
 
 /*
 NeuClear Distributed Transaction Clearing Platform
@@ -25,8 +25,13 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: TransferReceiptBuilder.java,v 1.2 2003/11/09 03:26:47 pelle Exp $
+$Id: TransferReceiptBuilder.java,v 1.3 2003/11/10 17:42:07 pelle Exp $
 $Log: TransferReceiptBuilder.java,v $
+Revision 1.3  2003/11/10 17:42:07  pelle
+The AssetController interface has been more or less finalized.
+CurrencyController fully implemented
+AssetControlClient implementes a remote client for communicating with AssetControllers
+
 Revision 1.2  2003/11/09 03:26:47  pelle
 More house keeping and shuffling about mainly pay
 
@@ -36,8 +41,8 @@ Major changes that apparently didnt get properly checked in earlier.
 Revision 1.2  2003/11/06 23:47:43  pelle
 Major Refactoring of CurrencyController.
 Factored out AssetController to be new abstract parent class together with most of its support classes.
-Created (Half way) RemoteAssetController, which can perform transactions on external AssetControllers via NeuClear.
-Created the first attempt at the ExchangeAgent. This will need use of the RemoteAssetController.
+Created (Half way) AssetControlClient, which can perform transactions on external AssetControllers via NeuClear.
+Created the first attempt at the ExchangeAgent. This will need use of the AssetControlClient.
 SOAPTools was changed to return a stream. This is required by the VerifyingReader in NeuClear.
 
 Revision 1.1  2003/10/03 23:48:29  pelle
@@ -59,6 +64,18 @@ TransferReceiptBuilder has been created for use by Transfer processors. It is us
 public class TransferReceiptBuilder extends TransferBuilder {
     public TransferReceiptBuilder(TransferRequest req,String id) throws InvalidTransferException, NegativeTransferException {
         this(TransferGlobals.XFER_RCPT_TAGNAME,req,id);
+    }
+    public TransferReceiptBuilder(CompleteHeldTransferRequest req,String id) throws InvalidTransferException, NegativeTransferException {
+        super(TransferGlobals.XFER_RCPT_TAGNAME,
+                req.getAsset(),
+                req.getAsset(),
+                req.getTo(),
+                req.getAmount(),
+                req.getValueTime(),
+                req.getComment());
+        Element element = getElement();
+        element.add(TransferGlobals.createAttribute(element, "sender", req.getFrom().getName()));
+        element.add(TransferGlobals.createAttribute(element, "holdid", req.getHoldId()));
     }
 
     TransferReceiptBuilder(String tagname,TransferRequest req,String id) throws InvalidTransferException, NegativeTransferException {

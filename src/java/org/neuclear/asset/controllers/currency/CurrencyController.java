@@ -4,6 +4,7 @@ import org.neuclear.asset.*;
 import org.neuclear.asset.contracts.*;
 import org.neuclear.asset.contracts.builders.TransferReceiptBuilder;
 import org.neuclear.asset.contracts.builders.HeldTransferReceiptBuilder;
+import org.neuclear.asset.contracts.builders.CancelHeldTransferReceiptBuilder;
 import org.neuclear.commons.NeuClearException;
 import org.neuclear.commons.configuration.Configuration;
 import org.neuclear.commons.configuration.ConfigurationException;
@@ -12,6 +13,7 @@ import org.neuclear.id.resolver.NSResolver;
 import org.neuclear.ledger.*;
 
 import java.util.Date;
+import java.util.Iterator;
 
 /**
  * Created by IntelliJ IDEA.
@@ -39,22 +41,22 @@ public final class CurrencyController extends AssetController {
     }
 
     public boolean canProcess(Asset asset) {
-        return false;
+        return this.asset.getName().equals(asset.getName());
     }
 
-    public final TransferReceiptBuilder processTransfer(TransferRequest req) throws InvalidTransferException {
+    public final TransferReceiptBuilder processTransfer(TransferRequest req) throws InvalidTransferException, LowLevelPaymentException, TransferDeniedException {
         try {
+            if (!req.getSignatory().equals(req.getFrom()))
+                throw new TransferDeniedException(req);
             Book from = getBook(req.getFrom());
             Book to = getBook(req.getTo());
 
             PostedTransaction posted = from.transfer(to, req.getAmount(), req.getComment(), req.getValueTime());
-
-
             return new TransferReceiptBuilder(req, createTransactionId(req, posted));
-        } catch (UnknownBookException e) { //TODO Implement something like this eg. AccountNotValidException
+        } catch (UnknownBookException e) {
             throw new InvalidTransferException(e.getSubMessage());
-        } catch (LowlevelLedgerException e) { //TODO Really need to move this out of ledger
-            e.printStackTrace();
+        } catch (LowlevelLedgerException e) {
+            throw new LowLevelPaymentException(e);
         } catch (InvalidTransactionException e) {
             throw new InvalidTransferException(e.getSubMessage());
         } catch (UnBalancedTransactionException e) {
@@ -62,7 +64,6 @@ public final class CurrencyController extends AssetController {
         } catch (NegativeTransferException e) {
             throw new InvalidTransferException("postive amount");
         }
-        return null;//TODO No no no
     }
 
     private String createTransactionId(TransferRequest req, PostedTransaction posted) {
@@ -74,103 +75,105 @@ public final class CurrencyController extends AssetController {
     }
 
 
-    public final HeldTransferReceiptBuilder processHeldTransfer(HeldTransferRequest req) throws InvalidTransferException {
+    public final HeldTransferReceiptBuilder processHeldTransfer(HeldTransferRequest req) throws InvalidTransferException, LowLevelPaymentException, TransferDeniedException {
        try {
+           if (!req.getSignatory().equals(req.getFrom()))
+               throw new TransferDeniedException(req);
             Book from = getBook(req.getFrom());
             Book to = getBook(req.getTo());
 
-            PostedTransaction posted = from.transfer(to, req.getAmount(), req.getComment(), req.getValueTime());
+            PostedHeldTransaction posted = from.hold(to, req.getAmount(), req.getComment(), req.getValueTime(),req.getHeldUntil());
 
 
             return new HeldTransferReceiptBuilder(req, createTransactionId(req, posted));
         } catch (UnknownBookException e) { //TODO Implement something like this eg. AccountNotValidException
             throw new InvalidTransferException(e.getSubMessage());
-        } catch (LowlevelLedgerException e) { //TODO Really need to move this out of ledger
-            e.printStackTrace();
+        } catch (LowlevelLedgerException e) {
+           throw new LowLevelPaymentException(e);
         } catch (InvalidTransactionException e) {
             throw new InvalidTransferException(e.getSubMessage());
         } catch (UnBalancedTransactionException e) {
             throw new InvalidTransferException("unbalanced");
         } catch (NegativeTransferException e) {
             throw new InvalidTransferException("postive amount");
-        } catch (InvalidTransferException e) {
-           e.printStackTrace();  //To change body of catch statement use Options | File Templates.
        }
-        return null;//TODO No no no
     }
 
-    public final TransferReceipt processCompleteHold(HeldTransferReceipt hold, Date valuedate, double amount, String comment) throws LowlevelLedgerException, NegativeTransferException, TransferLargerThanHeldException, TransferNotStartedException, ExpiredHeldTransferException, InvalidTransferException {
+    public final TransferReceiptBuilder processCompleteHold(CompleteHeldTransferRequest complete) throws LowLevelPaymentException,InvalidTransferException,TransferDeniedException {
         try {
-            if (amount > hold.getAmount())
-                throw new TransferLargerThanHeldException(this, hold, amount);
-            if (amount < 0)
-                throw new NegativeTransferException(this, amount);
-            if (hold.getHeldUntil().before(valuedate) || hold.getValueTime().after(valuedate))
-                throw new ExpiredHeldTransferException(this, hold, valuedate);
-            PostedHeldTransaction heldTran = ledger.findHeldTransaction(hold.getId());
-            PostedTransaction tran = heldTran.complete(amount, valuedate, comment);
-            return createTransferReceipt(new TransferRequest(getIssuer().getID(), hold.getFrom(), hold.getTo(), amount, valuedate, comment), tran.getXid());
+            if (!complete.getSignatory().equals(complete.getTo()))
+                throw new TransferDeniedException(complete);
+
+            PostedHeldTransaction heldTran = ledger.findHeldTransaction(complete.getName());
+            if (heldTran==null)
+                throw new InvalidTransferException("holdid");
+            double amount = getTransactionAmount(heldTran);
+            if (amount > complete.getAmount())
+                throw new TransferLargerThanHeldException(complete,amount);
+            if (complete.getAmount() < 0)
+                throw new NegativeTransferException(complete.getAmount());
+            if (heldTran.getExpiryTime().before(complete.getValueTime()) || heldTran.getTransactionTime().after(complete.getValueTime()))
+                throw new ExpiredHeldTransferException(complete);
+
+            PostedTransaction tran = heldTran.complete(complete.getAmount(),complete.getValueTime(),complete.getComment());
+            return new TransferReceiptBuilder(complete,tran.getXid());
         } catch (UnknownTransactionException e) {
-            throw new LowlevelLedgerException(ledger, e);
+            throw new NonExistantHoldException(complete.getHoldId());
         } catch (TransactionExpiredException e) {
-            throw new ExpiredHeldTransferException(this, hold, valuedate);
+            throw new ExpiredHeldTransferException(complete);
         } catch (InvalidTransactionException e) {
-            throw new LowlevelLedgerException(ledger, e);
-        } catch (AssetMismatchException e) {
-            throw new LowlevelLedgerException(ledger, e);// At this stage this should never reall happen. Best be safe.
+            throw new InvalidTransferException(e.getLocalizedMessage());
+        } catch (LowlevelLedgerException e) {
+            throw new LowLevelPaymentException(e);
         }
     }
 
-    public final void processCancelHold(HeldTransferReceipt hold) throws LowlevelLedgerException {
+    public final CancelHeldTransferReceiptBuilder processCancelHold(CancelHeldTransferRequest cancel) throws InvalidTransferException,LowLevelPaymentException,TransferDeniedException {
         try {
-            PostedHeldTransaction heldTran = ledger.findHeldTransaction(hold.getId());
+            PostedHeldTransaction heldTran = ledger.findHeldTransaction(cancel.getHoldId());
+            if (!isRecipient(cancel.getSignatory(),heldTran))
+                throw new TransferDeniedException(cancel);
             heldTran.cancel();
+            return new CancelHeldTransferReceiptBuilder(cancel);
         } catch (UnknownTransactionException e) {
-            throw new LowlevelLedgerException(ledger, e);
+            throw new NonExistantHoldException(cancel.getHoldId());
+        } catch (LowlevelLedgerException e) {
+            throw new LowLevelPaymentException( e);
         }
     }
 
-    public final Account getAccount(String id) throws UnknownBookException, LowlevelLedgerException {
-        Book book = ledger.getBook(id);
-        return new CurrencyAccount(this, book);
-    }
-
-    public final Account createAccount(String id, String title) throws BookExistsException, LowlevelLedgerException {
-        return new CurrencyAccount(this, ledger.createNewBook(id, title));
-    }
-
-    public static CurrencyController getInstance() throws LowlevelLedgerException, LedgerCreationException, ConfigurationException {
-        return (CurrencyController) Configuration.getComponent(CurrencyController.class, "neuclear-pay");
-    }
-
-    public Issuer getIssuer() {
-        return issuerAccount;
-    }
-
-/*    public static PicoContainer getContainer() throws LedgerCreationException, LowlevelLedgerException {
-       CompositePicoContainer pico=new CompositePicoContainer.WithContainerArray(new PicoContainer[]{LedgerFactory.getInstance().getContainer("neu://superbux/reserve")});
-        try {
-            pico.
-            pico.registerComponentByClass( CurrencyController.class);
-            pico.addParameterToComponent(CurrencyController.class,String.class,"SuperBux");
-            pico.addParameterToComponent(CurrencyController.class,String.class,"neu://superbux/reserve");
-            pico.instantiateComponents();
-        } catch (DuplicateComponentKeyRegistrationException e) {
-            e.printStackTrace();  //To change body of catch statement use Options | File Templates.
-        } catch (AssignabilityRegistrationException e) {
-            e.printStackTrace();  //To change body of catch statement use Options | File Templates.
-        } catch (NotConcreteRegistrationException e) {
-            e.printStackTrace();  //To change body of catch statement use Options | File Templates.
-        } catch (PicoIntrospectionException e) {
-            e.printStackTrace();  //To change body of catch statement use Options | File Templates.
-        } catch (PicoInvocationTargetInitializationException e) {
-            e.printStackTrace();  //To change body of catch statement use Options | File Templates.
-        } catch (PicoInitializationException e) {
-            e.printStackTrace();  //To change body of catch statement use Options | File Templates.
+    /**
+     * Little tool to return the amount of a ledger transaction.
+     * It returns the sum of all the positive values.
+     * @param tran
+     * @return
+     */
+    private static double getTransactionAmount(PostedTransaction tran){
+        Iterator iter=tran.getItems();
+        double amount=0;
+        while (iter.hasNext()) {
+            TransactionItem item = (TransactionItem) iter.next();
+            if (item.getAmount()>0)
+                amount+=item.getAmount();
         }
-        return pico;
+        return amount;
     }
-  */
+    /**
+     * Utility to verify if the identity is a recepient of funds in a given transaction
+     * @param id
+     * @param tran
+     * @return
+     */
+    private static boolean isRecipient(Identity id,PostedTransaction tran){
+        Iterator iter=tran.getItems();
+        while (iter.hasNext()) {
+            TransactionItem item = (TransactionItem) iter.next();
+            if (item.getAmount()>=0&&item.getBook().getBookID().equals(id.getName()))
+                return true;
+        }
+        return false;
+    }
+
     private final Ledger ledger;
     private final Asset asset;
     private final Book issuerBook;

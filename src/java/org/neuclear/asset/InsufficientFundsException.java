@@ -1,5 +1,6 @@
 package org.neuclear.asset;
 
+import org.neuclear.id.Identity;
 
 
 /**
@@ -8,16 +9,16 @@ package org.neuclear.asset;
  * Time: 11:38:10 AM
  */
 public class InsufficientFundsException extends TransferException {
-    public InsufficientFundsException(AssetController proc, Account account, double amount) {
+    public InsufficientFundsException(AssetController proc, Identity account, double amount) {
         super(proc);
         this.account = account;
         this.amount = amount;
     }
 
-    private Account account;
+    private Identity account;
     private double amount;
 
-    public Account getAccount() {
+    public Identity getAccount() {
         return account;
     }
 
@@ -26,6 +27,6 @@ public class InsufficientFundsException extends TransferException {
     }
 
     public String getSubMessage() {
-        return "Insufficient Funds in Account: " + account.getID() + " to pay: " + amount;
+        return "Insufficient Funds in Account: " + account.getName() + " to pay: " + amount;
     }
 }

@@ -1,10 +1,7 @@
 package org.neuclear.asset.receiver;
 
 import org.dom4j.DocumentException;
-import org.neuclear.asset.Account;
 import org.neuclear.asset.AssetController;
-import org.neuclear.asset.receiver.AssetControllerReceiver;
-import org.neuclear.asset.contracts.TransferContract;
 import org.neuclear.commons.NeuClearException;
 import org.neuclear.commons.configuration.Configuration;
 import org.neuclear.commons.configuration.ConfigurationException;
@@ -14,7 +11,7 @@ import org.neuclear.ledger.LedgerCreationException;
 import org.neuclear.ledger.LowlevelLedgerException;
 import org.neuclear.ledger.UnknownBookException;
 import org.neuclear.asset.controllers.currency.CurrencyController;
-import org.neuclear.receiver.AbstractReceiverTest;
+import org.neuclear.tests.AbstractReceiverTest;
 import org.neuclear.receiver.Receiver;
 import org.neudist.xml.XMLException;
 
@@ -36,8 +33,13 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: PaymentReceiverTest.java,v 1.1 2003/11/09 03:26:48 pelle Exp $
+$Id: PaymentReceiverTest.java,v 1.2 2003/11/10 17:42:08 pelle Exp $
 $Log: PaymentReceiverTest.java,v $
+Revision 1.2  2003/11/10 17:42:08  pelle
+The AssetController interface has been more or less finalized.
+CurrencyController fully implemented
+AssetControlClient implementes a remote client for communicating with AssetControllers
+
 Revision 1.1  2003/11/09 03:26:48  pelle
 More house keeping and shuffling about mainly pay
 
@@ -56,8 +58,8 @@ which will handle all neuclear-ledger based AssetControllers.
 Revision 1.4  2003/11/06 23:47:44  pelle
 Major Refactoring of CurrencyController.
 Factored out AssetController to be new abstract parent class together with most of its support classes.
-Created (Half way) RemoteAssetController, which can perform transactions on external AssetControllers via NeuClear.
-Created the first attempt at the ExchangeAgent. This will need use of the RemoteAssetController.
+Created (Half way) AssetControlClient, which can perform transactions on external AssetControllers via NeuClear.
+Created the first attempt at the ExchangeAgent. This will need use of the AssetControlClient.
 SOAPTools was changed to return a stream. This is required by the VerifyingReader in NeuClear.
 
 Revision 1.3  2003/10/29 21:14:45  pelle
@@ -101,19 +103,12 @@ public class PaymentReceiverTest extends AbstractReceiverTest {
         return ".xml";
     }
 
-    private Account createNewAccount(String name) throws BookExistsException, LowlevelLedgerException {
-        try {
-            return proc.getAccount(name);
-        } catch (UnknownBookException e) {
-            return proc.createAccount(name, name);
-        }
-
-    }
 
     public Object getPreTransactionState(SignedNamedObject obj) throws Exception {
 
-        if (obj instanceof TransferContract) {
-            TransferContract transfer = (TransferContract) obj;
+/*
+        if (obj instanceof AssetTransactionContract) {
+            AssetTransactionContract transfer = (AssetTransactionContract) obj;
             Account fromAccount = createNewAccount(transfer.getSignatory().getName());
             double fromBalance = (fromAccount != null) ? fromAccount.getBalance(transfer.getTimeStamp()) : 0;
             Account toAccount = createNewAccount(transfer.getRecipient());
@@ -122,11 +117,13 @@ public class PaymentReceiverTest extends AbstractReceiverTest {
             return new double[]{fromBalance, toBalance};
 
         }
+*/
         return null; //No state to report
     }
 
     public boolean verifyTransaction(final SignedNamedObject obj, final Object state) throws Exception {
-        if (obj instanceof TransferContract && state != null) {
+/*
+        if (obj instanceof AssetTransactionContract && state != null) {
             TransferContract transfer = (TransferContract) obj;
             final double prebalances[] = (double[]) state;
             Account fromAccount = createNewAccount(transfer.getSignatory().getName());
@@ -138,6 +135,7 @@ public class PaymentReceiverTest extends AbstractReceiverTest {
             return (fromBalance == prebalances[0] - transfer.getAmount()) &&
                     (toBalance == prebalances[1] + transfer.getAmount());
         }
+*/
         return false;
     }
 
