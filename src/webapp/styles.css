@@ -262,12 +262,20 @@ td      {
 tr.odd      {
         background:#F0F0FF;
 }
+tr.oddnegative      {
+        background:#FFF0F0;
+        color: #A00;
+}
 tr.oddhover     {
         background:#DDE;
 }
 
 tr.even      {
         background:#E0E0EF;
+}
+tr.evennegative      {
+        background:#EFE0E0;
+        color: #A00;
 }
 tr.evenhover     {
         background:#EDD;

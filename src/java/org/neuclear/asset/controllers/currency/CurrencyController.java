@@ -17,7 +17,6 @@ import org.neuclear.exchange.orders.builders.ExchangeOrderReceiptBuilder;
 import org.neuclear.id.Identity;
 import org.neuclear.id.Service;
 import org.neuclear.id.Signatory;
-import org.neuclear.id.SignedNamedObject;
 import org.neuclear.ledger.*;
 
 import java.util.Date;
@@ -41,13 +40,13 @@ public final class CurrencyController extends AssetController {
         issuerBook = new Signatory(asset.getIssuerKey()).getName();
     }
 
-    public SignedNamedObject process(Identity identity) throws LowLevelPaymentException {
+    public Identity register(Identity identity, final String source) throws LowLevelPaymentException {
         try {
-            ledger.registerBook(identity.getSignatory().getName(), identity.getSignatory().getName().substring(0, 10), "identity", "", identity.getEncoded());
+            ledger.registerBook(identity.getSignatory().getName(), identity.getNickname(), "identity", source, identity.getDigest());
         } catch (LowlevelLedgerException e) {
             throw new LowLevelPaymentException(e);
         }
-        return null;
+        return identity;
     }
 
     public boolean canProcess(final Service asset) {
@@ -63,6 +62,7 @@ public final class CurrencyController extends AssetController {
             final PostedTransaction posted = ledger.verifiedTransfer(req.getDigest(), req.getSignatory().getName(), req.getRecipient(), req.getAmount().getAmount(), req.getComment());
             final TransferReceipt receipt = (TransferReceipt) new TransferReceiptBuilder(req, posted.getTransactionTime()).convert(alias, signer);
             ledger.setReceiptId(req.getDigest(), receipt.getDigest());
+            receipt.log();
             return receipt;
         } catch (LowlevelLedgerException e) {
             throw new LowLevelPaymentException(e);

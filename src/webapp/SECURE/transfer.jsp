@@ -1,5 +1,4 @@
-<%@ page import="org.neuclear.id.Identity,
-                 org.neuclear.commons.Utility,
+<%@ page import="org.neuclear.commons.Utility,
                  org.neuclear.asset.orders.builders.TransferOrderBuilder,
                  org.neuclear.id.resolver.Resolver,
                  org.neuclear.asset.contracts.Asset,
@@ -7,12 +6,9 @@
                  org.neuclear.id.builders.SignatureRequestBuilder,
                  org.neuclear.asset.contracts.AssetGlobals,
                  org.neuclear.asset.servlet.AssetControllerServlet,
-                 org.neuclear.id.SignedNamedObject,
                  org.neuclear.commons.crypto.Base64,
                  org.neuclear.commons.servlets.ServletTools,
-                 org.neuclear.id.Service,
                  org.neuclear.asset.orders.TransferGlobals,
-                 org.neuclear.id.Signatory,
                  org.neuclear.asset.orders.Amount,
                  org.neuclear.commons.crypto.signers.TestCaseSigner,
                  org.neuclear.commons.crypto.signers.ServletSignerFactory,
@@ -23,12 +19,18 @@
                  org.neuclear.ledger.servlets.ServletLedgerFactory,
                  org.neuclear.ledger.Book,
                  org.neuclear.ledger.LowlevelLedgerException,
-                 org.neuclear.ledger.UnknownBookException"%>
+                 org.neuclear.ledger.UnknownBookException,
+                 org.neuclear.asset.LowLevelPaymentException,
+                 org.neuclear.id.*"%>
 <%
 //    AssetGlobals.registerReaders();
 //    TransferGlobals.registerReaders();
     final Signer signer = ServletSignerFactory.getInstance().createSigner(config);
     Signatory userns=(Signatory) request.getUserPrincipal();
+    if (userns==null){
+        response.sendRedirect("../");
+        return;
+    }
     String service=ServletTools.getInitParam("serviceid",config);
 //    String asseturl=ServletTools.getInitParam("asset",config);
     AssetController controller=ServletAssetControllerFactory.getInstance().createAssetController(config);
@@ -41,10 +43,19 @@
 
     Book recpbook=null;
     if (!Utility.isEmpty(recipient)){
-        try {
-            recpbook=ledger.getBook(recipient);
-        } catch (UnknownBookException e) {
-            submit=false;
+        if (recipient.startsWith("http://")||recipient.startsWith("https://")) {
+            try {
+                Identity id=controller.register(recipient);
+                recpbook=ledger.getBook(id.getSignatory().getName());
+            } catch (Exception e) {
+                submit=false;
+            }
+        }  else {
+            try {
+                recpbook=ledger.getBook(recipient);
+            } catch (UnknownBookException e) {
+                submit=false;
+            }
         }
     }
     final double balance = ledger.getAvailableBalance(userns.getName());
@@ -75,15 +86,15 @@ if (!submit){
     <table>
     <tr><th>Account</th><td><%=book.getNickname()%></td></tr>
     <tr><th>Account ID</th><td><%=book.getId()%></td></tr>
-    <tr><th>Available Balance:</th><td><%=balance%></td></tr>
+    <tr><th>Available Balance:</th><td><%=balance%> <%=asset.getUnits()%></td></tr>
     </table>
     <hr/>
-    <p<%=(!Utility.isEmpty(recipient)&&recpbook==null)?" class=\"invalid\"":""%>>Recipient: (Use the full 32 character id, the nickname if known or the first characters of the id)<br/>
+    <p<%=(!Utility.isEmpty(recipient)&&recpbook==null)?" class=\"invalid\"":""%>>Recipient: (Use the full 32 character id, the nickname if known or the identity url)<br/>
     <input type="text" name="recipient" value="<%=recipient%>" size="32"/>
     <%=(!Utility.isEmpty(recipient)&&recpbook==null)?"Unknown Account":""%>
     </p>
     <p<%=(amount>balance)||(amount<0)?" class=\"invalid\"":""%>>Amount:<br/>
-    <input type="text" name="amount" value="<%=amount%>" size="10" style="text-align:right"/>
+    <input type="text" name="amount" value="<%=amount%>" size="10" style="text-align:right"/> <%=asset.getUnits()%>
     <%=(amount>balance)?"Insufficient Funds":""%>
     <%=(amount<0)?"You can not transfer a negative amount":""%>
     </p>
@@ -102,7 +113,7 @@ if (!submit){
 
 
     TransferOrderBuilder transfer=new TransferOrderBuilder(
-            asset.getName(),
+            asset.getURL(),
             recpbook.getId(),//new Signatory(signer.getPublicKey(recipient)),
             new Amount(amount),
             comment

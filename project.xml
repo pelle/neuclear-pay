@@ -3,7 +3,7 @@
 
     <name>NeuClear Pay</name>
     <id>neuclear-pay</id>
-    <currentVersion>0.3-SNAPSHOT</currentVersion>
+    <currentVersion>0.3</currentVersion>
     <inceptionYear>2003</inceptionYear>
     <package>org.neuclear.asset</package>
     <logo>/images/logo.gif</logo>
@@ -75,7 +75,7 @@
         <dependency>
             <id>neuclear-commons</id>
             <name>neuclear-commons</name>
-            <version>0.7-SNAPSHOT</version>
+            <version>0.7</version>
             <properties>
                 <war.bundle>true</war.bundle>
             </properties>
@@ -83,7 +83,7 @@
         <dependency>
             <id>neuclear-ledger</id>
             <name>neuclear-ledger</name>
-            <version>0.4-SNAPSHOT</version>
+            <version>0.4</version>
             <properties>
                 <war.bundle>true</war.bundle>
             </properties>
@@ -91,7 +91,7 @@
         <dependency>
             <id>neuclear-ledger-prevalent</id>
             <name>neuclear-ledger-prevalent</name>
-            <version>0.4-SNAPSHOT</version>
+            <version>0.4</version>
             <properties>
                 <war.bundle>true</war.bundle>
             </properties>
@@ -99,7 +99,7 @@
         <dependency>
             <id>neuclear-ledger-hibernate</id>
             <name>neuclear-ledger-hibernate</name>
-            <version>0.4-SNAPSHOT</version>
+            <version>0.4</version>
             <properties>
                 <war.bundle>true</war.bundle>
             </properties>
@@ -114,7 +114,7 @@
         <dependency>
             <id>neuclear-id</id>
             <name>neuclear-id</name>
-            <version>0.9-SNAPSHOT</version>
+            <version>0.9</version>
             <properties>
                 <war.bundle>true</war.bundle>
             </properties>
@@ -122,7 +122,7 @@
         <dependency>
             <id>neuclear-xmlsig</id>
             <name>neuclear-xmlsig</name>
-            <version>0.13-SNAPSHOT</version>
+            <version>0.13</version>
             <properties>
                 <war.bundle>true</war.bundle>
             </properties>

@@ -11,7 +11,8 @@
                  org.neuclear.asset.AssetController,
                  org.neuclear.asset.servlet.ServletAssetControllerFactory,
                  org.neuclear.asset.AssetStatistics,
-                 org.neuclear.ledger.Book"%>
+                 org.neuclear.ledger.Book,
+                 org.neuclear.asset.contracts.Asset"%>
  <%
     response.setHeader("Pragma","no-cache");
     response.setDateHeader("Expires",0);
@@ -19,6 +20,8 @@
     boolean loggedin=userns!=null;
     AssetController controller=ServletAssetControllerFactory.getInstance().createAssetController(config);
     AssetStatistics stats=controller.getStats();
+    Asset asset=controller.getAsset();
+
     Ledger ledger=ServletLedgerFactory.getInstance().createLedger(config);
     if (loggedin){
         Book book=(Book) session.getAttribute("book");
@@ -26,6 +29,8 @@
             book=ledger.getBook(userns.getName());
             session.setAttribute("book",book);
         }
+    }   else {
+        session.removeAttribute("book");
     }
 
  %>
@@ -56,6 +61,7 @@ will download
             <li><a href="SECURE/transfer.jsp">Transfer Funds</a></li>
             <li><a href="SECURE/browse/">Browse Transactions</a></li>
             <li><a href="SECURE/issue.jsp">Request Funds</a></li>
+            <li><a href="register.jsp">Register Identity Page</a></li>
 
         </ul>
         <%
@@ -66,7 +72,7 @@ For more information about what this is visit <a href="http://neuclear.org">NeuC
 </div>
 <table style="float:right">
 <tr><th colspan=2>Asset Statistics</th></tr>
-<tr class="even"><td>Amount in Circulation</td><td align="right"><%=stats.getCirculation()%></td></tr>
+<tr class="even"><td>Amount in Circulation</td><td align="right"><%=stats.getCirculation()%> <%=asset.getUnits()%></td></tr>
 <tr class="odd"><td>Amount of Accounts</td><td align="right"><%=stats.getAmountOfAccounts()%></td></tr>
 <tr class="even"><td>Amount of Transactions</td><td align="right"><%=stats.getTransactionCount()%></td></tr>
 <%if(!loggedin){ %>
@@ -81,10 +87,10 @@ For more information about what this is visit <a href="http://neuclear.org">NeuC
         double available=ledger.getAvailableBalance(userns.getName());
 %>
     <tr><th>Account</th><th  title="<%=book.getId()%>" ><%=book.getNickname()%></th></tr>
-<tr class="even"><td>Balance</td><td align="right"><%=balance%></td></tr>
-<tr class="odd"><td>Available</td><td align="right"><%=available%></td></tr>
-<tr class="even"><td>Held in Exchange</td><td align="right"><%=balance-available%></td></tr>
-<tr><th colspan="2"><a href="<%=ServletTools.getAbsoluteURL(request,"/")%>?logout=1">Log Out</a></th></tr>
+<tr class="even"><td>Balance</td><td align="right"><%=balance%> <%=asset.getUnits()%></td></tr>
+<tr class="odd"><td>Available</td><td align="right"><%=available%> <%=asset.getUnits()%></td></tr>
+<tr class="even"><td>Held in Exchange</td><td align="right"><%=balance-available%> <%=asset.getUnits()%></td></tr>
+<tr><td colspan="2"><form method="POST" action="<%=ServletTools.getAbsoluteURL(request,"/")%>"><input type="submit" value="Log Out" name="logout"/></form></th></tr>
 <%}%>
 </table>
 
