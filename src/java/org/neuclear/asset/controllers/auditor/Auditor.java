@@ -3,6 +3,8 @@ package org.neuclear.asset.controllers.auditor;
 import org.neuclear.asset.InvalidTransferException;
 import org.neuclear.asset.LowLevelPaymentException;
 import org.neuclear.asset.TransferDeniedException;
+import org.neuclear.asset.audits.History;
+import org.neuclear.asset.audits.HistoryRequest;
 import org.neuclear.asset.orders.IssueOrder;
 import org.neuclear.asset.orders.IssueReceipt;
 import org.neuclear.asset.orders.TransferOrder;
@@ -14,6 +16,8 @@ import org.neuclear.id.SignedNamedObject;
 import org.neuclear.id.receiver.Receiver;
 import org.neuclear.id.receiver.UnsupportedTransaction;
 import org.neuclear.ledger.*;
+
+import java.util.Iterator;
 
 /*
 NeuClear Distributed Transaction Clearing Platform
@@ -33,8 +37,11 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: Auditor.java,v 1.4 2004/05/24 18:31:29 pelle Exp $
+$Id: Auditor.java,v 1.5 2004/07/21 16:00:52 pelle Exp $
 $Log: Auditor.java,v $
+Revision 1.5  2004/07/21 16:00:52  pelle
+Added Balance and History related classes.
+
 Revision 1.4  2004/05/24 18:31:29  pelle
 Changed asset id in ledger to be asset.getSignatory().getName().
 Made SigningRequestServlet and SigningServlet a bit clearer.
@@ -165,30 +172,33 @@ public class Auditor implements Receiver {
 
     /**
      * Process the the request and returns and unsigned object for signing and sending.
-     * 
-     * @param contract 
-     * @return 
+     *
+     * @param contract
+     * @return
      */
     public final SignedNamedObject receive(final SignedNamedObject contract) throws UnsupportedTransaction, NeuClearException {
         try {
             if (contract instanceof TransferReceipt)
                 process((TransferReceipt) contract);
-            if (contract instanceof TransferOrder)
+            else if (contract instanceof TransferOrder)
                 process((TransferOrder) contract);
-            if (contract instanceof ExchangeOrderReceipt)
+            else if (contract instanceof ExchangeOrderReceipt)
                 process((ExchangeOrderReceipt) contract);
-            if (contract instanceof ExchangeCompletedReceipt)
+            else if (contract instanceof ExchangeCompletedReceipt)
                 process((ExchangeCompletedReceipt) contract);
-            if (contract instanceof ExchangeOrder)
+            else if (contract instanceof ExchangeOrder)
                 process((ExchangeOrder) contract);
-            if (contract instanceof ExchangeCompletionOrder)
+            else if (contract instanceof ExchangeCompletionOrder)
                 process((ExchangeCompletionOrder) contract);
-            if (contract instanceof CancelExchangeReceipt)
+            else if (contract instanceof CancelExchangeReceipt)
                 process((CancelExchangeReceipt) contract);
-            if (contract instanceof IssueReceipt)
+            else if (contract instanceof IssueReceipt)
                 process((IssueReceipt) contract);
-            if (contract instanceof IssueOrder)
+            else if (contract instanceof IssueOrder)
                 process((IssueOrder) contract);
+            else if (contract instanceof HistoryRequest)
+                process((HistoryRequest) contract);
+
         } catch (LowLevelPaymentException e) {
             throw new NeuClearException(e);
         } catch (TransferDeniedException e) {
@@ -198,6 +208,15 @@ public class Auditor implements Receiver {
         }
 
         return contract;
+    }
+
+    private void process(HistoryRequest request) throws NeuClearException {
+        History history = (History) request.getAsset().service(request);
+        Iterator iter = history.iterate();
+        while (iter.hasNext()) {
+            SignedNamedObject o = (SignedNamedObject) iter.next();
+            receive(o);
+        }
     }
 
     public boolean canProcess(final Service asset) {

@@ -1,6 +1,12 @@
 package org.neuclear.asset.controllers.currency;
 
 import org.neuclear.asset.*;
+import org.neuclear.asset.audits.Balance;
+import org.neuclear.asset.audits.BalanceRequest;
+import org.neuclear.asset.audits.History;
+import org.neuclear.asset.audits.HistoryRequest;
+import org.neuclear.asset.audits.builders.BalanceBuilder;
+import org.neuclear.asset.audits.builders.HistoryBuilder;
 import org.neuclear.asset.contracts.Asset;
 import org.neuclear.asset.orders.IssueOrder;
 import org.neuclear.asset.orders.IssueReceipt;
@@ -15,8 +21,10 @@ import org.neuclear.exchange.orders.builders.CancelExchangeReceiptBuilder;
 import org.neuclear.exchange.orders.builders.ExchangeCompletedReceiptBuilder;
 import org.neuclear.exchange.orders.builders.ExchangeOrderReceiptBuilder;
 import org.neuclear.id.Identity;
+import org.neuclear.id.InvalidNamedObjectException;
 import org.neuclear.id.Service;
 import org.neuclear.ledger.*;
+import org.neuclear.ledger.browser.LedgerBrowser;
 
 import java.util.Date;
 
@@ -198,6 +206,25 @@ public final class CurrencyController extends AssetController {
         };
     }
 
+    public final Balance process(final BalanceRequest request) throws LowLevelPaymentException, InvalidNamedObjectException {
+        try {
+            double balance = ledger.getBalance(request.getAsset().getSignatory().getName(), request.getSignatory().getName());
+            double available = ledger.getAvailableBalance(request.getAsset().getSignatory().getName(), request.getSignatory().getName());
+            return (Balance) new BalanceBuilder(request, balance, available, new Date()).convert(alias, signer);
+
+        } catch (LowlevelLedgerException e) {
+            throw new LowLevelPaymentException(e);
+        }
+    }
+
+    public final History process(final HistoryRequest request) throws LowLevelPaymentException, InvalidNamedObjectException {
+        try {
+            return (History) new HistoryBuilder(request, ((LedgerBrowser) ledger).browse(request.getAsset().getSignatory().getName(), request.getSignatory().getName()), new Date()).convert(alias, signer);
+
+        } catch (LowlevelLedgerException e) {
+            throw new LowLevelPaymentException(e);
+        }
+    }
 
     private final LedgerController ledger;
     private final Asset asset;

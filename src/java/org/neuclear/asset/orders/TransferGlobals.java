@@ -2,6 +2,10 @@ package org.neuclear.asset.orders;
 
 import org.dom4j.*;
 import org.neuclear.asset.InvalidTransferException;
+import org.neuclear.asset.audits.Balance;
+import org.neuclear.asset.audits.BalanceRequest;
+import org.neuclear.asset.audits.History;
+import org.neuclear.asset.audits.HistoryRequest;
 import org.neuclear.asset.contracts.Asset;
 import org.neuclear.commons.Utility;
 import org.neuclear.commons.time.TimeTools;
@@ -32,8 +36,11 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: TransferGlobals.java,v 1.12 2004/05/24 18:31:30 pelle Exp $
+$Id: TransferGlobals.java,v 1.13 2004/07/21 16:00:53 pelle Exp $
 $Log: TransferGlobals.java,v $
+Revision 1.13  2004/07/21 16:00:53  pelle
+Added Balance and History related classes.
+
 Revision 1.12  2004/05/24 18:31:30  pelle
 Changed asset id in ledger to be asset.getSignatory().getName().
 Made SigningRequestServlet and SigningServlet a bit clearer.
@@ -208,6 +215,10 @@ public final class TransferGlobals {
         VerifyingReader.getInstance().registerReader(TransferGlobals.XFER_RCPT_TAGNAME, new TransferReceipt.Reader());
         VerifyingReader.getInstance().registerReader(TransferGlobals.ISSUE_TAGNAME, new IssueOrder.Reader());
         VerifyingReader.getInstance().registerReader(TransferGlobals.ISSUE_RCPT_TAGNAME, new IssueReceipt.Reader());
+        VerifyingReader.getInstance().registerReader(Balance.BALANCE_TAGNAME, new Balance.Reader());
+        VerifyingReader.getInstance().registerReader(BalanceRequest.BALANCE_REQUEST_TAGNAME, new BalanceRequest.Reader());
+        VerifyingReader.getInstance().registerReader(History.HISTORY_TAGNAME, new History.Reader());
+        VerifyingReader.getInstance().registerReader(HistoryRequest.HISTORY_REQUEST_TAGNAME, new HistoryRequest.Reader());
     }
 
     public static final Timestamp parseValueTimeElement(final Element elem) throws InvalidNamedObjectException {
