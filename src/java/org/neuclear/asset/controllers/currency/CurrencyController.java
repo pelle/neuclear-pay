@@ -49,8 +49,6 @@ public final class CurrencyController extends AssetController {
             throw new LowLevelPaymentException(e);
         } catch (InvalidTransactionException e) {
             throw new InvalidTransferException(e.getSubMessage());
-        } catch (UnBalancedTransactionException e) {
-            throw new InvalidTransferException("unbalanced");
         } catch (NegativeTransferException e) {
             throw new InvalidTransferException("postive amount");
         }
