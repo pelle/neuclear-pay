@@ -1,12 +1,13 @@
 package org.neuclear.exchange.orders;
 
-import org.neuclear.asset.contracts.Asset;
+import org.dom4j.Element;
 import org.neuclear.asset.contracts.AssetGlobals;
 import org.neuclear.asset.orders.TransferGlobals;
 import org.neuclear.asset.orders.Value;
-import org.neuclear.exchange.contracts.ExchangeAgent;
-import org.neuclear.id.*;
-import org.dom4j.Element;
+import org.neuclear.id.InvalidNamedObjectException;
+import org.neuclear.id.NamedObjectReader;
+import org.neuclear.id.SignedNamedCore;
+import org.neuclear.id.SignedNamedObject;
 
 import java.sql.Timestamp;
 import java.util.Date;
@@ -17,13 +18,13 @@ import java.util.Date;
  * Time: 5:35:26 PM
  */
 public final class ExchangeCompletionOrder extends ExchangeTransactionContract {
-    private ExchangeCompletionOrder(final SignedNamedCore core, final ExchangeOrderReceipt receipt, final Identity counterparty, final Value amount, final Date exchangetime,final String comment) {
-        super(core,receipt.getAsset(), receipt.getAgent());
+    private ExchangeCompletionOrder(final SignedNamedCore core, final ExchangeOrderReceipt receipt, final String counterparty, final Value amount, final Date exchangetime, final String comment) {
+        super(core, receipt.getAsset(), receipt.getAgent());
         this.exchangetime = exchangetime.getTime();
         this.amount = amount;
-        this.counterparty=counterparty;
-        this.receipt=receipt;
-        this.comment=comment;
+        this.counterparty = counterparty;
+        this.receipt = receipt;
+        this.comment = comment;
     }
 
     public final Timestamp getExchangeTime() {
@@ -34,7 +35,7 @@ public final class ExchangeCompletionOrder extends ExchangeTransactionContract {
         return amount;
     }
 
-    public final Identity getCounterparty() {
+    public final String getCounterparty() {
         return counterparty;
     }
 
@@ -48,7 +49,7 @@ public final class ExchangeCompletionOrder extends ExchangeTransactionContract {
 
     private final long exchangetime;
     private final Value amount;
-    private final Identity counterparty;
+    private final String counterparty;
     private final ExchangeOrderReceipt receipt;
     private final String comment;
 
@@ -61,18 +62,17 @@ public final class ExchangeCompletionOrder extends ExchangeTransactionContract {
          */
         public final SignedNamedObject read(final SignedNamedCore core, final Element elem) throws InvalidNamedObjectException {
             if (!elem.getNamespace().equals(AssetGlobals.NS_ASSET))
-                throw new InvalidNamedObjectException(core.getName(),"Not in XML NameSpace: "+AssetGlobals.NS_ASSET.getURI());
+                throw new InvalidNamedObjectException(core.getName(), "Not in XML NameSpace: " + AssetGlobals.NS_ASSET.getURI());
 
-            if (elem.getName().equals(ExchangeGlobals.COMPLETE_TAGNAME)){
+            if (elem.getName().equals(ExchangeGlobals.COMPLETE_TAGNAME)) {
                 return new ExchangeCompletionOrder(core,
-                        (ExchangeOrderReceipt)TransferGlobals.parseEmbedded(elem,ExchangeGlobals.createQName(ExchangeGlobals.EXCHANGE_RCPT_TAGNAME)),
+                        (ExchangeOrderReceipt) TransferGlobals.parseEmbedded(elem, ExchangeGlobals.createQName(ExchangeGlobals.EXCHANGE_RCPT_TAGNAME)),
                         TransferGlobals.parseRecipientTag(elem),
                         TransferGlobals.parseValueTag(elem),
-                        TransferGlobals.parseTimeStampElement(elem,ExchangeGlobals.createQName(ExchangeGlobals.EXCHANGE_TIME_TAGNAME)),
-                        TransferGlobals.parseCommentElement(elem)
-                        );
+                        TransferGlobals.parseTimeStampElement(elem, ExchangeGlobals.createQName(ExchangeGlobals.EXCHANGE_TIME_TAGNAME)),
+                        TransferGlobals.parseCommentElement(elem));
             }
-            throw new InvalidNamedObjectException(core.getName(),"Not Matched");
+            throw new InvalidNamedObjectException(core.getName(), "Not Matched");
         }
     }
 

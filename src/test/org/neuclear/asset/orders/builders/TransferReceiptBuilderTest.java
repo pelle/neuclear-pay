@@ -5,6 +5,7 @@ import org.neuclear.asset.contracts.Asset;
 import org.neuclear.asset.contracts.builders.AssetBuilder;
 import org.neuclear.asset.orders.Amount;
 import org.neuclear.asset.orders.TransferOrder;
+import org.neuclear.asset.orders.TransferReceipt;
 import org.neuclear.commons.NeuClearException;
 import org.neuclear.commons.crypto.signers.NonExistingSignerException;
 import org.neuclear.id.SignedNamedObject;
@@ -13,6 +14,7 @@ import org.neuclear.tests.AbstractObjectCreationTest;
 import org.neuclear.xml.XMLException;
 
 import java.security.GeneralSecurityException;
+import java.util.Date;
 
 /*
 NeuClear Distributed Transaction Clearing Platform
@@ -32,9 +34,9 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: TransferOrderBuilderTest.java,v 1.6 2004/04/02 23:04:36 pelle Exp $
-$Log: TransferOrderBuilderTest.java,v $
-Revision 1.6  2004/04/02 23:04:36  pelle
+$Id: TransferReceiptBuilderTest.java,v 1.1 2004/04/02 23:04:36 pelle Exp $
+$Log: TransferReceiptBuilderTest.java,v $
+Revision 1.1  2004/04/02 23:04:36  pelle
 Got TransferOrder and Builder working with their test cases.
 Working on TransferReceipt which is the first embedded receipt. This is causing some problems at the moment.
 
@@ -63,16 +65,22 @@ Started the unit tests for the new payment message format.
  * Date: Jan 21, 2004
  * Time: 9:11:44 PM
  */
-public class TransferOrderBuilderTest extends AbstractObjectCreationTest {
-    public TransferOrderBuilderTest(String string) throws NeuClearException, GeneralSecurityException {
+public class TransferReceiptBuilderTest extends AbstractObjectCreationTest {
+    public TransferReceiptBuilderTest(String string) throws NeuClearException, GeneralSecurityException {
         super(string);
         asset = createTestAsset();
     }
 
     protected void verifyObject(SignedNamedObject obj) throws NonExistingSignerException {
         assertNotNull(obj);
-        assertTrue(obj instanceof TransferOrder);
-        TransferOrder order = (TransferOrder) obj;
+        assertTrue(obj instanceof TransferReceipt);
+        TransferReceipt receipt = (TransferReceipt) obj;
+        assertNotNull(receipt.getValueTime());
+        assertEquals(asset.getDigest(), receipt.getAsset().getDigest());
+        assertEquals(getSigner().getPublicKey("neu://test").getEncoded(), receipt.getSignatory().getPublicKey().getEncoded());
+
+        TransferOrder order = receipt.getOrder();
+        assertNotNull(order);
         assertEquals(asset.getDigest(), order.getAsset().getDigest());
         assertEquals(getSigner().getPublicKey("neu://test").getEncoded(), order.getSignatory().getPublicKey().getEncoded());
 //        assertEquals(getBob().getPublicKey().getEncoded(), order.getRecipient().getSignatory().getPublicKey().getEncoded());
@@ -81,13 +89,13 @@ public class TransferOrderBuilderTest extends AbstractObjectCreationTest {
     }
 
     protected Class getRequiredClass() {
-        return TransferOrder.class;
+        return TransferReceipt.class;
     }
 
     protected Builder createBuilder() throws NeuClearException, InvalidTransferException, XMLException {
         Builder builder = new TransferOrderBuilder(asset, getAlice(), new Amount(20), "Test");
 //        System.out.println(builder.asXML());
-        return builder;
+        return new TransferReceiptBuilder((TransferOrder) builder.convert(NAME, getSigner()), new Date());
     }
 
     public Asset createTestAsset() throws NeuClearException {

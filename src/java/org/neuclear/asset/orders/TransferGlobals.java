@@ -5,7 +5,6 @@ import org.neuclear.asset.InvalidTransferException;
 import org.neuclear.asset.contracts.Asset;
 import org.neuclear.commons.Utility;
 import org.neuclear.commons.time.TimeTools;
-import org.neuclear.id.Identity;
 import org.neuclear.id.InvalidNamedObjectException;
 import org.neuclear.id.NameResolutionException;
 import org.neuclear.id.SignedNamedObject;
@@ -33,8 +32,12 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: TransferGlobals.java,v 1.8 2004/04/01 23:18:32 pelle Exp $
+$Id: TransferGlobals.java,v 1.9 2004/04/02 23:04:36 pelle Exp $
 $Log: TransferGlobals.java,v $
+Revision 1.9  2004/04/02 23:04:36  pelle
+Got TransferOrder and Builder working with their test cases.
+Working on TransferReceipt which is the first embedded receipt. This is causing some problems at the moment.
+
 Revision 1.8  2004/04/01 23:18:32  pelle
 Split Identity into Signatory and Identity class.
 Identity remains a signed named object and will in the future just be used for self declared information.
@@ -225,13 +228,9 @@ public final class TransferGlobals {
 
     }
 
-    public static final Identity parseRecipientTag(Element elem) throws InvalidNamedObjectException {
+    public static final String parseRecipientTag(Element elem) throws InvalidNamedObjectException {
         final String name = getElementValue(elem, RECIPIENT_TAG);
-        try {
-            return Resolver.resolveIdentity(name);
-        } catch (NameResolutionException e) {
-            throw new InvalidNamedObjectException(name, e);
-        }
+        return name;
 
     }
 

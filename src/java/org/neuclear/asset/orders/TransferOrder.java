@@ -3,7 +3,10 @@ package org.neuclear.asset.orders;
 import org.dom4j.Element;
 import org.neuclear.asset.contracts.Asset;
 import org.neuclear.asset.contracts.AssetGlobals;
-import org.neuclear.id.*;
+import org.neuclear.id.InvalidNamedObjectException;
+import org.neuclear.id.NamedObjectReader;
+import org.neuclear.id.SignedNamedCore;
+import org.neuclear.id.SignedNamedObject;
 
 /**
  * User: pelleb
@@ -12,25 +15,26 @@ import org.neuclear.id.*;
  */
 public final class TransferOrder extends AssetTransactionContract {
 
-    private TransferOrder(final SignedNamedCore core, final Asset asset, final Identity recipient, final Value amount, final String comment)  {
+    private TransferOrder(final SignedNamedCore core, final Asset asset, final String recipient, final Value amount, final String comment) {
         super(core, asset);
         this.amount = amount;
         this.comment = comment;
-        this.recipient=recipient;
+        this.recipient = recipient;
     }
 
-    public final Identity getRecipient() {
+    public final String getRecipient() {
         return recipient;
     }
+
     public final Value getAmount() {
-            return amount;
-        }
+        return amount;
+    }
 
     public final String getComment() {
         return comment;
     }
 
-    private final Identity recipient;
+    private final String recipient;
 
     private final Value amount;
     private final String comment;
@@ -44,16 +48,15 @@ public final class TransferOrder extends AssetTransactionContract {
          */
         public final SignedNamedObject read(final SignedNamedCore core, final Element elem) throws InvalidNamedObjectException {
             if (!elem.getNamespace().getURI().equals(TransferGlobals.XFER_NSURI))
-                throw new InvalidNamedObjectException(core.getName(),"Not in XML NameSpace: "+AssetGlobals.NS_ASSET.getURI());
+                throw new InvalidNamedObjectException(core.getName(), "Not in XML NameSpace: " + AssetGlobals.NS_ASSET.getURI());
             if (!elem.getName().equals(TransferGlobals.XFER_TAGNAME))
-                throw new InvalidNamedObjectException(core.getName(),"Incorrect XML Tagname for reader: "+TransferGlobals.XFER_TAGNAME);
+                throw new InvalidNamedObjectException(core.getName(), "Incorrect XML Tagname for reader: " + TransferGlobals.XFER_TAGNAME);
 
             return new TransferOrder(core,
                     TransferGlobals.parseAssetTag(elem),
                     TransferGlobals.parseRecipientTag(elem),
                     TransferGlobals.parseValueTag(elem),
-                    TransferGlobals.parseCommentElement(elem)
-                    );
+                    TransferGlobals.parseCommentElement(elem));
         }
     }
 

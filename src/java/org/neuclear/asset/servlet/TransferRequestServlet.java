@@ -1,7 +1,6 @@
 package org.neuclear.asset.servlet;
 
 import org.neuclear.asset.InvalidTransferException;
-import org.neuclear.asset.contracts.Asset;
 import org.neuclear.asset.orders.Amount;
 import org.neuclear.asset.orders.builders.TransferOrderBuilder;
 import org.neuclear.commons.NeuClearException;
@@ -32,8 +31,12 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: TransferRequestServlet.java,v 1.3 2004/04/01 23:18:33 pelle Exp $
+$Id: TransferRequestServlet.java,v 1.4 2004/04/02 23:04:36 pelle Exp $
 $Log: TransferRequestServlet.java,v $
+Revision 1.4  2004/04/02 23:04:36  pelle
+Got TransferOrder and Builder working with their test cases.
+Working on TransferReceipt which is the first embedded receipt. This is causing some problems at the moment.
+
 Revision 1.3  2004/04/01 23:18:33  pelle
 Split Identity into Signatory and Identity class.
 Identity remains a signed named object and will in the future just be used for self declared information.
@@ -88,15 +91,14 @@ Added cactus tests to pay
  */
 public class TransferRequestServlet extends SignatureRequestServlet {
     protected Builder createBuilder(HttpServletRequest request) throws NeuClearException {
-        Asset asset = (Asset) Resolver.resolveIdentity(getServiceid());
         Identity user = (Identity) request.getUserPrincipal();
         if (user == null)
             user = Resolver.resolveIdentity(request.getParameter("sender"));
-        Identity to = Resolver.resolveIdentity(request.getParameter("recipient"));
+        String to = request.getParameter("recipient");
         double amount = Double.parseDouble(Utility.denullString(request.getParameter("amount"), "0"));
         String comment = Utility.denullString(request.getParameter("comment"));
         try {
-            return new TransferOrderBuilder(asset, to, new Amount(amount), comment);
+            return new TransferOrderBuilder(getServiceid(), to, new Amount(amount), comment);
         } catch (InvalidTransferException e) {
             throw new InvalidNamedObjectException(user.getName(), e);
         }

@@ -8,7 +8,7 @@ import org.neuclear.asset.orders.TransferGlobals;
 import org.neuclear.asset.orders.Value;
 import org.neuclear.commons.NeuClearException;
 import org.neuclear.commons.Utility;
-import org.neuclear.id.Identity;
+import org.neuclear.id.Signatory;
 import org.neuclear.id.builders.Builder;
 
 /*
@@ -29,8 +29,12 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: TransferOrderBuilder.java,v 1.4 2004/02/18 00:13:30 pelle Exp $
+$Id: TransferOrderBuilder.java,v 1.5 2004/04/02 23:04:35 pelle Exp $
 $Log: TransferOrderBuilder.java,v $
+Revision 1.5  2004/04/02 23:04:35  pelle
+Got TransferOrder and Builder working with their test cases.
+Working on TransferReceipt which is the first embedded receipt. This is causing some problems at the moment.
+
 Revision 1.4  2004/02/18 00:13:30  pelle
 Many, many clean ups. I've readded Targets in a new method.
 Gotten rid of NamedObjectBuilder and revamped Identity and Resolvers
@@ -132,14 +136,15 @@ TransferReceiptBuilder has been created for use by Transfer processors. It is us
  * Time: 3:13:27 PM
  */
 public class TransferOrderBuilder extends Builder {
-    public TransferOrderBuilder(final Asset asset, final Identity recipient, final Value amount, final String comment) throws InvalidTransferException, NegativeTransferException, NeuClearException {
-        this(asset.getName(),recipient.getName(),amount,comment);
+    public TransferOrderBuilder(final Asset asset, final Signatory recipient, final Value amount, final String comment) throws InvalidTransferException, NegativeTransferException, NeuClearException {
+        this(asset.getName(), recipient.getName(), amount, comment);
     }
+
     public TransferOrderBuilder(final String assetname, final String recipient, final Value amount, final String comment) throws InvalidTransferException, NegativeTransferException, NeuClearException {
         super(TransferGlobals.createQName(TransferGlobals.XFER_TAGNAME));
         if (amount.getAmount() < 0)
             throw new NegativeTransferException(amount);
-        if (assetname==null)
+        if (assetname == null)
             throw new InvalidTransferException("assetName");
         if (recipient == null)
             throw new InvalidTransferException("to");

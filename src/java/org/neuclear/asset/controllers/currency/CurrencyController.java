@@ -40,7 +40,7 @@ public final class CurrencyController extends AssetController {
 
         try {
 
-            final PostedTransaction posted = ledger.verifiedTransfer("id", req.getSignatory().getName(), req.getRecipient().getName(), req.getAmount().getAmount(), req.getComment());
+            final PostedTransaction posted = ledger.verifiedTransfer("id", req.getSignatory().getName(), req.getRecipient(), req.getAmount().getAmount(), req.getComment());
             return (TransferReceipt) new TransferReceiptBuilder(req, posted.getTransactionTime()).convert(asset.getName(), signer);
         } catch (LowlevelLedgerException e) {
             throw new LowLevelPaymentException(e);
@@ -63,9 +63,9 @@ public final class CurrencyController extends AssetController {
      * @return 
      * @throws LowLevelPaymentException 
      */
-    public double getBalance(final Identity id) throws LowLevelPaymentException {
+    public double getBalance(final String id) throws LowLevelPaymentException {
         try {
-            return ledger.getBalance(id.getName());
+            return ledger.getBalance(id);
         } catch (LowlevelLedgerException e) {
             throw new LowLevelPaymentException(e);
         }

@@ -10,7 +10,6 @@ import org.neuclear.asset.orders.TransferOrder;
 import org.neuclear.asset.orders.builders.TransferOrderBuilder;
 import org.neuclear.commons.NeuClearException;
 import org.neuclear.commons.crypto.signers.TestCaseSigner;
-import org.neuclear.id.Identity;
 import org.neuclear.id.SignedNamedObject;
 import org.neuclear.id.receiver.Receiver;
 import org.neuclear.id.resolver.Resolver;
@@ -43,8 +42,12 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: PaymentReceiverTest.java,v 1.18 2004/04/01 23:18:34 pelle Exp $
+$Id: PaymentReceiverTest.java,v 1.19 2004/04/02 23:04:37 pelle Exp $
 $Log: PaymentReceiverTest.java,v $
+Revision 1.19  2004/04/02 23:04:37  pelle
+Got TransferOrder and Builder working with their test cases.
+Working on TransferReceipt which is the first embedded receipt. This is causing some problems at the moment.
+
 Revision 1.18  2004/04/01 23:18:34  pelle
 Split Identity into Signatory and Identity class.
 Identity remains a signed named object and will in the future just be used for self declared information.
@@ -243,9 +246,9 @@ public final class PaymentReceiverTest extends AbstractSigningTest {
         return false;
     }
 
-    public final SignedNamedObject createPayments(final Identity from, final Identity to, final double amount) throws InvalidTransferException, XMLException, NeuClearException, IOException, UnsupportedEncodingException {
-        final TransferOrderBuilder transfer = new TransferOrderBuilder(asset, to, new Amount(amount), "Test One");
-        return transfer.convert(from.getName(), getSigner());
+    public final SignedNamedObject createPayments(final String from, final String to, final double amount) throws InvalidTransferException, XMLException, NeuClearException, IOException, UnsupportedEncodingException {
+        final TransferOrderBuilder transfer = new TransferOrderBuilder(assetName, to, new Amount(amount), "Test One");
+        return transfer.convert(from, getSigner());
     }
 
     protected final String assetName = "neu://test/bux";
