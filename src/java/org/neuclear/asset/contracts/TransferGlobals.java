@@ -21,8 +21,11 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: TransferGlobals.java,v 1.4 2003/11/22 00:22:28 pelle Exp $
+$Id: TransferGlobals.java,v 1.5 2003/11/28 00:11:50 pelle Exp $
 $Log: TransferGlobals.java,v $
+Revision 1.5  2003/11/28 00:11:50  pelle
+Getting the NeuClear web transactions working.
+
 Revision 1.4  2003/11/22 00:22:28  pelle
 All unit tests in commons, id and xmlsec now work.
 AssetController now successfully processes payments in the unit test.
@@ -90,6 +93,12 @@ public final class TransferGlobals {
     }
 
     public static Element createElement(final String name, final String value) {
+        Element elem = createElement(name);
+        elem.setText(value);
+        return elem;
+    }
+
+    public static Element createElement(final String name) {
         return DocumentHelper.createElement(createQName(name));
     }
 

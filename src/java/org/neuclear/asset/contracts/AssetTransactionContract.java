@@ -18,14 +18,17 @@ import java.util.Date;
  * User: pelleb
  * Date: Nov 10, 2003
  * Time: 11:06:37 AM
- * $Id: AssetTransactionContract.java,v 1.7 2003/11/22 00:22:28 pelle Exp $
+ * $Id: AssetTransactionContract.java,v 1.8 2003/11/28 00:11:50 pelle Exp $
  * $Log: AssetTransactionContract.java,v $
+ * Revision 1.8  2003/11/28 00:11:50  pelle
+ * Getting the NeuClear web transactions working.
+ *
  * Revision 1.7  2003/11/22 00:22:28  pelle
  * All unit tests in commons, id and xmlsec now work.
  * AssetController now successfully processes payments in the unit test.
  * Payment Web App has working form that creates a TransferRequest presents it to the signer
  * and forwards it to AssetControlServlet. (Which throws an XML Parser Exception) I think the XMLReaderServlet is bust.
- *
+ * <p/>
  * Revision 1.6  2003/11/21 04:43:04  pelle
  * EncryptedFileStore now works. It uses the PBECipher with DES3 afair.
  * Otherwise You will Finaliate.
@@ -84,6 +87,7 @@ public class AssetTransactionContract extends SignedNamedObject {
                 throw new UnsupportedTransaction(core);
 
             final Asset asset = (Asset) NSResolver.resolveIdentity(elem.attributeValue("assetName"));
+
             final String holdid = elem.attributeValue("holdid");
             if (elem.getName().equals(TransferGlobals.CANCEL_TAGNAME))
                 return new CancelHeldTransferRequest(core, asset, holdid);
@@ -93,7 +97,9 @@ public class AssetTransactionContract extends SignedNamedObject {
             final double amount = Double.parseDouble(elem.attributeValue("amount"));
             final Date valuetime = TimeTools.parseTimeStamp(elem.attributeValue("valuetime"));
             final Identity to = NSResolver.resolveIdentity(elem.attributeValue("recipient"));
-            final String comment = elem.attributeValue("comment");
+            final Element commentElement = elem.element(TransferGlobals.createQName("comment"));
+
+            final String comment = (commentElement != null) ? commentElement.getText() : "";
             if (elem.getName().equals(TransferGlobals.XFER_TAGNAME))
                 return new TransferRequest(core, asset, to, amount, valuetime, comment);
 

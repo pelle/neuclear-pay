@@ -43,8 +43,11 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: PaymentReceiverTest.java,v 1.7 2003/11/22 00:22:29 pelle Exp $
+$Id: PaymentReceiverTest.java,v 1.8 2003/11/28 00:11:51 pelle Exp $
 $Log: PaymentReceiverTest.java,v $
+Revision 1.8  2003/11/28 00:11:51  pelle
+Getting the NeuClear web transactions working.
+
 Revision 1.7  2003/11/22 00:22:29  pelle
 All unit tests in commons, id and xmlsec now work.
 AssetController now successfully processes payments in the unit test.
@@ -156,8 +159,8 @@ public final class PaymentReceiverTest extends AbstractSigningTest {
     }
 
     public final void testTransactions() throws Exception, IOException, InvalidTransferException, NeuClearException {
-        performTransaction(createPayments(getAlice(), getBob(), 100));
-        performTransaction(createPayments(getBob(), getAlice(), 100));
+        performTransaction(createPayments(getAlice(), getBob(), 0));
+        performTransaction(createPayments(getBob(), getAlice(), 0));
     }
 
     public void performTransaction(SignedNamedObject obj) throws Exception {

@@ -42,6 +42,7 @@ public final class CurrencyController extends AssetController {
     }
 
     public final TransferReceiptBuilder process(final TransferRequest req) throws InvalidTransferException, LowLevelPaymentException, TransferDeniedException, NeuClearException {
+
         try {
             if (!req.getSignatory().equals(req.getFrom()))
                 throw new TransferDeniedException(req);

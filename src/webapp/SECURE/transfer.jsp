@@ -38,7 +38,7 @@ if (!submit){
     <p>Recipient:
     <input type="text" name="recipient" value="<%=recipient%>"/></p>
     <p>Amount:
-    <input type="text" name="recipient" value="<%=amount%>"/></p>
+    <input type="text" name="amount" value="<%=amount%>"/></p>
     <p>Comment:
     <input type="text" name="comment" value="<%=comment%>"/></p>
     <p><input type="submit" name="submit" value="Verify"/></p>

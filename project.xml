@@ -1,205 +1,205 @@
 <?xml version="1.0"?>
 <project>
 
-  <name>NeuClear Pay</name>
-  <id>neuclear-pay</id>
-  <currentVersion>0.3-SNAPSHOT</currentVersion>
-  <inceptionYear>2003</inceptionYear>
-  <package>org.neuclear.asset</package>
-  <logo>/images/logo.gif</logo>
-  <shortDescription>NeuClear Payment API</shortDescription>
-	<organization>
-		<name>Antilles Software Ventures SA</name>
-		<url>http://neubia.com/</url>
+    <name>NeuClear Pay</name>
+    <id>neuclear-pay</id>
+    <currentVersion>0.3-SNAPSHOT</currentVersion>
+    <inceptionYear>2003</inceptionYear>
+    <package>org.neuclear.asset</package>
+    <logo>/images/logo.gif</logo>
+    <shortDescription>NeuClear Payment API</shortDescription>
+    <organization>
+        <name>Antilles Software Ventures SA</name>
+        <url>http://neubia.com/</url>
 
-<!--	  <logo>/images/neubiasmallnotext.png</logo>-->
-	</organization>
-  <description>
+        <!--	  <logo>/images/neubiasmallnotext.png</logo>-->
+    </organization>
+    <description>
     Generalised Java API for pay like Applications.
-  </description>
+    </description>
 
-  <url>http://neuclear.org/pay/</url>
+    <url>http://neuclear.org/pay/</url>
     <repository>
-     <connection>
+        <connection>
          scm:cvs:pserver:anonymous@cvs.neuclear.sourceforge.net:/cvsroot/neuclear:neuclear-pay
-     </connection>
-     <url>
+        </connection>
+        <url>
       http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/neuclear/neuclear-pay/
-    </url>
-  </repository>
+        </url>
+    </repository>
 
-  <siteAddress>neuclear.org</siteAddress>
-  <siteDirectory>/home/sites/neuclear.org/public_html/pay/</siteDirectory>
-  <issueTrackingUrl>http://devone.veraxpay.com:9090/</issueTrackingUrl>
-  <mailingLists>
-    <mailingList>
-      <name>NeuClear Announce</name>
-      <subscribe>http://lists.sourceforge.net/lists/listinfo/neuclear-announce</subscribe>
-      <unsubscribe>http://lists.sourceforge.net/lists/listinfo/neuclear-announce</unsubscribe>
-      <archive>http://sourceforge.net/mailarchive/forum.php?forum=neuclear-announce</archive>
-    </mailingList>
-    <mailingList>
-      <name>NeuClear General</name>
-      <subscribe>http://lists.sourceforge.net/lists/listinfo/neuclear-general</subscribe>
-      <unsubscribe>http://lists.sourceforge.net/lists/listinfo/neuclear-general</unsubscribe>
-      <archive>http://sourceforge.net/mailarchive/forum.php?forum=neuclear-general</archive>
-    </mailingList>
-      <mailingList>
-        <name>NeuClear Develop</name>
-        <subscribe>http://lists.sourceforge.net/lists/listinfo/neuclear-develop</subscribe>
-        <unsubscribe>http://lists.sourceforge.net/lists/listinfo/neuclear-develop</unsubscribe>
-        <archive>http://sourceforge.net/mailarchive/forum.php?forum=neuclear-develop</archive>
-      </mailingList>
-  </mailingLists>
+    <siteAddress>neuclear.org</siteAddress>
+    <siteDirectory>/home/sites/neuclear.org/public_html/pay/</siteDirectory>
+    <issueTrackingUrl>http://devone.veraxpay.com:9090/</issueTrackingUrl>
+    <mailingLists>
+        <mailingList>
+            <name>NeuClear Announce</name>
+            <subscribe>http://lists.sourceforge.net/lists/listinfo/neuclear-announce</subscribe>
+            <unsubscribe>http://lists.sourceforge.net/lists/listinfo/neuclear-announce</unsubscribe>
+            <archive>http://sourceforge.net/mailarchive/forum.php?forum=neuclear-announce</archive>
+        </mailingList>
+        <mailingList>
+            <name>NeuClear General</name>
+            <subscribe>http://lists.sourceforge.net/lists/listinfo/neuclear-general</subscribe>
+            <unsubscribe>http://lists.sourceforge.net/lists/listinfo/neuclear-general</unsubscribe>
+            <archive>http://sourceforge.net/mailarchive/forum.php?forum=neuclear-general</archive>
+        </mailingList>
+        <mailingList>
+            <name>NeuClear Develop</name>
+            <subscribe>http://lists.sourceforge.net/lists/listinfo/neuclear-develop</subscribe>
+            <unsubscribe>http://lists.sourceforge.net/lists/listinfo/neuclear-develop</unsubscribe>
+            <archive>http://sourceforge.net/mailarchive/forum.php?forum=neuclear-develop</archive>
+        </mailingList>
+    </mailingLists>
 
-  <developers>
+    <developers>
 
-     <developer>
-      <name>Pelle Braendgaard</name>
-      <id>pelle</id>
-      <email>pelle@neubia.com</email>
-      <organization>Antilles Software Ventures SA</organization>
-    </developer>
+        <developer>
+            <name>Pelle Braendgaard</name>
+            <id>pelle</id>
+            <email>pelle@neubia.com</email>
+            <organization>Antilles Software Ventures SA</organization>
+        </developer>
 
-  </developers>
+    </developers>
 
 
-  <!-- Need to mark these as compile-time/run-time -->
-   <dependencies>
-	<dependency>
-   	<id>neuclear-ledger</id>
-	<name>neuclear-ledger</name>
-	<version>0.3</version>
-        <properties>
-              <war.bundle>true</war.bundle>
-        </properties>
-    </dependency>
-       <dependency>
-          <id>neuclear-commons</id>
-       <name>neuclear-commons</name>
-       <version>0.5-SNAPSHOT</version>
-           <properties>
-                 <war.bundle>true</war.bundle>
-           </properties>
-       </dependency>
-       <dependency>
-           <id>picocontainer</id>
-           <version>1.0-beta-1</version>
-           <properties>
-                 <war.bundle>true</war.bundle>
-           </properties>
-       </dependency>
-       <dependency>
-           <id>nanocontainer</id>
-           <version>1.0-alpha-PRESPLIT-1</version>
-       </dependency>
-       <dependency>
-          <id>neuclear-id</id>
-       <name>neuclear-id</name>
-       <version>0.8-SNAPSHOT</version>
-           <properties>
-                 <war.bundle>true</war.bundle>
-           </properties>
-       </dependency>
-       <dependency>
-           <id>neuclear-xmlsig</id>
-           <name>neuclear-xmlsig</name>
-           <version>0.10</version>
-           <properties>
-                 <war.bundle>true</war.bundle>
-           </properties>
-       </dependency>
-    <dependency>
-    	<id>commons-collections</id>
-      <name>commons-collections</name>
-      <version>2.1</version>
-      <jar>commons-collections-2.1.jar</jar>
-      <properties>
-            <war.bundle>true</war.bundle>
-      </properties>
-    </dependency>
-    <dependency>
-      <id>dom4j</id>
-      <version>1.4</version>
-      <jar>dom4j-1.4.jar</jar>
-      <properties>
-            <war.bundle>true</war.bundle>
-      </properties>
-    </dependency>
-     <dependency>
-          <id>commons-cli</id>
-          <name>commons-cli</name>
-          <version>1.0-beta-2</version>
+    <!-- Need to mark these as compile-time/run-time -->
+    <dependencies>
+        <dependency>
+            <id>neuclear-ledger</id>
+            <name>neuclear-ledger</name>
+            <version>0.3</version>
+            <properties>
+                <war.bundle>true</war.bundle>
+            </properties>
         </dependency>
-    <dependency>
-      <id>bouncycastle</id>
-      <name>bouncycastle</name>
-      <version>115</version>
-      <jar>jce-jdk13-115.jar</jar>
-      <properties>
-            <war.bundle>false</war.bundle>
-      </properties>
-    </dependency>
-   <dependency>
-      <id>junit</id>
-      <name>junit</name>
-      <version>3.8</version>
-    </dependency>
-      <dependency>
-      <id>waterken-adt</id>
-      <version>2.0-beta13</version>
-      <properties>
-            <war.bundle>true</war.bundle>
-      </properties>
-    </dependency>
-    <dependency>
-      <id>javamail</id>
-      <version>1.3</version>
-      <jar>mail.jar</jar>
-      <url>http://java.sun.com/products/javamail/</url>
-   </dependency>
-    <dependency>
-      <id>activation</id>
-      <version>1.0.2</version>
-      <jar>activation.jar</jar>
-      <url>http://java.sun.com/products/javabeans/glasgow/jaf.html</url>
-   </dependency>
-       <dependency>
-           <id>jstl</id>
-           <version>1.0.2</version>
-           <properties>
-            <war.bundle>true</war.bundle>
-      </properties>
-       </dependency>
-       <dependency>
-          <id>servletapi</id>
-          <name>servletapi</name>
-          <version>2.3</version>
+        <dependency>
+            <id>neuclear-commons</id>
+            <name>neuclear-commons</name>
+            <version>0.5-SNAPSHOT</version>
+            <properties>
+                <war.bundle>true</war.bundle>
+            </properties>
+        </dependency>
+        <dependency>
+            <id>picocontainer</id>
+            <version>1.0-beta-1</version>
+            <properties>
+                <war.bundle>true</war.bundle>
+            </properties>
+        </dependency>
+        <dependency>
+            <id>nanocontainer</id>
+            <version>1.0-alpha-PRESPLIT-1</version>
+        </dependency>
+        <dependency>
+            <id>neuclear-id</id>
+            <name>neuclear-id</name>
+            <version>0.8-SNAPSHOT</version>
+            <properties>
+                <war.bundle>true</war.bundle>
+            </properties>
+        </dependency>
+        <dependency>
+            <id>neuclear-xmlsig</id>
+            <name>neuclear-xmlsig</name>
+            <version>0.11-SNAPSHOT</version>
+            <properties>
+                <war.bundle>true</war.bundle>
+            </properties>
+        </dependency>
+        <dependency>
+            <id>commons-collections</id>
+            <name>commons-collections</name>
+            <version>2.1</version>
+            <jar>commons-collections-2.1.jar</jar>
+            <properties>
+                <war.bundle>true</war.bundle>
+            </properties>
+        </dependency>
+        <dependency>
+            <id>dom4j</id>
+            <version>1.4</version>
+            <jar>dom4j-1.4.jar</jar>
+            <properties>
+                <war.bundle>true</war.bundle>
+            </properties>
+        </dependency>
+        <dependency>
+            <id>commons-cli</id>
+            <name>commons-cli</name>
+            <version>1.0-beta-2</version>
+        </dependency>
+        <dependency>
+            <id>bouncycastle</id>
+            <name>bouncycastle</name>
+            <version>120</version>
+            <jar>bcprov-jdk14-120.jar</jar>
+            <properties>
+                <war.bundle>false</war.bundle>
+            </properties>
+        </dependency>
+        <dependency>
+            <id>junit</id>
+            <name>junit</name>
+            <version>3.8</version>
+        </dependency>
+        <dependency>
+            <id>waterken-adt</id>
+            <version>2.0-beta13</version>
+            <properties>
+                <war.bundle>true</war.bundle>
+            </properties>
+        </dependency>
+        <dependency>
+            <id>javamail</id>
+            <version>1.3</version>
+            <jar>mail.jar</jar>
+            <url>http://java.sun.com/products/javamail/</url>
+        </dependency>
+        <dependency>
+            <id>activation</id>
+            <version>1.0.2</version>
+            <jar>activation.jar</jar>
+            <url>http://java.sun.com/products/javabeans/glasgow/jaf.html</url>
+        </dependency>
+        <dependency>
+            <id>jstl</id>
+            <version>1.0.2</version>
+            <properties>
+                <war.bundle>true</war.bundle>
+            </properties>
+        </dependency>
+        <dependency>
+            <id>servletapi</id>
+            <name>servletapi</name>
+            <version>2.3</version>
         </dependency>
 
 
-  </dependencies>
-  <build>
+    </dependencies>
+    <build>
 
-<!--    <sourceDirectories>-->
-      <sourceDirectory>src/java</sourceDirectory>
-<!--    </sourceDirectories>-->
+        <!--    <sourceDirectories>-->
+        <sourceDirectory>src/java</sourceDirectory>
+        <!--    </sourceDirectories>-->
 
-    <unitTestSourceDirectory>src/test</unitTestSourceDirectory>
-    <integrationUnitTestSourceDirectory/>
+        <unitTestSourceDirectory>src/test</unitTestSourceDirectory>
+        <integrationUnitTestSourceDirectory/>
 
-    <!-- Unit test cases -->
-    <unitTest>
-      <includes>
-        <include>**/*Test.java</include>
-      </includes>
-      <excludes>
-        <exclude>**/Abstract*.java</exclude>
-      </excludes>
-    </unitTest>
+        <!-- Unit test cases -->
+        <unitTest>
+            <includes>
+                <include>**/*Test.java</include>
+            </includes>
+            <excludes>
+                <exclude>**/Abstract*.java</exclude>
+            </excludes>
+        </unitTest>
 
-    <!-- J A R  R E S O U R C E S -->
+        <!-- J A R  R E S O U R C E S -->
 
-  </build>
+    </build>
 </project>
 

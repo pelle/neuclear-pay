@@ -54,6 +54,8 @@ public final class AssetControllerReceiver implements Receiver {
     public final ElementProxy receive(final SignedNamedObject obj) throws NeuClearException {
         if (obj instanceof AssetTransactionContract) {
             final TransferContract transfer = (TransferContract) obj;
+            if (obj == null)
+                throw new NeuClearException("Missing Request");
             if (!proc.canProcess(transfer.getAsset()))
                 throw new UnsupportedTransaction(obj);
 
@@ -61,7 +63,6 @@ public final class AssetControllerReceiver implements Receiver {
                 final NamedObjectBuilder sigReceipt = proc.process(transfer);
                 sigReceipt.sign(transfer.getAsset().getName(), signer);
                 return sigReceipt;
-                //TODO do something with receipt
 
             } catch (XMLSecurityException e) {
                 throw new NeuClearException(e);

@@ -5,8 +5,8 @@ import org.neuclear.asset.InvalidTransferException;
 import org.neuclear.asset.NegativeTransferException;
 import org.neuclear.asset.contracts.Asset;
 import org.neuclear.asset.contracts.TransferGlobals;
-import org.neuclear.commons.Utility;
 import org.neuclear.commons.NeuClearException;
+import org.neuclear.commons.Utility;
 import org.neuclear.commons.time.TimeTools;
 import org.neuclear.id.Identity;
 import org.neuclear.id.NSTools;
@@ -32,8 +32,11 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: TransferBuilder.java,v 1.6 2003/11/21 04:43:03 pelle Exp $
+$Id: TransferBuilder.java,v 1.7 2003/11/28 00:11:50 pelle Exp $
 $Log: TransferBuilder.java,v $
+Revision 1.7  2003/11/28 00:11:50  pelle
+Getting the NeuClear web transactions working.
+
 Revision 1.6  2003/11/21 04:43:03  pelle
 EncryptedFileStore now works. It uses the PBECipher with DES3 afair.
 Otherwise You will Finaliate.
@@ -102,6 +105,8 @@ public abstract class TransferBuilder extends NamedObjectBuilder {
         element.add(TransferGlobals.createAttribute(element, "assetName", asset.getName()));
         element.add(TransferGlobals.createAttribute(element, "amount", Double.toString(amount)));
         element.add(TransferGlobals.createAttribute(element, "valuetime", TimeTools.formatTimeStamp(valuetime)));
+        if (!Utility.isEmpty(comment))
+            element.add(TransferGlobals.createElement("comment", comment));
     }
 
     public final Asset getAsset() {
