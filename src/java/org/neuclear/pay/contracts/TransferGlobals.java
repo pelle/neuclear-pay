@@ -20,8 +20,15 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: TransferGlobals.java,v 1.2 2003/10/25 00:38:43 pelle Exp $
+$Id: TransferGlobals.java,v 1.3 2003/11/06 23:47:43 pelle Exp $
 $Log: TransferGlobals.java,v $
+Revision 1.3  2003/11/06 23:47:43  pelle
+Major Refactoring of PaymentProcessor.
+Factored out AssetController to be new abstract parent class together with most of its support classes.
+Created (Half way) RemoteAssetController, which can perform transactions on external AssetControllers via NeuClear.
+Created the first attempt at the ExchangeAgent. This will need use of the RemoteAssetController.
+SOAPTools was changed to return a stream. This is required by the VerifyingReader in NeuClear.
+
 Revision 1.2  2003/10/25 00:38:43  pelle
 Fixed SmtpSender it now sends the messages.
 Refactored CommandLineSigner. Now it simply signs files read from command line. However new class IdentityCreator
@@ -35,7 +42,7 @@ private key of the Receiver.
 A new class TransferGlobals contains usefull settings for making life easier in the other contract based classes.
 TransferContract the signed contract is functional and has a matching TransferRequestBuilder class for programmatically creating
 TransferRequests for signing.
-TransferReceiptBuilder has been created for use by Payment processors. It is used in the PaymentReceiver.
+TransferReceiptBuilder has been created for use by Transfer processors. It is used in the PaymentReceiver.
 
 */
 

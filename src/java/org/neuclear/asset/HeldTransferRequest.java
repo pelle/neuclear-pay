@@ -1,15 +1,14 @@
-package org.neuclear.pay;
+package org.neuclear.asset;
 
 import java.util.Date;
 
 /**
- * 
  * User: pelleb
  * Date: Jul 30, 2003
  * Time: 12:01:03 PM
  */
-public class HeldPaymentRequest extends PaymentRequest implements Held {
-    public HeldPaymentRequest(Account from, Account to, double amount, Date valuedate, Date helduntil, String comment) throws NegativePaymentException {
+public class HeldTransferRequest extends TransferRequest implements Held {
+    public HeldTransferRequest(Account from, Account to, double amount, Date valuedate, Date helduntil, String comment) throws NegativeTransferException, AssetMismatchException {
 
         super(from, to, amount, valuedate, comment);
 

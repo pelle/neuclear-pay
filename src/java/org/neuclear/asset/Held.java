@@ -1,9 +1,8 @@
-package org.neuclear.pay;
+package org.neuclear.asset;
 
 import java.util.Date;
 
 /**
- * 
  * User: pelleb
  * Date: Jul 30, 2003
  * Time: 11:57:39 AM

@@ -1,6 +1,8 @@
 package org.neuclear.pay.receiver;
 
 import org.dom4j.DocumentException;
+import org.neuclear.asset.Account;
+import org.neuclear.asset.AssetController;
 import org.neuclear.commons.NeuClearException;
 import org.neuclear.commons.configuration.Configuration;
 import org.neuclear.commons.configuration.ConfigurationException;
@@ -9,7 +11,6 @@ import org.neuclear.ledger.BookExistsException;
 import org.neuclear.ledger.LedgerCreationException;
 import org.neuclear.ledger.LowlevelLedgerException;
 import org.neuclear.ledger.UnknownBookException;
-import org.neuclear.pay.Account;
 import org.neuclear.pay.PaymentProcessor;
 import org.neuclear.pay.contracts.TransferContract;
 import org.neuclear.receiver.AbstractReceiverTest;
@@ -34,8 +35,15 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: PaymentReceiverTest.java,v 1.3 2003/10/29 21:14:45 pelle Exp $
+$Id: PaymentReceiverTest.java,v 1.4 2003/11/06 23:47:44 pelle Exp $
 $Log: PaymentReceiverTest.java,v $
+Revision 1.4  2003/11/06 23:47:44  pelle
+Major Refactoring of PaymentProcessor.
+Factored out AssetController to be new abstract parent class together with most of its support classes.
+Created (Half way) RemoteAssetController, which can perform transactions on external AssetControllers via NeuClear.
+Created the first attempt at the ExchangeAgent. This will need use of the RemoteAssetController.
+SOAPTools was changed to return a stream. This is required by the VerifyingReader in NeuClear.
+
 Revision 1.3  2003/10/29 21:14:45  pelle
 Refactored the whole signing process. Now we have an interface called Signer which is the old SignerStore.
 To use it you pass a byte array and an alias. The sign method then returns the signature.
@@ -61,7 +69,7 @@ CreateTestPayments is a command line utility to create signed payment requests
 public class PaymentReceiverTest extends AbstractReceiverTest {
     public PaymentReceiverTest(String string) throws LowlevelLedgerException, LedgerCreationException, ConfigurationException {
         super(string);
-        proc = (PaymentProcessor) Configuration.getComponent(PaymentProcessor.class, "neuclear-pay");
+        proc = (AssetController) Configuration.getComponent(PaymentProcessor.class, "neuclear-pay");
         receiver = (PaymentReceiver) Configuration.getComponent(PaymentReceiver.class, "neuclear-pay");
     }
 
@@ -118,6 +126,6 @@ public class PaymentReceiverTest extends AbstractReceiverTest {
     }
 
     private Receiver receiver;
-    private PaymentProcessor proc;
+    private AssetController proc;
     private double balance = 0.0;
 }

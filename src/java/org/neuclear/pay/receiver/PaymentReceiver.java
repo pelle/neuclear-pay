@@ -1,12 +1,12 @@
 package org.neuclear.pay.receiver;
 
+import org.neuclear.asset.*;
 import org.neuclear.id.SignedNamedObject;
 import org.neuclear.id.verifier.VerifyingReader;
 import org.neuclear.ledger.InvalidTransactionException;
 import org.neuclear.ledger.LowlevelLedgerException;
 import org.neuclear.ledger.UnBalancedTransactionException;
 import org.neuclear.ledger.UnknownBookException;
-import org.neuclear.pay.*;
 import org.neuclear.pay.contracts.TransferContract;
 import org.neuclear.pay.contracts.TransferGlobals;
 import org.neuclear.pay.contracts.builders.TransferReceiptBuilder;
@@ -43,7 +43,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 public class PaymentReceiver implements Receiver {
 
-    public PaymentReceiver(PaymentProcessor proc, Signer signer, String asset) {
+    public PaymentReceiver(AssetController proc, Signer signer, String asset) {
         this.proc = proc;
         this.asset = asset;
         this.signer = signer;
@@ -64,7 +64,7 @@ public class PaymentReceiver implements Receiver {
             try {
                 Account from = proc.getAccount(transfer.getName());
                 Account to = proc.getAccount(transfer.getName());
-                PaymentReceipt receipt = from.pay(to, transfer.getAmount(), transfer.getTimeStamp(), "transfer");
+                TransferReceipt receipt = from.pay(to, transfer.getAmount(), transfer.getTimeStamp(), "asset");
                 TransferReceiptBuilder sigReceipt = new TransferReceiptBuilder(receipt);
                 sigReceipt.sign(asset, signer);
                 return sigReceipt;
@@ -79,9 +79,11 @@ public class PaymentReceiver implements Receiver {
                 e.printStackTrace();
             } catch (UnBalancedTransactionException e) {
                 e.printStackTrace();
-            } catch (NegativePaymentException e) {
+            } catch (NegativeTransferException e) {
                 e.printStackTrace();
             } catch (XMLSecurityException e) {
+                e.printStackTrace();
+            } catch (AssetMismatchException e) {
                 e.printStackTrace();
             }
 
@@ -90,7 +92,7 @@ public class PaymentReceiver implements Receiver {
         return null;
     }
 
-    private final PaymentProcessor proc;
+    private final AssetController proc;
     private final String asset;
     private Signer signer;
 

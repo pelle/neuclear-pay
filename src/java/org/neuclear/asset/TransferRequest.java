@@ -1,23 +1,24 @@
-package org.neuclear.pay;
+package org.neuclear.asset;
 
 import java.util.Date;
 
 /**
- * 
  * User: pelleb
  * Date: Jul 21, 2003
  * Time: 5:35:26 PM
  */
-public class PaymentRequest extends Payment {
+public class TransferRequest {
     private final double amount;
     private final Date valuedate;
     private final Account to;
     private final Account from;
     private final String comment;
 
-    public PaymentRequest(Account from, Account to, double amount, Date valuedate, String comment) throws NegativePaymentException {
+    public TransferRequest(Account from, Account to, double amount, Date valuedate, String comment) throws NegativeTransferException, AssetMismatchException {
+        if (!from.getController().equals(to.getController()))
+            throw new AssetMismatchException(from, to);
         if (amount < 0)
-            throw new NegativePaymentException(from.getProc(), amount);
+            throw new NegativeTransferException(from.getController(), amount);
         this.from = from;
         this.to = to;
         this.amount = amount;
@@ -29,7 +30,7 @@ public class PaymentRequest extends Payment {
         return amount;
     }
 
-    public final Date getValuedate() {
+    public final Date getValueTime() {
         return valuedate;
     }
 
