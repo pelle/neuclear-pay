@@ -40,20 +40,21 @@ public final class CurrencyController extends AssetController {
 
         try {
 
-            final PostedTransaction posted = ledger.verifiedTransfer("id", req.getSignatory().getName(), req.getRecipient(), req.getAmount().getAmount(), req.getComment());
-            return (TransferReceipt) new TransferReceiptBuilder(req, posted.getTransactionTime()).convert(asset.getName(), signer);
+            final PostedTransaction posted = ledger.verifiedTransfer(req.getDigest(), req.getSignatory().getName(), req.getRecipient(), req.getAmount().getAmount(), req.getComment());
+            final TransferReceipt receipt = (TransferReceipt) new TransferReceiptBuilder(req, posted.getTransactionTime()).convert(asset.getName(), signer);
+            ledger.setReceiptId(req.getDigest(), receipt.getDigest());
+            return receipt;
         } catch (LowlevelLedgerException e) {
             throw new LowLevelPaymentException(e);
         } catch (InvalidTransactionException e) {
             throw new InvalidTransferException(e.getSubMessage());
         } catch (NegativeTransferException e) {
             throw new InvalidTransferException("postive amount");
+        } catch (UnknownTransactionException e) {
+            throw new LowLevelPaymentException(e);
         }
     }
 
-    private String createTransactionId(final TransferOrder req, final PostedTransaction posted) {
-        return req.getDigest();
-    }
 
     /**
      * Returns balance for a given Identity.
