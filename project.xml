@@ -220,25 +220,34 @@
         </dependency>
     </dependencies>
     <build>
-
-        <!--    <sourceDirectories>-->
         <sourceDirectory>src/java</sourceDirectory>
-        <!--    </sourceDirectories>-->
 
         <unitTestSourceDirectory>src/test</unitTestSourceDirectory>
-        <integrationUnitTestSourceDirectory/>
 
-        <!-- Unit test cases -->
         <unitTest>
             <includes>
                 <include>**/*Test.java</include>
             </includes>
             <excludes>
-                <exclude>**/Abstract*.java</exclude>
+                <exclude>**/Abstract*Test.java</exclude>
             </excludes>
         </unitTest>
 
-        <!-- J A R  R E S O U R C E S -->
+        <resources>
+            <resource>
+                <directory>
+                  src/java
+                </directory>
+                <includes>
+                    <include>*.jks</include>
+                    <include>*.xml</include>
+                    <include>*.properties</include>
+                </includes>
+                <excludes>
+                    <exclude>*.java</exclude>
+                </excludes>
+            </resource>
+        </resources>
 
     </build>
 </project>
