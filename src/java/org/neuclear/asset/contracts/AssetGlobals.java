@@ -24,8 +24,11 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: AssetGlobals.java,v 1.10 2004/04/02 16:58:54 pelle Exp $
+$Id: AssetGlobals.java,v 1.11 2004/04/19 18:46:20 pelle Exp $
 $Log: AssetGlobals.java,v $
+Revision 1.11  2004/04/19 18:46:20  pelle
+Change Asset type name to lowercase
+
 Revision 1.10  2004/04/02 16:58:54  pelle
 Updated Asset and Asset Builder with semi fully featured functionality.
 It now has Issuer, Service etc.
@@ -134,7 +137,7 @@ public final class AssetGlobals {
         return DocumentHelper.createElement(createQName(name));
     }
 
-    public static final String ASSET_TAGNAME = "Asset";
+    public static final String ASSET_TAGNAME = "asset";
     public static final String XFER_ASSETS = "http://neuclear.org/neu/assets";
     public static final String ASSET_NSPREFIX = "as";
     public static final String ISSUER_TAGNAME = "Issuer";
