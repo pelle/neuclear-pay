@@ -33,8 +33,11 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: AssetBuilder.java,v 1.4 2003/11/21 04:43:03 pelle Exp $
+$Id: AssetBuilder.java,v 1.5 2003/12/19 00:30:49 pelle Exp $
 $Log: AssetBuilder.java,v $
+Revision 1.5  2003/12/19 00:30:49  pelle
+Lots of usability changes through out all the passphrase agents and end user tools.
+
 Revision 1.4  2003/11/21 04:43:03  pelle
 EncryptedFileStore now works. It uses the PBECipher with DES3 afair.
 Otherwise You will Finaliate.
@@ -132,11 +135,7 @@ public final class AssetBuilder extends IdentityBuilder {
             final Asset asset= (Asset) assetraw.sign(signer);
             final Store store = new FileStore("target/testdata/repository");
             store.receive(asset);
-        } catch (GeneralSecurityException e) {
-            e.printStackTrace();
-        } catch (NeuClearException e) {
-            e.printStackTrace();
-        } catch (XMLException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
