@@ -151,7 +151,7 @@ public final class CurrencyTests extends TestCase {
         }
 
         TransferReceipt receipt = hold.complete(t3, payment, "valid completion of held payment");
-        System.out.println("Completed held: " + hold.getId() + " complete= " + receipt.getId());
+        System.out.println("Completed held: " + hold.getRequestId() + " complete= " + receipt.getRequestId());
         assertEquals(bob.getBalance(t2), initial, 0);
         assertEquals(bob.getBalance(t3), initial - payment, 0);
         assertEquals(bob.getBalance(t4), initial - payment, 0);

@@ -7,13 +7,11 @@ import org.neuclear.asset.orders.TransferReceipt;
 import org.neuclear.asset.orders.builders.TransferReceiptBuilder;
 import org.neuclear.commons.NeuClearException;
 import org.neuclear.commons.crypto.signers.Signer;
-import org.neuclear.commons.time.TimeTools;
 import org.neuclear.exchange.orders.*;
 import org.neuclear.id.Identity;
 import org.neuclear.id.resolver.NSResolver;
 import org.neuclear.ledger.*;
 
-import java.sql.Timestamp;
 import java.util.Iterator;
 
 /**
@@ -42,9 +40,8 @@ public final class CurrencyController extends AssetController {
 
         try {
 
-            final Timestamp valuetime = TimeTools.now();
-            final PostedTransaction posted = ledger.transfer("id", req.getName(), req.getSignatory().getName(), req.getRecipient().getName(), req.getAmount().getAmount(), req.getComment());
-            return (TransferReceipt) new TransferReceiptBuilder(req, valuetime).convert(asset.getName(), signer);
+            final PostedTransaction posted = ledger.verifiedTransfer("id", req.getSignatory().getName(), req.getRecipient().getName(), req.getAmount().getAmount(), req.getComment());
+            return (TransferReceipt) new TransferReceiptBuilder(req, posted.getTransactionTime()).convert(asset.getName(), signer);
         } catch (LowlevelLedgerException e) {
             throw new LowLevelPaymentException(e);
         } catch (InvalidTransactionException e) {
