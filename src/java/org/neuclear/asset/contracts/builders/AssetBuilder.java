@@ -7,8 +7,6 @@ import org.neuclear.commons.NeuClearException;
 import org.neuclear.commons.crypto.signers.JCESigner;
 import org.neuclear.commons.crypto.signers.TestCaseSigner;
 import org.neuclear.id.builders.IdentityBuilder;
-import org.neuclear.store.FileStore;
-import org.neuclear.store.Store;
 
 import java.security.PublicKey;
 
@@ -30,8 +28,12 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: AssetBuilder.java,v 1.7 2004/02/18 00:13:29 pelle Exp $
+$Id: AssetBuilder.java,v 1.8 2004/03/02 18:39:29 pelle Exp $
 $Log: AssetBuilder.java,v $
+Revision 1.8  2004/03/02 18:39:29  pelle
+Done some more minor fixes within xmlsig, but mainly I've removed the old Source and Store patterns and sub packages. This is because
+they really are no longer necessary with the new non naming naming system.
+
 Revision 1.7  2004/02/18 00:13:29  pelle
 Many, many clean ups. I've readded Targets in a new method.
 Gotten rid of NamedObjectBuilder and revamped Identity and Resolvers
@@ -139,8 +141,7 @@ public final class AssetBuilder extends IdentityBuilder {
                     0.01
             );
             final Asset asset= (Asset) assetraw.convert(assetname,signer);
-            final Store store = new FileStore("target/testdata/repository");
-            store.receive(asset);
+
         } catch (Exception e) {
             e.printStackTrace();
         }
