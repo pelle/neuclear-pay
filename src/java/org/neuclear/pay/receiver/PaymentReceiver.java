@@ -12,10 +12,9 @@ import org.neuclear.pay.contracts.TransferGlobals;
 import org.neuclear.pay.contracts.builders.TransferReceiptBuilder;
 import org.neuclear.receiver.Receiver;
 import org.neuclear.receiver.UnsupportedTransaction;
+import org.neudist.crypto.Signer;
 import org.neudist.xml.ElementProxy;
 import org.neudist.xml.xmlsec.XMLSecurityException;
-
-import java.security.PrivateKey;
 
 /*
 NeuClear Distributed Transaction Clearing Platform
@@ -44,10 +43,10 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 public class PaymentReceiver implements Receiver {
 
-    public PaymentReceiver(PaymentProcessor proc, String asset) {
+    public PaymentReceiver(PaymentProcessor proc, Signer signer, String asset) {
         this.proc = proc;
         this.asset = asset;
-        this.signer = null;
+        this.signer = signer;
     }
 
     /**
@@ -67,7 +66,7 @@ public class PaymentReceiver implements Receiver {
                 Account to = proc.getAccount(transfer.getName());
                 PaymentReceipt receipt = from.pay(to, transfer.getAmount(), transfer.getTimeStamp(), "transfer");
                 TransferReceiptBuilder sigReceipt = new TransferReceiptBuilder(receipt);
-                sigReceipt.sign(signer);
+                sigReceipt.sign(asset, signer);
                 return sigReceipt;
                 //TODO do something with receipt
             } catch (UnknownBookException e) {
@@ -93,7 +92,7 @@ public class PaymentReceiver implements Receiver {
 
     private final PaymentProcessor proc;
     private final String asset;
-    private PrivateKey signer;
+    private Signer signer;
 
     {
         // Registers the readers for transfers
