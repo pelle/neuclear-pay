@@ -1,12 +1,17 @@
 package org.neuclear.asset.remote;
 
+import org.neuclear.asset.orders.AssetTransactionContract;
 import org.neuclear.asset.orders.TransferReceipt;
 import org.neuclear.asset.orders.builders.TransferOrderBuilder;
 import org.neuclear.commons.NeuClearException;
 import org.neuclear.commons.crypto.signers.Signer;
 import org.neuclear.exchange.orders.CancelExchangeReceipt;
 import org.neuclear.exchange.orders.ExchangeOrderReceipt;
+import org.neuclear.exchange.orders.builders.CancelExchangeOrderBuilder;
+import org.neuclear.exchange.orders.builders.ExchangeCompletionOrderBuilder;
+import org.neuclear.exchange.orders.builders.ExchangeOrderBuilder;
 import org.neuclear.id.SignedNamedObject;
+import org.neuclear.id.builders.Builder;
 import org.neuclear.xml.XMLException;
 
 /*
@@ -27,8 +32,11 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: AssetControlClient.java,v 1.12 2004/01/11 00:39:06 pelle Exp $
+$Id: AssetControlClient.java,v 1.13 2004/01/13 23:37:30 pelle Exp $
 $Log: AssetControlClient.java,v $
+Revision 1.13  2004/01/13 23:37:30  pelle
+Refactoring parts of the core of XMLSignature. There shouldnt be any real API changes.
+
 Revision 1.12  2004/01/11 00:39:06  pelle
 Cleaned up the schemas even more they now all verifiy.
 The Order/Receipt pairs for neuclear pay, should now work. They all have Readers using the latest
@@ -128,30 +136,33 @@ SOAPTools was changed to return a stream. This is required by the VerifyingReade
  * This client can be used to perform all the major Asset Transfer functionality using the Assets remote assetName server.
  */
 public final class AssetControlClient {
-    public AssetControlClient(final Signer signer) throws NeuClearException {
+    public AssetControlClient(String name, final Signer signer) throws NeuClearException {
         this.signer = signer;
+        this.name=name;
     }
 
-    public final TransferReceipt performTransfer(final TransferRequestBuilder req) throws NeuClearException, XMLException {
+    public final TransferReceipt performTransfer(final TransferOrderBuilder req) throws NeuClearException, XMLException {
         return (TransferReceipt) send(req);
     }
 
 
-    public final ExchangeOrderReceipt performHeldTransfer(final ExchangeRequestBuilder req) throws NeuClearException, XMLException {
+    public final ExchangeOrderReceipt performHeldTransfer(final ExchangeOrderBuilder req) throws NeuClearException, XMLException {
         return (ExchangeOrderReceipt) send(req);
     }
 
-    public final TransferReceipt performCompleteHeld(final CompleteExchangeRequestBuilder req) throws NeuClearException, XMLException {
+    public final TransferReceipt performCompleteHeld(final ExchangeCompletionOrderBuilder req) throws NeuClearException, XMLException {
         return (TransferReceipt) send(req);
     }
 
-    public final CancelExchangeReceipt performCancelHeld(final CancelExchangeRequestBuilder req) throws NeuClearException, XMLException {
-        return (CancelExchangeReceipt) req.getAsset().receive(req.sign(signer));
+    public final CancelExchangeReceipt performCancelHeld(final CancelExchangeOrderBuilder req) throws NeuClearException, XMLException {
+        return (CancelExchangeReceipt) send(req);
     }
 
-    private SignedNamedObject send(final TransferOrderBuilder req) throws NeuClearException, XMLException {
-        return req.getAsset().receive(req.sign(signer));
+    private SignedNamedObject send(final Builder req) throws NeuClearException, XMLException {
+        final AssetTransactionContract object = (AssetTransactionContract) req.convert(name,signer);
+        return object.getAsset().receive(object);
     }
 
     private final Signer signer;
+    private final String name;
 }
