@@ -3,7 +3,7 @@
 
     <name>NeuClear Pay</name>
     <id>neuclear-pay</id>
-    <currentVersion>1.0-beta3</currentVersion>
+    <currentVersion>1.0-beta4</currentVersion>
     <inceptionYear>2003</inceptionYear>
     <package>org.neuclear.asset</package>
     <logo>/images/logo.gif</logo>
@@ -75,7 +75,7 @@
         <dependency>
             <id>neuclear-commons</id>
             <name>neuclear-commons</name>
-            <version>1.0-beta4</version>
+            <version>1.0-beta8</version>
             <properties>
                 <war.bundle>true</war.bundle>
             </properties>
@@ -105,16 +105,9 @@
             </properties>
         </dependency>
         <dependency>
-            <id>picocontainer</id>
-            <version>1.0-beta-5</version>
-            <properties>
-                <war.bundle>true</war.bundle>
-            </properties>
-        </dependency>
-        <dependency>
             <id>neuclear-id</id>
             <name>neuclear-id</name>
-            <version>1.0-beta4</version>
+            <version>1.0-beta8</version>
             <properties>
                 <war.bundle>true</war.bundle>
             </properties>
@@ -266,6 +259,18 @@
             <properties>
                 <war.bundle>true</war.bundle>
             </properties>
+        </dependency>
+        <dependency>
+            <id>jline</id>
+            <version>0.8.1</version>
+            <properties>
+                <war.bundle>true</war.bundle>
+            </properties>
+        </dependency>
+        <dependency>
+            <id>commons-cli</id>
+            <name>commons-cli</name>
+            <version>1.0</version>
         </dependency>
     </dependencies>
     <build>
