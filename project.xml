@@ -18,7 +18,7 @@
     Generalised Java API for pay like Applications.
     </description>
 
-    <url>http://neuclear.org/pay/</url>
+    <url>http://old.neuclear.org/pay/</url>
     <repository>
         <connection>
          scm:cvs:pserver:anonymous@cvs.neuclear.sourceforge.net:/cvsroot/neuclear:neuclear-pay
@@ -28,9 +28,9 @@
         </url>
     </repository>
 
-    <siteAddress>neuclear.org</siteAddress>
+    <siteAddress>old.neuclear.org</siteAddress>
     <siteDirectory>/home/sites/neuclear.org/public_html/pay/</siteDirectory>
-    <issueTrackingUrl>http://devone.veraxpay.com:9090/</issueTrackingUrl>
+    <issueTrackingUrl>http://jira.neuclear.org/</issueTrackingUrl>
     <mailingLists>
         <mailingList>
             <name>NeuClear Announce</name>
@@ -73,7 +73,7 @@
         <dependency>
             <id>neuclear-commons</id>
             <name>neuclear-commons</name>
-            <version>0.6-SNAPSHOT</version>
+            <version>0.6</version>
             <properties>
                 <war.bundle>true</war.bundle>
             </properties>
@@ -96,7 +96,7 @@
         <dependency>
             <id>neuclear-xmlsig</id>
             <name>neuclear-xmlsig</name>
-            <version>0.12-SNAPSHOT</version>
+            <version>0.12</version>
             <properties>
                 <war.bundle>true</war.bundle>
             </properties>
