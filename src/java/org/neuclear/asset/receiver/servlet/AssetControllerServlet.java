@@ -7,6 +7,7 @@ import org.neuclear.asset.controllers.currency.CurrencyController;
 import org.neuclear.asset.receiver.AssetControllerReceiver;
 import org.neuclear.commons.crypto.signers.TestCaseSigner;
 import org.neuclear.commons.sql.JNDIConnectionSource;
+import org.neuclear.commons.sql.statements.SimpleStatementFactory;
 import org.neuclear.commons.servlets.ServletTools;
 import org.neuclear.id.resolver.NSResolver;
 import org.neuclear.ledger.implementations.SQLLedger;
@@ -33,8 +34,11 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: AssetControllerServlet.java,v 1.7 2003/12/17 23:52:57 pelle Exp $
+$Id: AssetControllerServlet.java,v 1.8 2004/01/02 23:18:06 pelle Exp $
 $Log: AssetControllerServlet.java,v $
+Revision 1.8  2004/01/02 23:18:06  pelle
+Added StatementFactory pattern and refactored the ledger to use it.
+
 Revision 1.7  2003/12/17 23:52:57  pelle
 Added SignatureRequestServlet which is abstract and can be used for building SignatureRequests for various applications.
 
@@ -92,7 +96,7 @@ public final class AssetControllerServlet extends ReceiverServlet {
             final AssetControllerReceiver receiver = new AssetControllerReceiver(
                     new CurrencyController(
                             new SQLLedger(
-                                    new JNDIConnectionSource(datasource),
+                                    new SimpleStatementFactory(new JNDIConnectionSource(datasource)),
                                     getServiceid()
                             ),
                             getServiceid()
