@@ -74,7 +74,7 @@
        <dependency>
           <id>neuclear-commons</id>
        <name>neuclear-commons</name>
-       <version>0.4-SNAPSHOT</version>
+       <version>0.4</version>
        </dependency>
        <dependency>
            <id>picocontainer</id>
@@ -92,7 +92,7 @@
        <dependency>
            <id>neuclear-xmlsig</id>
            <name>neuclear-xmlsig</name>
-           <version>0.10-SNAPSHOT</version>
+           <version>0.10</version>
            <properties>
                  <war.bundle.jar>true</war.bundle.jar>
            </properties>
