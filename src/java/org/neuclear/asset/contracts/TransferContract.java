@@ -49,7 +49,7 @@ public abstract class TransferContract extends AssetTransactionContract {
         this.amount = amount;
         this.comment = (comment != null) ? comment : "";
         this.to = to;
-        this.valuetime = valuetime;
+        this.valuetime = valuetime.getTime();
     }
 
     public final double getAmount() {
@@ -57,7 +57,7 @@ public abstract class TransferContract extends AssetTransactionContract {
     }
 
     public final Date getValueTime() {
-        return valuetime;
+        return new Timestamp(valuetime);
     }
 
     public final Identity getTo() {
@@ -73,7 +73,7 @@ public abstract class TransferContract extends AssetTransactionContract {
 
     private final double amount;
     private final Identity to;
-    private final Date valuetime;
+    private final long valuetime;
     private final String comment;
 
 }

@@ -16,12 +16,12 @@ public final class HeldTransferReceipt extends TransferReceipt implements Held {
 
     HeldTransferReceipt(final SignedNamedCore core, final Asset asset, final Identity from, final Identity to, final String reqid, final double amount, final Date valuetime, final String comment, final Date helduntil) throws NeuClearException {
         super(core, asset, from, to, reqid, amount, valuetime, comment);
-        this.helduntil = helduntil;
+        this.helduntil = helduntil.getTime();
     }
 
     public final Date getHeldUntil() {
-        return helduntil;
+        return new Timestamp(helduntil);
     }
 
-    private final Date helduntil;
+    private final long helduntil;
 }
