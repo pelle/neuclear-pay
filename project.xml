@@ -18,7 +18,7 @@
     Generalised Java API for pay like Applications.
     </description>
 
-    <url>http://old.neuclear.org/pay/</url>
+    <url>http://dev.neuclear.org/pay/</url>
     <repository>
         <connection>
          scm:cvs:pserver:anonymous@cvs.neuclear.sourceforge.net:/cvsroot/neuclear:neuclear-pay
@@ -28,7 +28,7 @@
         </url>
     </repository>
 
-    <siteAddress>old.neuclear.org</siteAddress>
+    <siteAddress>dev.neuclear.org</siteAddress>
     <siteDirectory>/home/sites/neuclear.org/public_html/pay/</siteDirectory>
     <issueTrackingUrl>http://jira.neuclear.org/</issueTrackingUrl>
     <mailingLists>
