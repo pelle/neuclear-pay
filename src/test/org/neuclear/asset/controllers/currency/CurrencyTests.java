@@ -60,7 +60,7 @@ public class CurrencyTests extends AbstractSigningTest {
         return new SimpleLedger("asset");
     }
 
-    protected Ledger createAuditLedger() {
+    protected Ledger createAuditLedger() throws LowlevelLedgerException {
         return new SimpleLedger("audit");
     }
 
@@ -290,7 +290,7 @@ public class CurrencyTests extends AbstractSigningTest {
     public Asset createTestAsset() throws NeuClearException {
         AssetBuilder builder = new AssetBuilder("http://bux.neuclear.org",
                 getSigner().getPublicKey("neu://test/bux"),
-                getAlice().getPublicKey(),
+                getIssuer().getPublicKey(),
                 2, 0);
         return (Asset) builder.convert("neu://test/bux", getSigner());
 
@@ -299,7 +299,7 @@ public class CurrencyTests extends AbstractSigningTest {
     public Asset createShoeAsset() throws NeuClearException {
         AssetBuilder builder = new AssetBuilder("http://shoes.neuclear.org",
                 getSigner().getPublicKey("neu://test/bux"),
-                getAlice().getPublicKey(),
+                getIssuer().getPublicKey(),
                 2, 0);
         return (Asset) builder.convert("neu://test", getSigner());
 

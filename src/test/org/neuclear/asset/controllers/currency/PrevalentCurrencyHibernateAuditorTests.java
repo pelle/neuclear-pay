@@ -4,6 +4,7 @@ import org.neuclear.commons.NeuClearException;
 import org.neuclear.ledger.Ledger;
 import org.neuclear.ledger.LowlevelLedgerException;
 import org.neuclear.ledger.hibernate.HibernateLedger;
+import org.neuclear.ledger.prevalent.PrevalentLedger;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
@@ -26,9 +27,9 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: HibernateCurrencyTests.java,v 1.2 2004/04/12 19:29:53 pelle Exp $
-$Log: HibernateCurrencyTests.java,v $
-Revision 1.2  2004/04/12 19:29:53  pelle
+$Id: PrevalentCurrencyHibernateAuditorTests.java,v 1.1 2004/04/12 19:29:53 pelle Exp $
+$Log: PrevalentCurrencyHibernateAuditorTests.java,v $
+Revision 1.1  2004/04/12 19:29:53  pelle
 Hibernate and Pervayler implementations of the Ledger all pass now for both currency and ledger tests.
 
 Revision 1.1  2004/04/12 15:27:52  pelle
@@ -44,15 +45,18 @@ Create new PrevalentCurrencyTests TestCase for doing integration testing with va
  * Date: Apr 6, 2004
  * Time: 8:11:02 PM
  */
-public class HibernateCurrencyTests extends CurrencyTests {
+public class PrevalentCurrencyHibernateAuditorTests extends CurrencyTests {
 
-    public HibernateCurrencyTests(String s) throws GeneralSecurityException, LowlevelLedgerException, NeuClearException, IOException, ClassNotFoundException {
+    public PrevalentCurrencyHibernateAuditorTests(String s) throws GeneralSecurityException, LowlevelLedgerException, NeuClearException, IOException, ClassNotFoundException {
         super(s);
     }
 
-    protected Ledger createControllerLedger() throws IOException, ClassNotFoundException, LowlevelLedgerException {
-        return new HibernateLedger("test", true);
+    protected Ledger createControllerLedger() throws IOException, ClassNotFoundException {
+        return new PrevalentLedger("asset");
     }
 
+    protected Ledger createAuditLedger() throws LowlevelLedgerException {
+        return new HibernateLedger("audit", true);
+    }
 
 }

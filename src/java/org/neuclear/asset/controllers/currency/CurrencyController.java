@@ -46,6 +46,8 @@ public final class CurrencyController extends AssetController {
     public final TransferReceipt process(final TransferOrder req) throws InvalidTransferException, LowLevelPaymentException, TransferDeniedException, NeuClearException {
 
         try {
+            if (req.getSignatory().getName().equals(issuerBook))
+                throw new InvalidTransferException("Issuer is not allowed to transfer");
 
             final PostedTransaction posted = ledger.verifiedTransfer(req.getDigest(), req.getSignatory().getName(), req.getRecipient(), req.getAmount().getAmount(), req.getComment());
             final TransferReceipt receipt = (TransferReceipt) new TransferReceiptBuilder(req, posted.getTransactionTime()).convert(alias, signer);
@@ -96,6 +98,8 @@ public final class CurrencyController extends AssetController {
 
     public final ExchangeOrderReceipt process(final ExchangeOrder req) throws InvalidTransferException, LowLevelPaymentException, TransferDeniedException, NeuClearException {
         try {
+            if (req.getSignatory().getName().equals(issuerBook))
+                throw new InvalidTransferException("Issuer is not allowed to Exchange");
 
             final PostedHeldTransaction posted = ledger.hold(req.getDigest(), req.getSignatory().getName(), req.getAgent().getSignatory().getName(), req.getExpiry(), req.getAmount().getAmount(), req.getComment());
             final ExchangeOrderReceipt receipt = (ExchangeOrderReceipt) new ExchangeOrderReceiptBuilder(req, posted.getTransactionTime()).convert(alias, signer);

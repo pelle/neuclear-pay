@@ -26,8 +26,11 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: PrevalentCurrencyTests.java,v 1.1 2004/04/12 15:27:52 pelle Exp $
+$Id: PrevalentCurrencyTests.java,v 1.2 2004/04/12 19:29:53 pelle Exp $
 $Log: PrevalentCurrencyTests.java,v $
+Revision 1.2  2004/04/12 19:29:53  pelle
+Hibernate and Pervayler implementations of the Ledger all pass now for both currency and ledger tests.
+
 Revision 1.1  2004/04/12 15:27:52  pelle
 Added Hibernate and Prevalent tests for Currency Controllers
 
@@ -48,7 +51,7 @@ public class PrevalentCurrencyTests extends CurrencyTests {
     }
 
     protected Ledger createControllerLedger() throws IOException, ClassNotFoundException {
-        return new PrevalentLedger("asset", "target/test-data/pl");
+        return new PrevalentLedger("asset");
     }
 
 
