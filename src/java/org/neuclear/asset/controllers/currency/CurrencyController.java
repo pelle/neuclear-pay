@@ -1,4 +1,4 @@
-package org.neuclear.pay;
+package org.neuclear.asset.controllers.currency;
 
 import org.neuclear.asset.*;
 import org.neuclear.asset.contracts.*;

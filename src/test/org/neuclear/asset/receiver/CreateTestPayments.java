@@ -1,4 +1,4 @@
-package org.neuclear.pay.receiver;
+package org.neuclear.asset.receiver;
 
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
@@ -31,8 +31,11 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: CreateTestPayments.java,v 1.3 2003/11/08 01:39:58 pelle Exp $
+$Id: CreateTestPayments.java,v 1.1 2003/11/09 03:26:48 pelle Exp $
 $Log: CreateTestPayments.java,v $
+Revision 1.1  2003/11/09 03:26:48  pelle
+More house keeping and shuffling about mainly pay
+
 Revision 1.3  2003/11/08 01:39:58  pelle
 WARNING this rev is majorly unstable and will almost certainly not compile.
 More major refactoring in neuclear-pay.
@@ -53,7 +56,7 @@ This new Signer pattern allows us to use secure signing hardware such as N-Ciphe
 as SmartCards for end user applications.
 
 Revision 1.1  2003/10/25 00:46:29  pelle
-Added tests to test the PaymentReceiver.
+Added tests to test the AssetControllerReceiver.
 CreateTestPayments is a command line utility to create signed payment requests
 
 */

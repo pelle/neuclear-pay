@@ -1,8 +1,9 @@
-package org.neuclear.pay.receiver;
+package org.neuclear.asset.receiver;
 
 import org.dom4j.DocumentException;
 import org.neuclear.asset.Account;
 import org.neuclear.asset.AssetController;
+import org.neuclear.asset.receiver.AssetControllerReceiver;
 import org.neuclear.asset.contracts.TransferContract;
 import org.neuclear.commons.NeuClearException;
 import org.neuclear.commons.configuration.Configuration;
@@ -12,7 +13,7 @@ import org.neuclear.ledger.BookExistsException;
 import org.neuclear.ledger.LedgerCreationException;
 import org.neuclear.ledger.LowlevelLedgerException;
 import org.neuclear.ledger.UnknownBookException;
-import org.neuclear.pay.CurrencyController;
+import org.neuclear.asset.controllers.currency.CurrencyController;
 import org.neuclear.receiver.AbstractReceiverTest;
 import org.neuclear.receiver.Receiver;
 import org.neudist.xml.XMLException;
@@ -35,8 +36,11 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: PaymentReceiverTest.java,v 1.5 2003/11/08 01:39:58 pelle Exp $
+$Id: PaymentReceiverTest.java,v 1.1 2003/11/09 03:26:48 pelle Exp $
 $Log: PaymentReceiverTest.java,v $
+Revision 1.1  2003/11/09 03:26:48  pelle
+More house keeping and shuffling about mainly pay
+
 Revision 1.5  2003/11/08 01:39:58  pelle
 WARNING this rev is majorly unstable and will almost certainly not compile.
 More major refactoring in neuclear-pay.
@@ -68,7 +72,7 @@ The GuiDialogAgent now works. It simply presents itself as a simple modal dialog
 The two Signer implementations both use it for the passphrase.
 
 Revision 1.1  2003/10/25 00:46:29  pelle
-Added tests to test the PaymentReceiver.
+Added tests to test the AssetControllerReceiver.
 CreateTestPayments is a command line utility to create signed payment requests
 
 */
@@ -82,7 +86,7 @@ public class PaymentReceiverTest extends AbstractReceiverTest {
     public PaymentReceiverTest(String string) throws LowlevelLedgerException, LedgerCreationException, ConfigurationException {
         super(string);
         proc = (AssetController) Configuration.getComponent(CurrencyController.class, "neuclear-pay");
-        receiver = (PaymentReceiver) Configuration.getComponent(PaymentReceiver.class, "neuclear-pay");
+        receiver = (AssetControllerReceiver) Configuration.getComponent(AssetControllerReceiver.class, "neuclear-pay");
     }
 
     public void testSimple() throws Exception, DocumentException, NeuClearException, XMLException {

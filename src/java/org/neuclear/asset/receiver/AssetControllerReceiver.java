@@ -1,4 +1,4 @@
-package org.neuclear.pay.receiver;
+package org.neuclear.asset.receiver;
 
 import org.neuclear.asset.AssetController;
 import org.neuclear.asset.InsufficientFundsException;
@@ -42,9 +42,9 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  * Date: Sep 23, 2003
  * Time: 3:03:03 PM
  */
-public class PaymentReceiver implements Receiver {
+public class AssetControllerReceiver implements Receiver {
 
-    public PaymentReceiver(AssetController proc, Signer signer, String asset) {
+    public AssetControllerReceiver(AssetController proc, Signer signer, String asset) {
         this.proc = proc;
         this.asset = asset;
         this.signer = signer;

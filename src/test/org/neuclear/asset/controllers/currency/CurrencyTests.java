@@ -1,7 +1,8 @@
-package org.neuclear.pay;
+package org.neuclear.asset.controllers.currency;
 
 import junit.framework.TestCase;
 import org.neuclear.asset.*;
+import org.neuclear.asset.controllers.currency.CurrencyController;
 import org.neuclear.asset.contracts.HeldTransferReceipt;
 import org.neuclear.asset.contracts.TransferReceipt;
 import org.neuclear.commons.configuration.ConfigurationException;
@@ -19,8 +20,8 @@ import java.util.Random;
  * Date: Jul 21, 2003
  * Time: 6:05:04 PM
  */
-public class PaymentTests extends TestCase {
-    public PaymentTests(String s) throws SQLException, IOException, LowlevelLedgerException, BookExistsException, LedgerCreationException, ConfigurationException {
+public class CurrencyTests extends TestCase {
+    public CurrencyTests(String s) throws SQLException, IOException, LowlevelLedgerException, BookExistsException, LedgerCreationException, ConfigurationException {
         super(s);
         proc = CurrencyController.getInstance();
     }
