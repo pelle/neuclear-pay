@@ -26,8 +26,12 @@ import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.net.URL;
+import java.net.URLEncoder;
 import java.text.NumberFormat;
 import java.util.Iterator;
 import java.util.ResourceBundle;
@@ -50,8 +54,11 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: TransferOrderServlet.java,v 1.2 2004/06/22 14:23:33 pelle Exp $
+$Id: TransferOrderServlet.java,v 1.3 2004/08/18 09:42:55 pelle Exp $
 $Log: TransferOrderServlet.java,v $
+Revision 1.3  2004/08/18 09:42:55  pelle
+Many fixes to the various Signing and SigningRequest Servlets etc.
+
 Revision 1.2  2004/06/22 14:23:33  pelle
 Fixed issues with endpoints in the signing request and signing servlets
 
@@ -150,6 +157,22 @@ public class TransferOrderServlet extends SignatureRequestServlet {
                         Identity id = controller.register(recipient);
                         recpbook = ledger.getBook(id.getSignatory().getName());
                     } catch (Exception e) {
+                        submit = false;
+                    }
+                } else if (recipient.indexOf('@') >= 0) {
+                    URL url = new URL("http://tiqt.com/send.jsp?create=xml&senderemail=noreply@tiqt.com&email=" + URLEncoder.encode(recipient));
+//                    System.out.println("URL: "+url.toExternalForm());
+                    String tiqt = new BufferedReader(new InputStreamReader(url.openStream())).readLine();
+//                    System.out.println("TIQT: "+tiqt);
+                    if (tiqt != null && tiqt.startsWith("http://tiqt.com")) {
+                        try {
+                            Identity id = controller.register(tiqt);
+                            recpbook = ledger.getBook(id.getSignatory().getName());
+                        } catch (Exception e) {
+                            submit = false;
+                        }
+
+                    } else {
                         submit = false;
                     }
                 } else if (recipient.length() == 32) {
