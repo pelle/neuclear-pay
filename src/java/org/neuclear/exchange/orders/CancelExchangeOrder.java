@@ -17,20 +17,16 @@ import org.neuclear.id.SignedNamedObject;
  */
 public final class CancelExchangeOrder extends ExchangeTransactionContract{
 
-    private CancelExchangeOrder(final SignedNamedCore core, final Asset asset,final ExchangeAgent agent, final String exchangeid)  {
-        super(core, asset,agent);
-        this.exchangeid = exchangeid;
+    private CancelExchangeOrder(final SignedNamedCore core, final ExchangeOrderReceipt receipt)  {
+        super(core, receipt.getAsset(), receipt.getAgent());
+        this.receipt=receipt;
     }
     public ExchangeOrderReceipt getExchangeReceipt(){
-        //TODO Implement
-        return null;
+        return receipt;
     }
 
-    public String getExchangeid() {
-        return exchangeid;
-    }
 
-    private final String exchangeid;
+    private final ExchangeOrderReceipt receipt;
 
     public static final class Reader implements NamedObjectReader {
         /**
@@ -45,9 +41,8 @@ public final class CancelExchangeOrder extends ExchangeTransactionContract{
 
             if (elem.getName().equals(ExchangeGlobals.CANCEL_TAGNAME))
                 return new CancelExchangeOrder(core,
-                        TransferGlobals.parseAssetTag(elem),
-                        ExchangeGlobals.parseAgentTag(elem),
-                        ExchangeGlobals.parseExchangeOrderId(elem));
+                        (ExchangeOrderReceipt) TransferGlobals.parseEmbedded(elem,ExchangeGlobals.createQName(ExchangeGlobals.EXCHANGE_RCPT_TAGNAME))
+                        );
 
             throw new InvalidNamedObjectException(core.getName(),"Not Matched");
         }

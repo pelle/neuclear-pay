@@ -10,7 +10,7 @@ import org.neuclear.id.*;
  * Date: Jul 21, 2003
  * Time: 5:35:26 PM
  */
-public class TransferOrder extends AssetTransactionContract {
+public final class TransferOrder extends AssetTransactionContract {
 
     private TransferOrder(final SignedNamedCore core, final Asset asset, final Identity recipient, final double amount, final String comment)  {
         super(core, asset);

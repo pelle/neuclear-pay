@@ -1,13 +1,18 @@
-package org.neuclear.exchange.orders.builders;
+package org.neuclear.asset.orders.builders;
 
 import org.dom4j.Element;
+import org.dom4j.QName;
 import org.neuclear.asset.InvalidTransferException;
 import org.neuclear.asset.NegativeTransferException;
-import org.neuclear.asset.orders.builders.TransferBuilder;
+import org.neuclear.asset.contracts.Asset;
 import org.neuclear.asset.orders.transfers.TransferGlobals;
+import org.neuclear.asset.orders.TransferGlobals;
 import org.neuclear.commons.NeuClearException;
-import org.neuclear.exchange.orders.ExchangeOrderReceipt;
+import org.neuclear.commons.Utility;
 import org.neuclear.id.Identity;
+import org.neuclear.id.NSTools;
+import org.neuclear.id.builders.NamedObjectBuilder;
+import org.neuclear.xml.xmlsec.SignedElement;
 
 /*
 NeuClear Distributed Transaction Clearing Platform
@@ -27,32 +32,62 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: CompleteExchangeRequestBuilder.java,v 1.2 2004/01/10 00:00:46 pelle Exp $
-$Log: CompleteExchangeRequestBuilder.java,v $
-Revision 1.2  2004/01/10 00:00:46  pelle
+$Id: TransferOrderBuilder.java,v 1.1 2004/01/11 00:39:06 pelle Exp $
+$Log: TransferOrderBuilder.java,v $
+Revision 1.1  2004/01/11 00:39:06  pelle
+Cleaned up the schemas even more they now all verifiy.
+The Order/Receipt pairs for neuclear pay, should now work. They all have Readers using the latest
+Schema.
+The TransferBuilders are done and the ExchangeBuilders are nearly there.
+The new EmbeddedSignedNamedObject builder is useful for creating new Receipts. The new ReceiptBuilder uses
+this to create the embedded transaction.
+ExchangeOrders now have the concept of BidItem's, you could create an ExchangeOrder bidding on various items at the same time, to be exchanged as one atomic multiparty exchange.
+Still doesnt build yet, but very close now ;-)
+
+Revision 1.2  2004/01/10 00:00:44  pelle
 Implemented new Schema for Transfer*
 Working on it for Exchange*, so far all Receipts are implemented.
 Added SignedNamedDocument which is a generic SignedNamedObject that works with all Signed XML.
 Changed SignedNamedObject.getDigest() from byte array to String.
 The whole malarchy in neuclear-pay does not build yet. The refactoring is a big job, but getting there.
 
-Revision 1.1  2004/01/05 23:47:10  pelle
+Revision 1.1  2004/01/05 23:47:09  pelle
 Create new Document classification "order", which is really just inherint in the new
 package layout.
 Got rid of much of the inheritance that was lying around and thought a bit further about the format of the exchange orders.
 
-Revision 1.1  2004/01/03 20:36:25  pelle
+Revision 1.9  2004/01/03 20:36:25  pelle
 Renamed HeldTransfer to Exchange
 Dropped valuetime from the request objects.
 Doesnt yet compile. New commit to follow soon.
 
-Revision 1.2  2003/11/21 04:43:03  pelle
+Revision 1.8  2003/12/06 00:16:10  pelle
+Updated various areas in NSTools.
+Updated URI Validation in particular to support new expanded format
+Updated createUniqueID and friends to be a lot more unique and more efficient.
+In CryptoTools updated getRandom() to finally use a SecureRandom.
+Changed CryptoTools.getFormatURLSafe to getBase36 because that is what it really is.
+
+Revision 1.7  2003/11/28 00:11:50  pelle
+Getting the NeuClear web transactions working.
+
+Revision 1.6  2003/11/21 04:43:03  pelle
 EncryptedFileStore now works. It uses the PBECipher with DES3 afair.
 Otherwise You will Finaliate.
 Anything that can be final has been made final throughout everyting. We've used IDEA's Inspector tool to find all instance of variables that could be final.
 This should hopefully make everything more stable (and secure).
 
-Revision 1.1  2003/11/10 17:42:07  pelle
+Revision 1.5  2003/11/12 23:47:04  pelle
+Much work done in creating good test environment.
+PaymentReceiverTest works, but needs a abit more work in its environment to succeed testing.
+
+Revision 1.4  2003/11/11 21:17:19  pelle
+Further vital reshuffling.
+org.neudist.crypto.* and org.neudist.utils.* have been moved to respective areas under org.neuclear.commons
+org.neuclear.signers.* as well as org.neuclear.passphraseagents have been moved under org.neuclear.commons.crypto as well.
+Did a bit of work on the Canonicalizer and changed a few other minor bits.
+
+Revision 1.3  2003/11/10 17:42:07  pelle
 The AssetController interface has been more or less finalized.
 CurrencyController fully implemented
 AssetControlClient implementes a remote client for communicating with AssetControllers
@@ -84,19 +119,25 @@ TransferReceiptBuilder has been created for use by Transfer processors. It is us
 /**
  * User: pelleb
  * Date: Oct 3, 2003
- * Time: 6:28:26 PM
+ * Time: 3:13:27 PM
  */
-public final class CompleteExchangeRequestBuilder extends TransferBuilder {
-    public CompleteExchangeRequestBuilder(final ExchangeOrderReceipt req,final Identity signatory,final String id,final double amount, final String comment) throws InvalidTransferException, NegativeTransferException, NeuClearException {
-        super(TransferGlobals.COMPLETE_TAGNAME,
-                req.getAsset(),
-                signatory,
-                req.getAgent(),
-                amount,
-                comment);
+public class TransferOrderBuilder extends SignedElement {
+    protected TransferOrderBuilder(final Asset asset, final Identity recipient, final double amount, final String comment) throws InvalidTransferException, NegativeTransferException, NeuClearException {
+        super(TransferGlobals.createQName(TransferGlobals.XFER_TAGNAME));
+        if (amount < 0)
+            throw new NegativeTransferException(amount);
+        if (asset==null)
+            throw new InvalidTransferException("assetName");
+        if (recipient == null)
+            throw new InvalidTransferException("to");
+
         final Element element = getElement();
-        element.add(TransferGlobals.createAttribute(element, "sender", req.getFrom().getName()));
-        element.add(TransferGlobals.createAttribute(element, "holdid", req.getName()));
+        element.add(TransferGlobals.createElement(TransferGlobals.RECIPIENT_TAG, recipient.getName()));
+        element.add(TransferGlobals.createElement(TransferGlobals.ASSET_TAG, asset.getName()));
+        element.add(TransferGlobals.createElement(TransferGlobals.AMOUNT_TAG,Double.toString(amount)));
+
+        if (!Utility.isEmpty(comment))
+            element.add(TransferGlobals.createElement(TransferGlobals.COMMENT_TAG, comment));
     }
 
 }

@@ -2,7 +2,6 @@ package org.neuclear.asset.receiver.servlet;
 
 import org.neuclear.asset.InvalidTransferException;
 import org.neuclear.asset.contracts.Asset;
-import org.neuclear.asset.orders.builders.TransferRequestBuilder;
 import org.neuclear.commons.NeuClearException;
 import org.neuclear.commons.Utility;
 import org.neuclear.commons.time.TimeTools;
@@ -32,8 +31,18 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: TransferRequestServlet.java,v 1.3 2004/01/10 00:00:45 pelle Exp $
+$Id: TransferRequestServlet.java,v 1.4 2004/01/11 00:39:06 pelle Exp $
 $Log: TransferRequestServlet.java,v $
+Revision 1.4  2004/01/11 00:39:06  pelle
+Cleaned up the schemas even more they now all verifiy.
+The Order/Receipt pairs for neuclear pay, should now work. They all have Readers using the latest
+Schema.
+The TransferBuilders are done and the ExchangeBuilders are nearly there.
+The new EmbeddedSignedNamedObject builder is useful for creating new Receipts. The new ReceiptBuilder uses
+this to create the embedded transaction.
+ExchangeOrders now have the concept of BidItem's, you could create an ExchangeOrder bidding on various items at the same time, to be exchanged as one atomic multiparty exchange.
+Still doesnt build yet, but very close now ;-)
+
 Revision 1.3  2004/01/10 00:00:45  pelle
 Implemented new Schema for Transfer*
 Working on it for Exchange*, so far all Receipts are implemented.

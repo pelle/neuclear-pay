@@ -1,15 +1,11 @@
 package org.neuclear.asset.remote;
 
 import org.neuclear.asset.orders.TransferReceipt;
-import org.neuclear.asset.orders.builders.TransferBuilder;
-import org.neuclear.asset.orders.builders.TransferRequestBuilder;
+import org.neuclear.asset.orders.builders.TransferOrderBuilder;
 import org.neuclear.commons.NeuClearException;
 import org.neuclear.commons.crypto.signers.Signer;
 import org.neuclear.exchange.orders.CancelExchangeReceipt;
 import org.neuclear.exchange.orders.ExchangeOrderReceipt;
-import org.neuclear.exchange.orders.builders.CancelExchangeRequestBuilder;
-import org.neuclear.exchange.orders.builders.CompleteExchangeRequestBuilder;
-import org.neuclear.exchange.orders.builders.ExchangeRequestBuilder;
 import org.neuclear.id.SignedNamedObject;
 import org.neuclear.xml.XMLException;
 
@@ -31,8 +27,18 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: AssetControlClient.java,v 1.11 2004/01/10 00:00:45 pelle Exp $
+$Id: AssetControlClient.java,v 1.12 2004/01/11 00:39:06 pelle Exp $
 $Log: AssetControlClient.java,v $
+Revision 1.12  2004/01/11 00:39:06  pelle
+Cleaned up the schemas even more they now all verifiy.
+The Order/Receipt pairs for neuclear pay, should now work. They all have Readers using the latest
+Schema.
+The TransferBuilders are done and the ExchangeBuilders are nearly there.
+The new EmbeddedSignedNamedObject builder is useful for creating new Receipts. The new ReceiptBuilder uses
+this to create the embedded transaction.
+ExchangeOrders now have the concept of BidItem's, you could create an ExchangeOrder bidding on various items at the same time, to be exchanged as one atomic multiparty exchange.
+Still doesnt build yet, but very close now ;-)
+
 Revision 1.11  2004/01/10 00:00:45  pelle
 Implemented new Schema for Transfer*
 Working on it for Exchange*, so far all Receipts are implemented.
@@ -143,7 +149,7 @@ public final class AssetControlClient {
         return (CancelExchangeReceipt) req.getAsset().receive(req.sign(signer));
     }
 
-    private SignedNamedObject send(final TransferBuilder req) throws NeuClearException, XMLException {
+    private SignedNamedObject send(final TransferOrderBuilder req) throws NeuClearException, XMLException {
         return req.getAsset().receive(req.sign(signer));
     }
 

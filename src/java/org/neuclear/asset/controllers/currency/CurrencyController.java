@@ -50,14 +50,13 @@ public final class CurrencyController extends AssetController {
     public final TransferReceiptBuilder process(final TransferOrder req) throws InvalidTransferException, LowLevelPaymentException, TransferDeniedException, NeuClearException {
 
         try {
-            if (!req.getSignatory().equals(req.getFrom()))
-                throw new TransferDeniedException(req);
-            final Book from = getBook(req.getFrom());
+            final Book from = getBook(req.getSignatory());
             final Book to = getBook(req.getRecipient());
 
             final Timestamp valuetime =TimeTools.now();
             final PostedTransaction posted = from.transfer(to, req.getAmount(), req.getComment(), valuetime);
-            return new TransferReceiptBuilder(req, createTransactionId(req, posted));
+            final String transaction = createTransactionId(req, posted);
+            return new TransferReceiptBuilder(req, transaction);
         } catch (UnknownBookException e) {
             throw new InvalidTransferException(e.getSubMessage());
         } catch (LowlevelLedgerException e) {
@@ -72,7 +71,7 @@ public final class CurrencyController extends AssetController {
     }
 
     private String createTransactionId(final TransferOrder req, final PostedTransaction posted) {
-        return req.getAsset().getName() + "/" + posted.getXid();
+        return req.getDigest();
     }
 
     private Book getBook(final Identity id) throws UnknownBookException, LowlevelLedgerException {

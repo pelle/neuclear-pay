@@ -1,15 +1,20 @@
-package org.neuclear.asset.orders.builders;
+package org.neuclear.exchange.orders.builders;
 
 import org.dom4j.Element;
+import org.dom4j.QName;
 import org.neuclear.asset.InvalidTransferException;
 import org.neuclear.asset.NegativeTransferException;
 import org.neuclear.asset.contracts.Asset;
 import org.neuclear.asset.orders.transfers.TransferGlobals;
+import org.neuclear.asset.orders.TransferGlobals;
 import org.neuclear.commons.NeuClearException;
 import org.neuclear.commons.Utility;
 import org.neuclear.id.Identity;
 import org.neuclear.id.NSTools;
 import org.neuclear.id.builders.NamedObjectBuilder;
+import org.neuclear.xml.xmlsec.SignedElement;
+import org.neuclear.exchange.orders.ExchangeGlobals;
+import org.neuclear.exchange.contracts.ExchangeAgent;
 
 /*
 NeuClear Distributed Transaction Clearing Platform
@@ -29,8 +34,18 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: TransferBuilder.java,v 1.2 2004/01/10 00:00:44 pelle Exp $
-$Log: TransferBuilder.java,v $
+$Id: ExchangeOrderBuilder.java,v 1.1 2004/01/11 00:39:06 pelle Exp $
+$Log: ExchangeOrderBuilder.java,v $
+Revision 1.1  2004/01/11 00:39:06  pelle
+Cleaned up the schemas even more they now all verifiy.
+The Order/Receipt pairs for neuclear pay, should now work. They all have Readers using the latest
+Schema.
+The TransferBuilders are done and the ExchangeBuilders are nearly there.
+The new EmbeddedSignedNamedObject builder is useful for creating new Receipts. The new ReceiptBuilder uses
+this to create the embedded transaction.
+ExchangeOrders now have the concept of BidItem's, you could create an ExchangeOrder bidding on various items at the same time, to be exchanged as one atomic multiparty exchange.
+Still doesnt build yet, but very close now ;-)
+
 Revision 1.2  2004/01/10 00:00:44  pelle
 Implemented new Schema for Transfer*
 Working on it for Exchange*, so far all Receipts are implemented.
@@ -108,28 +123,23 @@ TransferReceiptBuilder has been created for use by Transfer processors. It is us
  * Date: Oct 3, 2003
  * Time: 3:13:27 PM
  */
-public abstract class TransferBuilder extends NamedObjectBuilder {
-    protected TransferBuilder(final String tagname, final Asset asset, final Identity signer, final Identity to, final double amount, final String comment) throws InvalidTransferException, NegativeTransferException, NeuClearException {
-        super(NSTools.createUniqueTransactionID(signer.getName(), to.getName()), TransferGlobals.createQName(tagname));
+public class ExchangeOrderBuilder extends SignedElement {
+    protected ExchangeOrderBuilder(final Asset asset, final ExchangeAgent agent, final double amount, final String comment) throws InvalidTransferException, NegativeTransferException, NeuClearException {
+        super(ExchangeGlobals.createQName(ExchangeGlobals.EXCHANGE_TAGNAME));
         if (amount < 0)
             throw new NegativeTransferException(amount);
-        if (Utility.isEmpty(asset))
+        if (asset==null)
             throw new InvalidTransferException("assetName");
-        if (to == null)
-            throw new InvalidTransferException("to");
+        if (agent == null)
+            throw new InvalidTransferException("agent");
 
-        this.asset = asset;
         final Element element = getElement();
-        element.add(TransferGlobals.createAttribute(element, "recipient", to.getName()));
-        element.add(TransferGlobals.createAttribute(element, "assetName", asset.getName()));
-        element.add(TransferGlobals.createAttribute(element, "amount", Double.toString(amount)));
+        element.add(ExchangeGlobals.createElement(ExchangeGlobals.AGENT_TAG, agent.getName()));
+        element.add(TransferGlobals.createElement(TransferGlobals.ASSET_TAG, asset.getName()));
+        element.add(TransferGlobals.createElement(TransferGlobals.AMOUNT_TAG,Double.toString(amount)));
+
         if (!Utility.isEmpty(comment))
-            element.add(TransferGlobals.createElement("comment", comment));
+            element.add(TransferGlobals.createElement(TransferGlobals.COMMENT_TAG, comment));
     }
 
-    public final Asset getAsset() {
-        return asset;
-    }
-
-    private final Asset asset;
 }

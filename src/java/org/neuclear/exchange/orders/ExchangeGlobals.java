@@ -26,8 +26,18 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: ExchangeGlobals.java,v 1.2 2004/01/10 00:00:46 pelle Exp $
+$Id: ExchangeGlobals.java,v 1.3 2004/01/11 00:39:06 pelle Exp $
 $Log: ExchangeGlobals.java,v $
+Revision 1.3  2004/01/11 00:39:06  pelle
+Cleaned up the schemas even more they now all verifiy.
+The Order/Receipt pairs for neuclear pay, should now work. They all have Readers using the latest
+Schema.
+The TransferBuilders are done and the ExchangeBuilders are nearly there.
+The new EmbeddedSignedNamedObject builder is useful for creating new Receipts. The new ReceiptBuilder uses
+this to create the embedded transaction.
+ExchangeOrders now have the concept of BidItem's, you could create an ExchangeOrder bidding on various items at the same time, to be exchanged as one atomic multiparty exchange.
+Still doesnt build yet, but very close now ;-)
+
 Revision 1.2  2004/01/10 00:00:46  pelle
 Implemented new Schema for Transfer*
 Working on it for Exchange*, so far all Receipts are implemented.
@@ -147,12 +157,6 @@ public final class ExchangeGlobals {
 
     }
 
-    public static final Asset parseBidAssetTag(final Element elem) throws InvalidNamedObjectException {
-        return parseAssetTag(elem,BID_ASSET_TAG);
-    }
-    public static final Asset parseSettlementAssetTag(final Element elem) throws InvalidNamedObjectException {
-        return parseAssetTag(elem,SETTLEMENT_ASSET_TAG);
-    }
     public static final Asset parseAssetTag(final Element elem,final String tag) throws InvalidNamedObjectException {
         final String name = getElementValue(elem,tag);
         try {
@@ -187,11 +191,13 @@ public final class ExchangeGlobals {
     public static final String COMPLETE_RCPT_TAGNAME = "ExchangeCompletedReceipt";
     public static final String CANCEL_TAGNAME = "CancelExchangeOrder";
     public static final String CANCEL_RCPT_TAGNAME = "CancelExchangeReceipt";
+    public static final String EXPIRY_TAG = "ExpiryDate";
+    public static final String EXCHANGE_REF_TAG = "ExchangeOrderRef";
+    public static final String EXCHANGE_TIME_TAGNAME = "ExchangeTime";
+    public static final String AGENT_TAG = "ExchangeAgent";
+    public static final String BID_ITEM_TAG = "BidItem";
 
     public static final String EX_NSPREFIX = "ex";
     public static final String EX_NSURI = "http://neuclear.org/neu/exch";
-    public static final String EXCHANGE_REF_TAG = "ExchangeOrderRef";
-    private static final String AGENT_TAG = "ExchangeAgent";
-    public static final String SETTLEMENT_ASSET_TAG = "SettlementAsset";
-    public static final String BID_ASSET_TAG = "BidAsset";
+
 }

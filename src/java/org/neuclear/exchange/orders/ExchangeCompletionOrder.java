@@ -1,8 +1,11 @@
 package org.neuclear.exchange.orders;
 
 import org.neuclear.asset.contracts.Asset;
+import org.neuclear.asset.contracts.AssetGlobals;
+import org.neuclear.asset.orders.TransferGlobals;
 import org.neuclear.exchange.contracts.ExchangeAgent;
-import org.neuclear.id.SignedNamedCore;
+import org.neuclear.id.*;
+import org.dom4j.Element;
 
 import java.sql.Timestamp;
 import java.util.Date;
@@ -13,33 +16,50 @@ import java.util.Date;
  * Time: 5:35:26 PM
  */
 public final class ExchangeCompletionOrder extends ExchangeTransactionContract {
-    private ExchangeCompletionOrder(final SignedNamedCore core, final Asset asset, final ExchangeAgent agent, final Date valuetime, final double amount, final String holdid, final String counterpartyid) {
-        super(core, asset,agent);
-        this.valuetime = valuetime.getTime();
+    private ExchangeCompletionOrder(final SignedNamedCore core, final ExchangeOrderReceipt receipt, final Identity counterparty, final double amount, final Date exchangetime) {
+        super(core,receipt.getAsset(), receipt.getAgent());
+        this.exchangetime = exchangetime.getTime();
         this.amount = amount;
-        this.holdid = holdid;
-        this.counterpartyid = counterpartyid;
+        this.counterparty=counterparty;
     }
 
-    public Timestamp getValuetime() {
-        return new Timestamp(valuetime);
+    public final Timestamp getExchangeTime() {
+        return new Timestamp(exchangetime);
     }
 
-    public double getAmount() {
+    public final double getAmount() {
         return amount;
     }
 
-    public String getHoldid() {
-        return holdid;
+    public final Identity getCounterparty() {
+        return counterparty;
     }
 
-    public String getCounterpartyid() {
-        return counterpartyid;
-    }
-
-    private final long valuetime;
+    private final long exchangetime;
     private final double amount;
-    private final String holdid;
-    private final String counterpartyid;
+    private final Identity counterparty;
+
+    public static final class Reader implements NamedObjectReader {
+        /**
+         * Read object from Element and fill in its details
+         *
+         * @param elem
+         * @return
+         */
+        public final SignedNamedObject read(final SignedNamedCore core, final Element elem) throws InvalidNamedObjectException {
+            if (!elem.getNamespace().equals(AssetGlobals.NS_ASSET))
+                throw new InvalidNamedObjectException(core.getName(),"Not in XML NameSpace: "+AssetGlobals.NS_ASSET.getURI());
+
+            if (elem.getName().equals(ExchangeGlobals.COMPLETE_TAGNAME)){
+                return new ExchangeCompletionOrder(core,
+                        (ExchangeOrderReceipt)TransferGlobals.parseEmbedded(elem,ExchangeGlobals.createQName(ExchangeGlobals.EXCHANGE_RCPT_TAGNAME)),
+                        TransferGlobals.parseRecipientTag(elem),
+                        TransferGlobals.parseAmountTag(elem),
+                        TransferGlobals.parseTimeStampElement(elem,ExchangeGlobals.createQName(ExchangeGlobals.EXCHANGE_TIME_TAGNAME))
+                        );
+            }
+            throw new InvalidNamedObjectException(core.getName(),"Not Matched");
+        }
+    }
 
 }
