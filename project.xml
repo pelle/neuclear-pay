@@ -75,7 +75,7 @@
         <dependency>
             <id>neuclear-commons</id>
             <name>neuclear-commons</name>
-            <version>1.0-beta10</version>
+            <version>1.0-beta12</version>
             <properties>
                 <war.bundle>true</war.bundle>
             </properties>
@@ -83,7 +83,7 @@
         <dependency>
             <id>neuclear-ledger</id>
             <name>neuclear-ledger</name>
-            <version>0.5.3</version>
+            <version>0.5.5</version>
             <properties>
                 <war.bundle>true</war.bundle>
             </properties>
@@ -99,7 +99,7 @@
         <dependency>
             <id>neuclear-ledger-hibernate</id>
             <name>neuclear-ledger-hibernate</name>
-            <version>0.5.3</version>
+            <version>0.5.4</version>
             <properties>
                 <war.bundle>true</war.bundle>
             </properties>
@@ -107,7 +107,7 @@
         <dependency>
             <id>neuclear-id</id>
             <name>neuclear-id</name>
-            <version>1.0-beta11</version>
+            <version>1.0-beta15</version>
             <properties>
                 <war.bundle>true</war.bundle>
             </properties>
@@ -116,6 +116,13 @@
             <id>neuclear-xmlsig</id>
             <name>neuclear-xmlsig</name>
             <version>0.13.1</version>
+            <properties>
+                <war.bundle>true</war.bundle>
+            </properties>
+        </dependency>
+        <dependency>
+            <id>pkyp</id>
+            <version>1.0-beta1</version>
             <properties>
                 <war.bundle>true</war.bundle>
             </properties>
