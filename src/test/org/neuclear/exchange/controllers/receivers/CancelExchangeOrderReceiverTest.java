@@ -1,4 +1,4 @@
-package org.neuclear.asset.controllers.receivers;
+package org.neuclear.exchange.controllers.receivers;
 
 import org.neuclear.asset.InvalidTransferException;
 import org.neuclear.asset.contracts.AssetGlobals;
@@ -13,7 +13,6 @@ import org.neuclear.exchange.orders.builders.CancelExchangeOrderBuilder;
 import org.neuclear.exchange.orders.builders.ExchangeOrderBuilder;
 import org.neuclear.id.Signatory;
 import org.neuclear.id.SignedNamedObject;
-import org.neuclear.id.receiver.Receiver;
 import org.neuclear.ledger.InvalidTransactionException;
 import org.neuclear.ledger.LowlevelLedgerException;
 import org.neuclear.ledger.UnknownBookException;
@@ -23,8 +22,12 @@ import java.security.GeneralSecurityException;
 import java.util.Date;
 
 /*
-$Id: CancelExchangeOrderReceiverTest.java,v 1.3 2004/09/08 16:50:49 pelle Exp $
+$Id: CancelExchangeOrderReceiverTest.java,v 1.1 2004/09/10 19:48:02 pelle Exp $
 $Log: CancelExchangeOrderReceiverTest.java,v $
+Revision 1.1  2004/09/10 19:48:02  pelle
+Refactored all the Exchange related receivers into a new package under org.neuclear.exchange.
+Refactored the way the Receivers handle embedded objects. Now they pass them on to the parent receiver for processing before they do their own thing.
+
 Revision 1.3  2004/09/08 16:50:49  pelle
 All unit tests now pass
 
@@ -62,9 +65,6 @@ public class CancelExchangeOrderReceiverTest extends AbstractExchangeReceiverTes
         shoes = createShoeAsset();
     }
 
-    protected Receiver createReceiver() {
-        return new CancelExchangeOrderReceiver(signer, ledger);
-    }
 
     public void testCancelExchangeOrder() throws NeuClearException, InvalidTransferException, LowlevelLedgerException, UnknownBookException, InvalidTransactionException {
         Signatory sender = new Signatory(signer.getPublicKey("bob"));
@@ -76,7 +76,7 @@ public class CancelExchangeOrderReceiverTest extends AbstractExchangeReceiverTes
         assertEquals(10, ledger.getAvailableBalance(asset.getServiceId(), sender.getName()), 0);
 
         SignedNamedObject order = new ExchangeOrderBuilder(asset, agent, new Amount(10), new Date(System.currentTimeMillis() + 50000), new BidItem[]{new BidItem(shoes, new Amount(10))}, "test").convert("bob", signer);
-        ExchangeOrderReceipt receipt = (ExchangeOrderReceipt) new ExchangeOrderReceiver(signer, ledger).receive(order);
+        ExchangeOrderReceipt receipt = (ExchangeOrderReceipt) receiver.receive(order);
         assertEquals(10, ledger.getBalance(asset.getServiceId(), sender.getName()), 0);
         assertEquals(0, ledger.getAvailableBalance(asset.getServiceId(), sender.getName()), 0);
 

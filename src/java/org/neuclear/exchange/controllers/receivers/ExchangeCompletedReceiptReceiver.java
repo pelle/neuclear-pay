@@ -1,20 +1,28 @@
-package org.neuclear.asset.controllers.receivers;
+package org.neuclear.exchange.controllers.receivers;
 
 import org.neuclear.asset.InvalidTransferException;
 import org.neuclear.asset.NegativeTransferException;
+import org.neuclear.asset.contracts.Asset;
+import org.neuclear.asset.controllers.receivers.LedgerReceiver;
 import org.neuclear.commons.NeuClearException;
 import org.neuclear.exchange.orders.ExchangeCompletedReceipt;
 import org.neuclear.exchange.orders.ExchangeCompletionOrder;
-import org.neuclear.exchange.orders.ExchangeOrder;
 import org.neuclear.exchange.orders.ExchangeOrderGlobals;
 import org.neuclear.id.SignedNamedObject;
 import org.neuclear.id.receiver.HandlingReceiver;
+import org.neuclear.id.receiver.Receiver;
 import org.neuclear.id.receiver.UnsupportedTransaction;
-import org.neuclear.ledger.*;
+import org.neuclear.ledger.LedgerController;
+import org.neuclear.ledger.LowlevelLedgerException;
+import org.neuclear.ledger.UnknownTransactionException;
 
 /*
-$Id: ExchangeCompletedReceiptReceiver.java,v 1.1 2004/08/18 09:42:55 pelle Exp $
+$Id: ExchangeCompletedReceiptReceiver.java,v 1.1 2004/09/10 19:48:02 pelle Exp $
 $Log: ExchangeCompletedReceiptReceiver.java,v $
+Revision 1.1  2004/09/10 19:48:02  pelle
+Refactored all the Exchange related receivers into a new package under org.neuclear.exchange.
+Refactored the way the Receivers handle embedded objects. Now they pass them on to the parent receiver for processing before they do their own thing.
+
 Revision 1.1  2004/08/18 09:42:55  pelle
 Many fixes to the various Signing and SigningRequest Servlets etc.
 
@@ -36,28 +44,25 @@ Added single function Receivers and a DelegatingAssetController. These will even
  * Time: 12:45:42 PM
  */
 public class ExchangeCompletedReceiptReceiver extends LedgerReceiver implements HandlingReceiver {
-    public ExchangeCompletedReceiptReceiver(LedgerController ledger) {
-        super(ledger);
+    public ExchangeCompletedReceiptReceiver(Receiver parent, LedgerController ledger) {
+        super(parent, ledger);
     }
 
     public SignedNamedObject receive(SignedNamedObject obj) throws UnsupportedTransaction, NeuClearException {
         try {
             ExchangeCompletedReceipt receipt = (ExchangeCompletedReceipt) obj;
             ExchangeCompletionOrder complete = receipt.getOrder();
-            String name = complete.getAsset().getServiceId();
+            final Asset asset = complete.getAsset();
+            String name = asset.getServiceId();
 
             if (!complete.getSignatory().getName().equals(complete.getReceipt().getOrder().getAgent().getServiceId()))
                 throw new InvalidTransferException("Only Agent is allowed to Sign Completion Order");
-            if (complete.getAmount().getAmount() > complete.getReceipt().getOrder().getAmount().getAmount())
+            final double amount = complete.getAmount().getAmount();
+            if (amount > complete.getReceipt().getOrder().getAmount().getAmount())
                 throw new InvalidTransferException("Attempting to complete larger than authorized amount");
 
             if (!ledger.transactionExists(complete.getDigest())) {
-                if (!ledger.heldTransactionExists(complete.getReceipt().getOrder().getDigest())) {
-                    ExchangeOrder order = complete.getReceipt().getOrder();
-                    ledger.hold(name, order.getDigest(), order.getSignatory().getName(), order.getAgent().getServiceId(), order.getExpiry(), order.getAmount().getAmount(), order.getComment());
-                    ledger.setHeldReceiptId(order.getDigest(), complete.getReceipt().getDigest());
-                }
-                ledger.complete(complete.getReceipt().getOrder().getDigest(), complete.getSignatory().getName(), complete.getCounterparty(), complete.getAmount().getAmount(), complete.getComment());
+                parent.receive(complete);
             }
             ledger.setReceiptId(complete.getReceipt().getOrder().getDigest(), receipt.getDigest());
 
@@ -66,21 +71,11 @@ public class ExchangeCompletedReceiptReceiver extends LedgerReceiver implements 
             throw new UnsupportedTransaction(obj);
         } catch (UnknownTransactionException e) {
             throw new NeuClearException(e);
-        } catch (InsufficientFundsException e) {
-            throw new NeuClearException(e);
         } catch (NegativeTransferException e) {
             throw new NeuClearException(e);
         } catch (InvalidTransferException e) {
             throw new NeuClearException(e);
-        } catch (UnBalancedTransactionException e) {
-            throw new NeuClearException(e);
         } catch (LowlevelLedgerException e) {
-            throw new NeuClearException(e);
-        } catch (InvalidTransactionException e) {
-            throw new NeuClearException(e);
-        } catch (TransactionExpiredException e) {
-            throw new NeuClearException(e);
-        } catch (UnknownBookException e) {
             throw new NeuClearException(e);
         }
         return null;

@@ -10,12 +10,17 @@ import org.neuclear.commons.NeuClearException;
 import org.neuclear.commons.crypto.signers.Signer;
 import org.neuclear.id.SignedNamedObject;
 import org.neuclear.id.receiver.HandlingReceiver;
+import org.neuclear.id.receiver.Receiver;
 import org.neuclear.id.receiver.UnsupportedTransaction;
 import org.neuclear.ledger.*;
 
 /*
-$Id: TransferOrderReceiver.java,v 1.3 2004/09/08 20:07:43 pelle Exp $
+$Id: TransferOrderReceiver.java,v 1.4 2004/09/10 19:48:01 pelle Exp $
 $Log: TransferOrderReceiver.java,v $
+Revision 1.4  2004/09/10 19:48:01  pelle
+Refactored all the Exchange related receivers into a new package under org.neuclear.exchange.
+Refactored the way the Receivers handle embedded objects. Now they pass them on to the parent receiver for processing before they do their own thing.
+
 Revision 1.3  2004/09/08 20:07:43  pelle
 Added support for fees to TransferOrderReceiver
 
@@ -34,8 +39,8 @@ Added single function Receivers and a DelegatingAssetController. These will even
  * Time: 12:45:42 PM
  */
 public class TransferOrderReceiver extends SigningLedgerReceiver implements HandlingReceiver {
-    public TransferOrderReceiver(Signer signer, LedgerController ledger) {
-        super(signer, ledger);
+    public TransferOrderReceiver(Receiver parent, Signer signer, LedgerController ledger) {
+        super(parent, signer, ledger);
     }
 
     public SignedNamedObject receive(SignedNamedObject obj) throws UnsupportedTransaction, NeuClearException {

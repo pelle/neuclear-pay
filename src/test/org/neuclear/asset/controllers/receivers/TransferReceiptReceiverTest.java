@@ -4,6 +4,7 @@ import org.neuclear.asset.InvalidTransferException;
 import org.neuclear.asset.contracts.Asset;
 import org.neuclear.asset.contracts.AssetGlobals;
 import org.neuclear.asset.contracts.builders.AssetBuilder;
+import org.neuclear.asset.controllers.DelegatingAssetController;
 import org.neuclear.asset.orders.Amount;
 import org.neuclear.asset.orders.TransferGlobals;
 import org.neuclear.asset.orders.TransferOrder;
@@ -24,8 +25,12 @@ import java.security.PublicKey;
 import java.util.Date;
 
 /*
-$Id: TransferReceiptReceiverTest.java,v 1.2 2004/09/08 17:41:11 pelle Exp $
+$Id: TransferReceiptReceiverTest.java,v 1.3 2004/09/10 19:48:02 pelle Exp $
 $Log: TransferReceiptReceiverTest.java,v $
+Revision 1.3  2004/09/10 19:48:02  pelle
+Refactored all the Exchange related receivers into a new package under org.neuclear.exchange.
+Refactored the way the Receivers handle embedded objects. Now they pass them on to the parent receiver for processing before they do their own thing.
+
 Revision 1.2  2004/09/08 17:41:11  pelle
 Changed these tests to use the SimpleLedgerController from the HibernateLedgerController.
 
@@ -59,7 +64,7 @@ public class TransferReceiptReceiverTest extends AbstractSigningTest {
         signeralias = new Signatory(pub).getName();
         asset = (Asset) new AssetBuilder("test", "http://localhost:8080/rules.html", "http://localhost:8080/Asset", pub, signer.getPublicKey("carol"), 2, 0, "t").convert("bux", signer);
         ledger = new SimpleLedgerController("test");
-        receiver = new TransferReceiptReceiver(ledger);
+        receiver = new DelegatingAssetController(signer, ledger);
     }
 
     public void testTransferReceipt() throws NeuClearException, InvalidTransferException, LowlevelLedgerException, UnknownBookException, InvalidTransactionException {

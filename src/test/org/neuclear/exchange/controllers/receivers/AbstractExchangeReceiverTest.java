@@ -1,4 +1,4 @@
-package org.neuclear.asset.controllers.receivers;
+package org.neuclear.exchange.controllers.receivers;
 
 import org.neuclear.asset.contracts.Asset;
 import org.neuclear.asset.contracts.builders.AssetBuilder;
@@ -6,6 +6,7 @@ import org.neuclear.asset.fees.FeeStructureBuilder;
 import org.neuclear.commons.NeuClearException;
 import org.neuclear.exchange.contracts.ExchangeAgent;
 import org.neuclear.exchange.contracts.builders.ExchangeAgentBuilder;
+import org.neuclear.exchange.controllers.DelegatingExchangeAssetController;
 import org.neuclear.id.Signatory;
 import org.neuclear.id.receiver.Receiver;
 import org.neuclear.ledger.LedgerController;
@@ -15,8 +16,12 @@ import java.security.GeneralSecurityException;
 import java.security.PublicKey;
 
 /*
-$Id: AbstractExchangeReceiverTest.java,v 1.3 2004/09/08 23:17:39 pelle Exp $
+$Id: AbstractExchangeReceiverTest.java,v 1.1 2004/09/10 19:48:02 pelle Exp $
 $Log: AbstractExchangeReceiverTest.java,v $
+Revision 1.1  2004/09/10 19:48:02  pelle
+Refactored all the Exchange related receivers into a new package under org.neuclear.exchange.
+Refactored the way the Receivers handle embedded objects. Now they pass them on to the parent receiver for processing before they do their own thing.
+
 Revision 1.3  2004/09/08 23:17:39  pelle
 Fees now work for everything but Exchange Completion.
 
@@ -79,5 +84,7 @@ public abstract class AbstractExchangeReceiverTest extends AbstractSigningTest {
         assetalias = new Signatory(pub).getName();
     }
 
-    protected abstract Receiver createReceiver();
+    public Receiver createReceiver() {
+        return new DelegatingExchangeAssetController(signer, ledger);
+    }
 }

@@ -9,12 +9,17 @@ import org.neuclear.commons.NeuClearException;
 import org.neuclear.commons.crypto.signers.Signer;
 import org.neuclear.id.SignedNamedObject;
 import org.neuclear.id.receiver.HandlingReceiver;
+import org.neuclear.id.receiver.Receiver;
 import org.neuclear.id.receiver.UnsupportedTransaction;
 import org.neuclear.ledger.*;
 
 /*
-$Id: IssueOrderReceiver.java,v 1.2 2004/07/22 21:48:42 pelle Exp $
+$Id: IssueOrderReceiver.java,v 1.3 2004/09/10 19:48:01 pelle Exp $
 $Log: IssueOrderReceiver.java,v $
+Revision 1.3  2004/09/10 19:48:01  pelle
+Refactored all the Exchange related receivers into a new package under org.neuclear.exchange.
+Refactored the way the Receivers handle embedded objects. Now they pass them on to the parent receiver for processing before they do their own thing.
+
 Revision 1.2  2004/07/22 21:48:42  pelle
 Further receivers and unit tests for for Exchanges etc.
 I've also changed the internal asset to ledger id from being the pk of the contract signer, to being the pk of the service key.
@@ -30,8 +35,8 @@ Added single function Receivers and a DelegatingAssetController. These will even
  * Time: 12:45:42 PM
  */
 public class IssueOrderReceiver extends SigningLedgerReceiver implements HandlingReceiver {
-    public IssueOrderReceiver(Signer signer, LedgerController ledger) {
-        super(signer, ledger);
+    public IssueOrderReceiver(Receiver parent, Signer signer, LedgerController ledger) {
+        super(parent, signer, ledger);
     }
 
     public SignedNamedObject receive(SignedNamedObject obj) throws UnsupportedTransaction, NeuClearException {

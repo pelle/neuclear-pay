@@ -1,4 +1,4 @@
-package org.neuclear.asset.controllers.receivers;
+package org.neuclear.exchange.controllers.receivers;
 
 import org.neuclear.asset.InvalidTransferException;
 import org.neuclear.asset.contracts.AssetGlobals;
@@ -6,16 +6,15 @@ import org.neuclear.asset.orders.Amount;
 import org.neuclear.commons.NeuClearException;
 import org.neuclear.exchange.contracts.ExchangeAgentGlobals;
 import org.neuclear.exchange.orders.BidItem;
-import org.neuclear.exchange.orders.ExchangeCompletedReceipt;
+import org.neuclear.exchange.orders.CancelExchangeOrder;
 import org.neuclear.exchange.orders.ExchangeOrderGlobals;
 import org.neuclear.exchange.orders.ExchangeOrderReceipt;
-import org.neuclear.exchange.orders.builders.ExchangeCompletionOrderBuilder;
+import org.neuclear.exchange.orders.builders.CancelExchangeOrderBuilder;
+import org.neuclear.exchange.orders.builders.CancelExchangeReceiptBuilder;
 import org.neuclear.exchange.orders.builders.ExchangeOrderBuilder;
 import org.neuclear.id.Signatory;
 import org.neuclear.id.SignedNamedObject;
-import org.neuclear.id.receiver.Receiver;
 import org.neuclear.ledger.InvalidTransactionException;
-import org.neuclear.ledger.LedgerController;
 import org.neuclear.ledger.LowlevelLedgerException;
 import org.neuclear.ledger.UnknownBookException;
 import org.neuclear.ledger.simple.SimpleLedgerController;
@@ -24,8 +23,15 @@ import java.security.GeneralSecurityException;
 import java.util.Date;
 
 /*
-$Id: ExchangeCompletedReceiptReceiverTest.java,v 1.1 2004/08/18 09:42:56 pelle Exp $
-$Log: ExchangeCompletedReceiptReceiverTest.java,v $
+$Id: CancelExchangeReceiptReceiverTest.java,v 1.1 2004/09/10 19:48:02 pelle Exp $
+$Log: CancelExchangeReceiptReceiverTest.java,v $
+Revision 1.1  2004/09/10 19:48:02  pelle
+Refactored all the Exchange related receivers into a new package under org.neuclear.exchange.
+Refactored the way the Receivers handle embedded objects. Now they pass them on to the parent receiver for processing before they do their own thing.
+
+Revision 1.2  2004/09/08 16:50:49  pelle
+All unit tests now pass
+
 Revision 1.1  2004/08/18 09:42:56  pelle
 Many fixes to the various Signing and SigningRequest Servlets etc.
 
@@ -43,9 +49,9 @@ Added single function Receivers and a DelegatingAssetController. These will even
  * Date: Jul 21, 2004
  * Time: 1:38:45 PM
  */
-public class ExchangeCompletedReceiptReceiverTest extends AbstractExchangeReceiverTest {
+public class CancelExchangeReceiptReceiverTest extends AbstractExchangeReceiverTest {
 
-    public ExchangeCompletedReceiptReceiverTest(String string) throws NeuClearException, GeneralSecurityException {
+    public CancelExchangeReceiptReceiverTest(String string) throws NeuClearException, GeneralSecurityException {
         super(string);
         ExchangeOrderGlobals.registerReaders();
         ExchangeAgentGlobals.registerReaders();
@@ -60,12 +66,8 @@ public class ExchangeCompletedReceiptReceiverTest extends AbstractExchangeReceiv
         shoes = createShoeAsset();
     }
 
-    protected Receiver createReceiver() {
-        return new ExchangeCompletedReceiptReceiver(ledger);
-    }
 
-    public void testExchangeCompletionOrder() throws NeuClearException, InvalidTransferException, LowlevelLedgerException, UnknownBookException, InvalidTransactionException {
-        LedgerController ac = new SimpleLedgerController("asset");
+    public void testCancelExchangeReceipt() throws NeuClearException, InvalidTransferException, LowlevelLedgerException, UnknownBookException, InvalidTransactionException {
         Signatory sender = new Signatory(signer.getPublicKey("bob"));
         Signatory recipient = new Signatory(signer.getPublicKey("alice"));
 
@@ -73,29 +75,21 @@ public class ExchangeCompletedReceiptReceiverTest extends AbstractExchangeReceiv
         ledger.transfer(asset.getServiceId(), "bluesky", sender.getName(), 10 - senderstart, "bla");
         assertEquals(10, ledger.getBalance(asset.getServiceId(), sender.getName()), 0);
         assertEquals(10, ledger.getAvailableBalance(asset.getServiceId(), sender.getName()), 0);
-        ac.transfer(asset.getServiceId(), "bluesky", sender.getName(), 10 - senderstart, "bla");
-        assertEquals(10, ac.getBalance(asset.getServiceId(), sender.getName()), 0);
-        assertEquals(10, ac.getAvailableBalance(asset.getServiceId(), sender.getName()), 0);
 
         SignedNamedObject order = new ExchangeOrderBuilder(asset, agent, new Amount(10), new Date(System.currentTimeMillis() + 50000), new BidItem[]{new BidItem(shoes, new Amount(10))}, "test").convert("bob", signer);
-        ExchangeOrderReceipt receipt = (ExchangeOrderReceipt) new ExchangeOrderReceiver(signer, ac).receive(order);
-        assertEquals(10, ac.getBalance(asset.getServiceId(), sender.getName()), 0);
-        assertEquals(0, ac.getAvailableBalance(asset.getServiceId(), sender.getName()), 0);
-
-        assertEquals(0, ac.getBalance(asset.getServiceId(), recipient.getName()), 0);
-        assertEquals(0, ac.getAvailableBalance(asset.getServiceId(), recipient.getName()), 0);
-
-        ExchangeCompletedReceipt completed = (ExchangeCompletedReceipt) new ExchangeCompletionOrderReceiver(signer, ac).receive(new ExchangeCompletionOrderBuilder(receipt, new Date(), recipient.getName(), new Amount(10), "did it").convert("exchange", signer));
-        assertNotNull(completed);
-        receiver.receive(completed);
-        assertEquals(0, ledger.getBalance(asset.getServiceId(), sender.getName()), 0);
+        ExchangeOrderReceipt receipt = (ExchangeOrderReceipt) receiver.receive(order);
+        assertEquals(10, ledger.getBalance(asset.getServiceId(), sender.getName()), 0);
         assertEquals(0, ledger.getAvailableBalance(asset.getServiceId(), sender.getName()), 0);
-        assertEquals(10, ledger.getBalance(asset.getServiceId(), recipient.getName()), 0);
-        assertEquals(10, ledger.getAvailableBalance(asset.getServiceId(), recipient.getName()), 0);
-        assertEquals(0, ac.getBalance(asset.getServiceId(), sender.getName()), 0);
-        assertEquals(0, ac.getAvailableBalance(asset.getServiceId(), sender.getName()), 0);
-        assertEquals(10, ac.getBalance(asset.getServiceId(), recipient.getName()), 0);
-        assertEquals(10, ac.getAvailableBalance(asset.getServiceId(), recipient.getName()), 0);
+
+        assertEquals(0, ledger.getBalance(asset.getServiceId(), recipient.getName()), 0);
+        assertEquals(0, ledger.getAvailableBalance(asset.getServiceId(), recipient.getName()), 0);
+
+        CancelExchangeOrder cancelOrder = (CancelExchangeOrder) new CancelExchangeOrderBuilder(receipt).convert("exchange", signer);
+        receiver.receive(new CancelExchangeReceiptBuilder(cancelOrder, new Date()).convert(assetalias, signer));
+        assertEquals(10, ledger.getBalance(asset.getServiceId(), sender.getName()), 0);
+        assertEquals(10, ledger.getAvailableBalance(asset.getServiceId(), sender.getName()), 0);
+        assertEquals(0, ledger.getBalance(asset.getServiceId(), recipient.getName()), 0);
+        assertEquals(0, ledger.getAvailableBalance(asset.getServiceId(), recipient.getName()), 0);
 
     }
 

@@ -24,6 +24,7 @@ import org.neuclear.asset.InvalidTransferException;
 import org.neuclear.asset.contracts.Asset;
 import org.neuclear.asset.contracts.AssetGlobals;
 import org.neuclear.asset.contracts.builders.AssetBuilder;
+import org.neuclear.asset.controllers.DelegatingAssetController;
 import org.neuclear.asset.fees.FeeStructureBuilder;
 import org.neuclear.asset.orders.Amount;
 import org.neuclear.asset.orders.TransferGlobals;
@@ -65,7 +66,7 @@ public class TransferReceiptReceiverWithFeesTest extends AbstractSigningTest {
         assetBuilder.addFeeAccount(signer.getPublicKey("ivan"));
         asset = (Asset) assetBuilder.convert("bux", signer);
         ledger = new SimpleLedgerController("test");
-        receiver = new TransferReceiptReceiver(ledger);
+        receiver = new DelegatingAssetController(signer, ledger);
     }
 
     public void testTransferReceipt() throws NeuClearException, InvalidTransferException, LowlevelLedgerException, UnknownBookException, InvalidTransactionException {

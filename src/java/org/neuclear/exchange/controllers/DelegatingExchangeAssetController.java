@@ -1,8 +1,9 @@
-package org.neuclear.asset;
+package org.neuclear.exchange.controllers;
 
-import org.neuclear.asset.contracts.Asset;
+import org.neuclear.asset.controllers.DelegatingAssetController;
+import org.neuclear.commons.crypto.signers.Signer;
+import org.neuclear.exchange.controllers.receivers.*;
 import org.neuclear.ledger.LedgerController;
-import org.neuclear.ledger.PostedTransaction;
 
 /*
  *  The NeuClear Project and it's libraries are
@@ -25,15 +26,16 @@ import org.neuclear.ledger.PostedTransaction;
  */
 
 /**
- * User: pelleb
- * Date: Sep 8, 2004
- * Time: 1:05:51 PM
+ * An asset controller with support for exchange transactions.
  */
-public class AssetLedgerHelper {
-    public static final PostedTransaction runTransaction(final LedgerController ledger, Asset asset) {
-        return null;
-    }
-
-    private AssetLedgerHelper() {
+public class DelegatingExchangeAssetController extends DelegatingAssetController {
+    public DelegatingExchangeAssetController(Signer signer, LedgerController ledger) {
+        super(signer, ledger);
+        register(new ExchangeOrderReceiver(this, signer, ledger));
+        register(new ExchangeOrderReceiptReceiver(this, ledger));
+        register(new ExchangeCompletionOrderReceiver(this, signer, ledger));
+        register(new ExchangeCompletedReceiptReceiver(this, ledger));
+        register(new CancelExchangeOrderReceiver(this, signer, ledger));
+        register(new CancelExchangeReceiptReceiver(this, ledger));
     }
 }

@@ -4,6 +4,7 @@ import org.neuclear.asset.InvalidTransferException;
 import org.neuclear.asset.contracts.Asset;
 import org.neuclear.asset.contracts.AssetGlobals;
 import org.neuclear.asset.contracts.builders.AssetBuilder;
+import org.neuclear.asset.controllers.DelegatingAssetController;
 import org.neuclear.asset.orders.Amount;
 import org.neuclear.asset.orders.TransferGlobals;
 import org.neuclear.asset.orders.builders.TransferOrderBuilder;
@@ -21,8 +22,12 @@ import java.security.GeneralSecurityException;
 import java.security.PublicKey;
 
 /*
-$Id: TransferOrderReceiverTest.java,v 1.4 2004/09/08 20:08:00 pelle Exp $
+$Id: TransferOrderReceiverTest.java,v 1.5 2004/09/10 19:48:02 pelle Exp $
 $Log: TransferOrderReceiverTest.java,v $
+Revision 1.5  2004/09/10 19:48:02  pelle
+Refactored all the Exchange related receivers into a new package under org.neuclear.exchange.
+Refactored the way the Receivers handle embedded objects. Now they pass them on to the parent receiver for processing before they do their own thing.
+
 Revision 1.4  2004/09/08 20:08:00  pelle
 Added support for fees to TransferOrderReceiver
 
@@ -55,7 +60,7 @@ public class TransferOrderReceiverTest extends AbstractSigningTest {
         PublicKey pub = signer.generateKey();
         asset = (Asset) new AssetBuilder("test", "http://localhost:8080/rules.html", "http://localhost:8080/Asset", pub, signer.getPublicKey("carol"), 2, 0, "t").convert("bux", signer);
         ledger = new SimpleLedgerController("test");
-        receiver = new TransferOrderReceiver(signer, ledger);
+        receiver = new DelegatingAssetController(signer, ledger);
     }
 
     public void testTransferOrder() throws NeuClearException, InvalidTransferException, LowlevelLedgerException, UnknownBookException, InvalidTransactionException {

@@ -4,6 +4,7 @@ import org.neuclear.asset.InvalidTransferException;
 import org.neuclear.asset.contracts.Asset;
 import org.neuclear.asset.contracts.AssetGlobals;
 import org.neuclear.asset.contracts.builders.AssetBuilder;
+import org.neuclear.asset.controllers.DelegatingAssetController;
 import org.neuclear.asset.orders.Amount;
 import org.neuclear.asset.orders.TransferGlobals;
 import org.neuclear.asset.orders.builders.IssueOrderBuilder;
@@ -21,8 +22,12 @@ import java.security.GeneralSecurityException;
 import java.security.PublicKey;
 
 /*
-$Id: IssueOrderReceiverTest.java,v 1.2 2004/07/22 21:48:46 pelle Exp $
+$Id: IssueOrderReceiverTest.java,v 1.3 2004/09/10 19:48:02 pelle Exp $
 $Log: IssueOrderReceiverTest.java,v $
+Revision 1.3  2004/09/10 19:48:02  pelle
+Refactored all the Exchange related receivers into a new package under org.neuclear.exchange.
+Refactored the way the Receivers handle embedded objects. Now they pass them on to the parent receiver for processing before they do their own thing.
+
 Revision 1.2  2004/07/22 21:48:46  pelle
 Further receivers and unit tests for for Exchanges etc.
 I've also changed the internal asset to ledger id from being the pk of the contract signer, to being the pk of the service key.
@@ -52,7 +57,7 @@ public class IssueOrderReceiverTest extends AbstractSigningTest {
         PublicKey pub = signer.generateKey();
         asset = (Asset) new AssetBuilder("test", "http://localhost:8080/rules.html", "http://localhost:8080/Asset", pub, signer.getPublicKey("carol"), 2, 0, "t").convert("bux", signer);
         ledger = new SimpleLedgerController("test");
-        receiver = new IssueOrderReceiver(signer, ledger);
+        receiver = new DelegatingAssetController(signer, ledger);
     }
 
     public void testIssueOrder() throws NeuClearException, InvalidTransferException, LowlevelLedgerException, UnknownBookException, InvalidTransactionException {
