@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<xs:schema targetNamespace="http://neuclear.org/neu/asset.xsd"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns="http://neuclear.org/neu/asset.xsd"
+    xmlns:id="http://neuclear.org/neu/neuid.xsd"
+    xmlns:ds="http://www.w3.org/2000/09/xmldsig#"
+
+    elementFormDefault="qualified" version="0.3" id="asset">
+ 	<xs:import namespace="http://neuclear.org/neu/neuid.xsd" schemaLocation="../../../neuclear-id/src/schemas/neuid.xsd" />
+    <xs:import namespace="http://www.w3.org/2000/09/xmldsig#" schemaLocation="../../../neuclear-id/src/schemas/xmldsig-core-schema.xsd"/>
+
+    <xs:element name="Asset" type="id:NamedObjectReference" nillable="false"/>
+    <xs:element name="Recipient" type="id:NamedObjectReference" nillable="false"/>
+    <xs:element name="ValueTime" type="xs:dateTime" nillable="true"/>
+    <xs:element name="Comment" type="xs:string" nillable="true"/>
+
+    <!-- Generic Value Identifier -->
+    <xs:element name="Value" abstract="true" nillable="false"/>
+    <!-- Specific numeric amount -->
+    <xs:element name="Amount" substitutionGroup="Value" type="xs:double"/>
+    <!-- All the serials numbers included in this Value. The numeric amount is always equals to the amount of items in
+    the list -->
+    <xs:element name="SerialNumbers" substitutionGroup="Value">
+        <xs:simpleType>
+            <xs:list itemType="id:NamedObjectReference"/>
+        </xs:simpleType>
+    </xs:element>
+
+    <xs:element name="TransferOrder" nillable="false">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="Recipient" minOccurs="1" maxOccurs="1"/>
+                <xs:element ref="Asset" minOccurs="1" maxOccurs="1"/>
+                <xs:element ref="Value" minOccurs="1" maxOccurs="1"/>
+                <xs:element ref="Comment"  minOccurs="0" maxOccurs="1"/>
+                <xs:group ref="id:SignedObjectGroup" minOccurs="0" maxOccurs="1"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="TransferReceipt" nillable="false">
+        <xs:complexType >
+            <xs:sequence>
+                <xs:element ref="ValueTime" minOccurs="1" maxOccurs="1"/>
+                <xs:element ref="Value" minOccurs="0" maxOccurs="1"/>
+                <xs:element ref="TransferOrder" minOccurs="1" maxOccurs="1"/>
+                <xs:group ref="id:SignedObjectGroup" minOccurs="0" maxOccurs="1"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+</xs:schema>

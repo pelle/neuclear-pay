@@ -30,8 +30,12 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: AssetBuilder.java,v 1.6 2004/01/10 00:00:44 pelle Exp $
+$Id: AssetBuilder.java,v 1.7 2004/02/18 00:13:29 pelle Exp $
 $Log: AssetBuilder.java,v $
+Revision 1.7  2004/02/18 00:13:29  pelle
+Many, many clean ups. I've readded Targets in a new method.
+Gotten rid of NamedObjectBuilder and revamped Identity and Resolvers
+
 Revision 1.6  2004/01/10 00:00:44  pelle
 Implemented new Schema for Transfer*
 Working on it for Exchange*, so far all Receipts are implemented.
@@ -101,7 +105,6 @@ public final class AssetBuilder extends IdentityBuilder {
     /**
      * Used to create new Assets
      * 
-     * @param name       The Name of Identity
      * @param allow      PublicKey allowed to sign in here
      * @param repository URL of Default Store for NameSpace. (Note. A NameSpace object is stored in the default repository of it's parent namespace)
      * @param signer     URL of default interactive signing service for namespace. If null it doesnt allow interactive signing
@@ -110,8 +113,8 @@ public final class AssetBuilder extends IdentityBuilder {
      * @param decimal    The amount of decimal points.
      * @param minimum    Minimum transaction size
      */
-    public AssetBuilder(final String name, final PublicKey allow, final String repository, final String signer, final String logger, final String receiver, final String controller, final int decimal, final double minimum) throws NeuClearException {
-        super(AssetGlobals.createQName(AssetGlobals.ASSET_TAGNAME), name, allow, repository, signer, logger, receiver);
+    public AssetBuilder(final PublicKey allow, final String signer, final String logger, final String receiver, final String controller, final int decimal, final double minimum) throws NeuClearException {
+        super(AssetGlobals.createQName(AssetGlobals.ASSET_TAGNAME),  allow,  signer, logger, receiver);
         final Element elem = getElement();
         AssetGlobals.createAttribute(elem, "controller", controller);
         AssetGlobals.createAttribute(elem, "decimalpoints", Integer.toString(decimal));
@@ -126,9 +129,8 @@ public final class AssetBuilder extends IdentityBuilder {
             if (args.length > 0)
                 assetname = args[0];
 
-            final AssetBuilder assetraw = new AssetBuilder(assetname,
+            final AssetBuilder assetraw = new AssetBuilder(
                     signer.getPublicKey(assetname),
-                    "http://repository.neuclear.org/",
                     "http://bux.neuclear.org:8080",
                     "http://logger.neuclear.org",
                     "http://bux.neuclear.org:8080",
@@ -136,7 +138,7 @@ public final class AssetBuilder extends IdentityBuilder {
                     2,
                     0.01
             );
-            final Asset asset= (Asset) assetraw.sign(signer);
+            final Asset asset= (Asset) assetraw.convert(assetname,signer);
             final Store store = new FileStore("target/testdata/repository");
             store.receive(asset);
         } catch (Exception e) {

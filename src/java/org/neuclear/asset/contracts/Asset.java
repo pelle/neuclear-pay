@@ -1,10 +1,9 @@
 package org.neuclear.asset.contracts;
 
 import org.dom4j.Element;
-import org.neuclear.commons.NeuClearException;
 import org.neuclear.commons.Utility;
 import org.neuclear.id.*;
-import org.neuclear.senders.Sender;
+import org.neuclear.id.targets.Targets;
 import org.neuclear.xml.xmlsec.KeyInfo;
 import org.neuclear.xml.xmlsec.XMLSecTools;
 import org.neuclear.xml.xmlsec.XMLSecurityException;
@@ -29,8 +28,12 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: Asset.java,v 1.13 2004/01/21 23:41:02 pelle Exp $
+$Id: Asset.java,v 1.14 2004/02/18 00:13:30 pelle Exp $
 $Log: Asset.java,v $
+Revision 1.14  2004/02/18 00:13:30  pelle
+Many, many clean ups. I've readded Targets in a new method.
+Gotten rid of NamedObjectBuilder and revamped Identity and Resolvers
+
 Revision 1.13  2004/01/21 23:41:02  pelle
 Started the unit tests for the new payment message format.
 
@@ -119,14 +122,14 @@ SOAPTools was changed to return a stream. This is required by the VerifyingReade
  * @see org.neuclear.asset.contracts.builders.AssetBuilder
  */
 public final class Asset extends Identity {
-    protected Asset(final SignedNamedCore core, final String serviceurl,final PublicKey pub, final int decimal, final double minimumTransaction) {
-        super(core, pub);
-        this.serviceurl=serviceurl;
+    protected Asset(final SignedNamedCore core, final Targets targets,final PublicKey pub, final int decimal, final double minimumTransaction) {
+        super(core, pub,null,targets); //Web services dont have signing urls
         this.decimal = decimal;
         this.multiplier = (int) Math.round(Math.pow(10, -decimal));
         this.minimumTransaction = minimumTransaction;
     }
 
+/*
     //TODO drop. This is for testing purposes only
     public Asset(final String serviceurl,final PublicKey pub, final int decimal, final double minimumTransaction) {
         super(pub);
@@ -135,6 +138,7 @@ public final class Asset extends Identity {
         this.multiplier = (int) Math.round(Math.pow(10, -decimal));
         this.minimumTransaction = minimumTransaction;
     }
+*/
 
     /**
      * Checks if an amount is valid within the boundaries of the assetName.
@@ -160,13 +164,6 @@ public final class Asset extends Identity {
         return Math.round(amount * multiplier) / multiplier;
     }
 
-    public final String getServiceurl() {
-        return serviceurl;
-    }
-
-    public final SignedNamedObject send(SignedNamedObject object) throws NeuClearException {
-        return Sender.quickSend(serviceurl,object);
-    }
 
     public static final class Reader implements NamedObjectReader {
         /**
@@ -178,7 +175,6 @@ public final class Asset extends Identity {
         public final SignedNamedObject read(final SignedNamedCore core, final Element elem) throws InvalidNamedObjectException {
             if (!elem.getNamespace().equals(AssetGlobals.NS_ASSET))
                 throw new InvalidNamedObjectException(core.getName(),"Not in XML NameSpace: "+AssetGlobals.NS_ASSET.getURI());
-            final String serviceurl = elem.attributeValue(createNEUIDQName("serviceurl"));
 
             final Element allowElement = InvalidNamedObjectException.assertContainsElementQName(core,elem,createNEUIDQName("allow"));
             try {
@@ -188,7 +184,8 @@ public final class Asset extends Identity {
                 final int decimal = (!Utility.isEmpty(dec)) ? Integer.parseInt(dec) : 0;
                 final String min = elem.attributeValue("minimumxact");
                 final double minimum = (!Utility.isEmpty(min)) ? Double.parseDouble(min) : 0;
-                return new Asset(core, serviceurl, pub, decimal, minimum);
+                final Targets targets=Targets.parseList(elem);
+                return new Asset(core, targets, pub, decimal, minimum);
             } catch (XMLSecurityException e) {
                 throw new InvalidNamedObjectException(core.getName(),e);
             }
@@ -197,7 +194,6 @@ public final class Asset extends Identity {
 
     }
 
-    private final String serviceurl;
     private final int decimal;
     private final int multiplier;
     private final double minimumTransaction;

@@ -10,7 +10,6 @@ import org.neuclear.commons.NeuClearException;
 import org.neuclear.commons.Utility;
 import org.neuclear.id.Identity;
 import org.neuclear.id.builders.Builder;
-import org.neuclear.xml.xmlsec.SignedElement;
 
 /*
 NeuClear Distributed Transaction Clearing Platform
@@ -30,8 +29,12 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: TransferOrderBuilder.java,v 1.3 2004/01/13 15:11:17 pelle Exp $
+$Id: TransferOrderBuilder.java,v 1.4 2004/02/18 00:13:30 pelle Exp $
 $Log: TransferOrderBuilder.java,v $
+Revision 1.4  2004/02/18 00:13:30  pelle
+Many, many clean ups. I've readded Targets in a new method.
+Gotten rid of NamedObjectBuilder and revamped Identity and Resolvers
+
 Revision 1.3  2004/01/13 15:11:17  pelle
 Now builds.
 Now need to do unit tests
@@ -130,17 +133,20 @@ TransferReceiptBuilder has been created for use by Transfer processors. It is us
  */
 public class TransferOrderBuilder extends Builder {
     public TransferOrderBuilder(final Asset asset, final Identity recipient, final Value amount, final String comment) throws InvalidTransferException, NegativeTransferException, NeuClearException {
+        this(asset.getName(),recipient.getName(),amount,comment);
+    }
+    public TransferOrderBuilder(final String assetname, final String recipient, final Value amount, final String comment) throws InvalidTransferException, NegativeTransferException, NeuClearException {
         super(TransferGlobals.createQName(TransferGlobals.XFER_TAGNAME));
         if (amount.getAmount() < 0)
             throw new NegativeTransferException(amount);
-        if (asset==null)
+        if (assetname==null)
             throw new InvalidTransferException("assetName");
         if (recipient == null)
             throw new InvalidTransferException("to");
 
         final Element element = getElement();
-        element.add(TransferGlobals.createElement(TransferGlobals.RECIPIENT_TAG, recipient.getName()));
-        element.add(TransferGlobals.createElement(TransferGlobals.ASSET_TAG, asset.getName()));
+        element.add(TransferGlobals.createElement(TransferGlobals.RECIPIENT_TAG, recipient));
+        element.add(TransferGlobals.createElement(TransferGlobals.ASSET_TAG, assetname));
         element.add(TransferGlobals.createValueTag(amount));
 
         if (!Utility.isEmpty(comment))

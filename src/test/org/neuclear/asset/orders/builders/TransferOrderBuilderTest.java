@@ -31,8 +31,12 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: TransferOrderBuilderTest.java,v 1.1 2004/01/21 23:41:02 pelle Exp $
+$Id: TransferOrderBuilderTest.java,v 1.2 2004/02/18 00:13:31 pelle Exp $
 $Log: TransferOrderBuilderTest.java,v $
+Revision 1.2  2004/02/18 00:13:31  pelle
+Many, many clean ups. I've readded Targets in a new method.
+Gotten rid of NamedObjectBuilder and revamped Identity and Resolvers
+
 Revision 1.1  2004/01/21 23:41:02  pelle
 Started the unit tests for the new payment message format.
 
@@ -61,12 +65,13 @@ public class TransferOrderBuilderTest extends AbstractObjectCreationTest{
     }
 
     protected Builder createBuilder() throws NeuClearException, InvalidTransferException, XMLException {
-        Builder builder=new TransferOrderBuilder(asset,getBob(),new Amount(20),"Test");
+        Builder builder=new TransferOrderBuilder("neu://test/bux","neu://bob@test",new Amount(20),"Test");
         System.out.println(builder.asXML());
         return builder;
     }
     public  Asset createTestAsset() throws NonExistingSignerException {
-        return new Asset("http://localhost",getSigner().getPublicKey("neu://test/bux"),1,1);
+//        return new Asset("http://localhost",getSigner().getPublicKey("neu://test/bux"),1,1);
+        return null;//TODO FIX
     }
 
     private Asset asset;
