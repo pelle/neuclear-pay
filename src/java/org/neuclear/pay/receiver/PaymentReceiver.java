@@ -1,15 +1,16 @@
 package org.neuclear.pay.receiver;
 
-import org.neuclear.asset.*;
+import org.neuclear.asset.AssetController;
+import org.neuclear.asset.InsufficientFundsException;
+import org.neuclear.asset.NegativeTransferException;
+import org.neuclear.asset.contracts.*;
+import org.neuclear.asset.contracts.builders.TransferReceiptBuilder;
 import org.neuclear.id.SignedNamedObject;
 import org.neuclear.id.verifier.VerifyingReader;
 import org.neuclear.ledger.InvalidTransactionException;
 import org.neuclear.ledger.LowlevelLedgerException;
 import org.neuclear.ledger.UnBalancedTransactionException;
 import org.neuclear.ledger.UnknownBookException;
-import org.neuclear.pay.contracts.TransferContract;
-import org.neuclear.pay.contracts.TransferGlobals;
-import org.neuclear.pay.contracts.builders.TransferReceiptBuilder;
 import org.neuclear.receiver.Receiver;
 import org.neuclear.receiver.UnsupportedTransaction;
 import org.neudist.crypto.Signer;
@@ -99,5 +100,9 @@ public class PaymentReceiver implements Receiver {
     {
         // Registers the readers for transfers
         VerifyingReader.getInstance().registerReader(TransferGlobals.XFER_TAGNAME, new TransferContract.Reader());
+        VerifyingReader.getInstance().registerReader(TransferGlobals.XFER_RCPT_TAGNAME, new TransferContract.Reader());
+        VerifyingReader.getInstance().registerReader(TransferGlobals.HELD_XFER_TAGNAME, new TransferContract.Reader());
+        VerifyingReader.getInstance().registerReader(TransferGlobals.HELD_XFER_RCPT_TAGNAME, new TransferContract.Reader());
+        VerifyingReader.getInstance().registerReader(AssetGlobals.ASSET_TAGNAME, new Asset.Reader());
     }
 }

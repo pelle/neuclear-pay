@@ -2,6 +2,8 @@ package org.neuclear.pay;
 
 import junit.framework.TestCase;
 import org.neuclear.asset.*;
+import org.neuclear.asset.contracts.HeldTransferReceipt;
+import org.neuclear.asset.contracts.TransferReceipt;
 import org.neuclear.commons.configuration.ConfigurationException;
 import org.neuclear.ledger.*;
 
@@ -20,7 +22,7 @@ import java.util.Random;
 public class PaymentTests extends TestCase {
     public PaymentTests(String s) throws SQLException, IOException, LowlevelLedgerException, BookExistsException, LedgerCreationException, ConfigurationException {
         super(s);
-        proc = PaymentProcessor.getInstance();
+        proc = CurrencyController.getInstance();
     }
 
     private Account createNewAccount(String name, String title) throws BookExistsException, LowlevelLedgerException {
@@ -188,5 +190,5 @@ public class PaymentTests extends TestCase {
 
     }
 
-    private PaymentProcessor proc;
+    private CurrencyController proc;
 }

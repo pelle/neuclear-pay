@@ -1,15 +1,14 @@
 package org.neuclear.asset;
 
 
-
 /**
  * User: pelleb
  * Date: Jul 23, 2003
  * Time: 11:38:10 AM
  */
 public class NegativeTransferException extends TransferException {
-    public NegativeTransferException(AssetController proc, double amount) {
-        super(proc);
+    public NegativeTransferException(double amount) {
+        super();
         this.amount = amount;
     }
 

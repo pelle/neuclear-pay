@@ -1,4 +1,4 @@
-package org.neuclear.asset;
+package org.neuclear.asset.contracts;
 
 import java.util.Date;
 

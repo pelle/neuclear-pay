@@ -1,5 +1,11 @@
-package org.neuclear.exchange;
+package org.neuclear.asset.contracts.builders;
 
+import org.dom4j.Element;
+import org.neuclear.asset.InvalidTransferException;
+import org.neuclear.asset.NegativeTransferException;
+import org.neuclear.asset.contracts.HeldTransferRequest;
+import org.neuclear.asset.contracts.TransferGlobals;
+import org.neuclear.time.TimeTools;
 
 /*
 NeuClear Distributed Transaction Clearing Platform
@@ -19,9 +25,9 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: ExchangeAgent.java,v 1.2 2003/11/08 01:39:58 pelle Exp $
-$Log: ExchangeAgent.java,v $
-Revision 1.2  2003/11/08 01:39:58  pelle
+$Id: HeldTransferReceiptBuilder.java,v 1.1 2003/11/08 01:39:57 pelle Exp $
+$Log: HeldTransferReceiptBuilder.java,v $
+Revision 1.1  2003/11/08 01:39:57  pelle
 WARNING this rev is majorly unstable and will almost certainly not compile.
 More major refactoring in neuclear-pay.
 Got rid of neuclear-ledger like features of pay such as Account and Issuer.
@@ -33,26 +39,18 @@ their matching TransferRequest/ReceiptBuilder classes.
 PaymentProcessor has been renamed CurrencyController. I will extract a superclass later to be named AbstractLedgerController
 which will handle all neuclear-ledger based AssetControllers.
 
-Revision 1.1  2003/11/06 23:47:43  pelle
-Major Refactoring of CurrencyController.
-Factored out AssetController to be new abstract parent class together with most of its support classes.
-Created (Half way) RemoteAssetController, which can perform transactions on external AssetControllers via NeuClear.
-Created the first attempt at the ExchangeAgent. This will need use of the RemoteAssetController.
-SOAPTools was changed to return a stream. This is required by the VerifyingReader in NeuClear.
-
 */
 
 /**
- * The ExchangeAgent takes an ExchangeOrder containing a
- * HeldTransferReceipt as the bid and defails of what is wanted in
- * exchange.
- * <p/>
  * User: pelleb
- * Date: Nov 6, 2003
- * Time: 5:14:06 PM
+ * Date: Nov 7, 2003
+ * Time: 8:05:15 PM
  */
-public abstract class ExchangeAgent {
-    public abstract ExchangeOrderReceipt exchange(ExchangeOrder bid);
+public class HeldTransferReceiptBuilder extends TransferReceiptBuilder {
+    public HeldTransferReceiptBuilder(HeldTransferRequest req, String id) throws InvalidTransferException, NegativeTransferException {
+        super(TransferGlobals.HELD_XFER_RCPT_TAGNAME, req, id);
+        Element element = getElement();
+        element.add(TransferGlobals.createAttribute(element, "helduntil", TimeTools.formatTimeStamp(req.getHeldUntil())));
 
-    public abstract void cancel(ExchangeOrderReceipt order) throws ExchangePerformedException;
+    }
 }

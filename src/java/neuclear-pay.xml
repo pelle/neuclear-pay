@@ -3,7 +3,7 @@
     <component type="org.neuclear.ledger.Ledger" class="org.neuclear.ledger.implementations.SQLLedger">
         <param type="java.lang.String">neu://superbux/reserve</param>
     </component>
-    <component class="org.neuclear.pay.PaymentProcessor">
+    <component class="org.neuclear.pay.CurrencyController">
         <param type="java.lang.String">SuperBux</param>
         <param type="java.lang.String">neu://superbux/reserve</param>
     </component>

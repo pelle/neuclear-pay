@@ -3,6 +3,7 @@ package org.neuclear.pay.receiver;
 import org.dom4j.DocumentException;
 import org.neuclear.asset.Account;
 import org.neuclear.asset.AssetController;
+import org.neuclear.asset.contracts.TransferContract;
 import org.neuclear.commons.NeuClearException;
 import org.neuclear.commons.configuration.Configuration;
 import org.neuclear.commons.configuration.ConfigurationException;
@@ -11,8 +12,7 @@ import org.neuclear.ledger.BookExistsException;
 import org.neuclear.ledger.LedgerCreationException;
 import org.neuclear.ledger.LowlevelLedgerException;
 import org.neuclear.ledger.UnknownBookException;
-import org.neuclear.pay.PaymentProcessor;
-import org.neuclear.pay.contracts.TransferContract;
+import org.neuclear.pay.CurrencyController;
 import org.neuclear.receiver.AbstractReceiverTest;
 import org.neuclear.receiver.Receiver;
 import org.neudist.xml.XMLException;
@@ -35,10 +35,22 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: PaymentReceiverTest.java,v 1.4 2003/11/06 23:47:44 pelle Exp $
+$Id: PaymentReceiverTest.java,v 1.5 2003/11/08 01:39:58 pelle Exp $
 $Log: PaymentReceiverTest.java,v $
+Revision 1.5  2003/11/08 01:39:58  pelle
+WARNING this rev is majorly unstable and will almost certainly not compile.
+More major refactoring in neuclear-pay.
+Got rid of neuclear-ledger like features of pay such as Account and Issuer.
+Accounts have been replaced by Identity from neuclear-id
+Issuer is now Asset which is a subclass of Identity
+AssetController supports more than one Asset. Which is important for most non ecurrency implementations.
+TransferRequest/Receipt and its Held companions are now SignedNamedObjects. Thus to create them you must use
+their matching TransferRequest/ReceiptBuilder classes.
+PaymentProcessor has been renamed CurrencyController. I will extract a superclass later to be named AbstractLedgerController
+which will handle all neuclear-ledger based AssetControllers.
+
 Revision 1.4  2003/11/06 23:47:44  pelle
-Major Refactoring of PaymentProcessor.
+Major Refactoring of CurrencyController.
 Factored out AssetController to be new abstract parent class together with most of its support classes.
 Created (Half way) RemoteAssetController, which can perform transactions on external AssetControllers via NeuClear.
 Created the first attempt at the ExchangeAgent. This will need use of the RemoteAssetController.
@@ -69,7 +81,7 @@ CreateTestPayments is a command line utility to create signed payment requests
 public class PaymentReceiverTest extends AbstractReceiverTest {
     public PaymentReceiverTest(String string) throws LowlevelLedgerException, LedgerCreationException, ConfigurationException {
         super(string);
-        proc = (AssetController) Configuration.getComponent(PaymentProcessor.class, "neuclear-pay");
+        proc = (AssetController) Configuration.getComponent(CurrencyController.class, "neuclear-pay");
         receiver = (PaymentReceiver) Configuration.getComponent(PaymentReceiver.class, "neuclear-pay");
     }
 

@@ -1,5 +1,7 @@
 package org.neuclear.asset;
 
+import org.neuclear.asset.contracts.Held;
+
 import java.util.Date;
 
 /**

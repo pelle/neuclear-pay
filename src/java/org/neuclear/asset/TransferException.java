@@ -1,5 +1,6 @@
 package org.neuclear.asset;
 
+import org.neudist.utils.Utility;
 
 
 /**
@@ -12,12 +13,16 @@ public abstract class TransferException extends Exception {
         this.proc = proc;
     }
 
+    public TransferException() {
+        ;
+    }
+
     public AssetController getProc() {
         return proc;
     }
 
     public String getMessage() {
-        return "NeuClear Transfer Exception: " + proc.toString() + "\n" + getSubMessage();
+        return "NeuClear Transfer Exception: " + Utility.denullString(proc.toString()) + "\n" + getSubMessage();
     }
 
     abstract public String getSubMessage();

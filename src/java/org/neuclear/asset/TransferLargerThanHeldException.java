@@ -1,6 +1,7 @@
 package org.neuclear.asset;
 
 
+import org.neuclear.asset.contracts.HeldTransferReceipt;
 
 /**
  * User: pelleb

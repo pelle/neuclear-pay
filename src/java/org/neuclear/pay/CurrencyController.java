@@ -1,8 +1,13 @@
 package org.neuclear.pay;
 
 import org.neuclear.asset.*;
+import org.neuclear.asset.contracts.*;
+import org.neuclear.asset.contracts.builders.TransferReceiptBuilder;
+import org.neuclear.commons.NeuClearException;
 import org.neuclear.commons.configuration.Configuration;
 import org.neuclear.commons.configuration.ConfigurationException;
+import org.neuclear.id.Identity;
+import org.neuclear.id.resolver.NSResolver;
 import org.neuclear.ledger.*;
 
 import java.util.Date;
@@ -14,31 +19,57 @@ import java.util.Date;
  * Time: 5:11:49 PM
  * To change this template use Options | File Templates.
  */
-public final class PaymentProcessor extends AssetController {
-//    public PaymentProcessor(String ledgername,String title,String reserve) throws LedgerCreationException, LowlevelLedgerException, BookExistsException {
+public final class CurrencyController extends AssetController {
+//    public CurrencyController(String ledgername,String title,String reserve) throws LedgerCreationException, LowlevelLedgerException, BookExistsException {
 //        this(LedgerFactory.getInstance().getLedger(ledgername),title,reserve);
 //    }
-    public PaymentProcessor(Ledger ledger, String title, String reserve) throws LowlevelLedgerException, BookExistsException {
-        super(title);
+    public CurrencyController(Ledger ledger, String assetname) throws LowlevelLedgerException, BookExistsException, NeuClearException {
+        super();
         this.ledger = ledger;
+        asset = (Asset) NSResolver.resolveIdentity(assetname);
 
-        Book issuerBook = null;
+        Book tmpIssuer = null;
         try {
-            issuerBook = ledger.getBook(reserve);
+            tmpIssuer = ledger.getBook(asset.getName());
         } catch (UnknownBookException e) {
-            createAccount(reserve, title);
+            tmpIssuer = ledger.createNewBook(asset.getName());
         }
-        issuerAccount = new CurrencyIssuer(this, issuerBook);
+        issuerBook = tmpIssuer;
     }
 
-    public final TransferReceipt processTransfer(TransferRequest req) throws UnknownBookException, LowlevelLedgerException, UnBalancedTransactionException, InvalidTransactionException {
-        Book from = ((CurrencyAccount) req.getFrom()).getBook();
+    public boolean canProcess(Asset asset) {
+        return false;
+    }
 
-        Book to = ((CurrencyAccount) req.getTo()).getBook();
-        PostedTransaction posted = from.transfer(to, req.getAmount(), req.getComment(), req.getValueTime());
+    public final TransferReceiptBuilder processTransfer(TransferRequest req) throws InvalidTransferException {
+        try {
+            Book from = getBook(req.getFrom());
+            Book to = getBook(req.getTo());
+
+            PostedTransaction posted = from.transfer(to, req.getAmount(), req.getComment(), req.getValueTime());
 
 
-        return createTransferReceipt(req, posted.getXid());
+            return new TransferReceiptBuilder(req, createTransactionId(req, posted));
+        } catch (UnknownBookException e) { //TODO Implement something like this eg. AccountNotValidException
+            throw new InvalidTransferException(e.getSubMessage());
+        } catch (LowlevelLedgerException e) { //TODO Really need to move this out of ledger
+            e.printStackTrace();
+        } catch (InvalidTransactionException e) {
+            throw new InvalidTransferException(e.getSubMessage());
+        } catch (UnBalancedTransactionException e) {
+            throw new InvalidTransferException("unbalanced");
+        } catch (NegativeTransferException e) {
+            throw new InvalidTransferException("postive amount");
+        }
+        return null;//TODO No no no
+    }
+
+    private String createTransactionId(TransferRequest req, PostedTransaction posted) {
+        return req.getAsset().getName() + "/" + posted.getXid();
+    }
+
+    private Book getBook(Identity id) throws UnknownBookException, LowlevelLedgerException {
+        return ledger.getBook(id.getName());
     }
 
 
@@ -56,7 +87,7 @@ public final class PaymentProcessor extends AssetController {
         }
     }
 
-    public final TransferReceipt processCompleteHold(HeldTransferReceipt hold, Date valuedate, double amount, String comment) throws LowlevelLedgerException, NegativeTransferException, TransferLargerThanHeldException, TransferNotStartedException, ExpiredHeldTransferException {
+    public final TransferReceipt processCompleteHold(HeldTransferReceipt hold, Date valuedate, double amount, String comment) throws LowlevelLedgerException, NegativeTransferException, TransferLargerThanHeldException, TransferNotStartedException, ExpiredHeldTransferException, InvalidTransferException {
         try {
             if (amount > hold.getAmount())
                 throw new TransferLargerThanHeldException(this, hold, amount);
@@ -66,7 +97,7 @@ public final class PaymentProcessor extends AssetController {
                 throw new ExpiredHeldTransferException(this, hold, valuedate);
             PostedHeldTransaction heldTran = ledger.findHeldTransaction(hold.getId());
             PostedTransaction tran = heldTran.complete(amount, valuedate, comment);
-            return createTransferReceipt(new TransferRequest(hold.getFrom(), hold.getTo(), amount, valuedate, comment), tran.getXid());
+            return createTransferReceipt(new TransferRequest(getIssuer().getID(), hold.getFrom(), hold.getTo(), amount, valuedate, comment), tran.getXid());
         } catch (UnknownTransactionException e) {
             throw new LowlevelLedgerException(ledger, e);
         } catch (TransactionExpiredException e) {
@@ -96,8 +127,8 @@ public final class PaymentProcessor extends AssetController {
         return new CurrencyAccount(this, ledger.createNewBook(id, title));
     }
 
-    public static PaymentProcessor getInstance() throws LowlevelLedgerException, LedgerCreationException, ConfigurationException {
-        return (PaymentProcessor) Configuration.getComponent(PaymentProcessor.class, "neuclear-pay");
+    public static CurrencyController getInstance() throws LowlevelLedgerException, LedgerCreationException, ConfigurationException {
+        return (CurrencyController) Configuration.getComponent(CurrencyController.class, "neuclear-pay");
     }
 
     public Issuer getIssuer() {
@@ -108,9 +139,9 @@ public final class PaymentProcessor extends AssetController {
        CompositePicoContainer pico=new CompositePicoContainer.WithContainerArray(new PicoContainer[]{LedgerFactory.getInstance().getContainer("neu://superbux/reserve")});
         try {
             pico.
-            pico.registerComponentByClass( PaymentProcessor.class);
-            pico.addParameterToComponent(PaymentProcessor.class,String.class,"SuperBux");
-            pico.addParameterToComponent(PaymentProcessor.class,String.class,"neu://superbux/reserve");
+            pico.registerComponentByClass( CurrencyController.class);
+            pico.addParameterToComponent(CurrencyController.class,String.class,"SuperBux");
+            pico.addParameterToComponent(CurrencyController.class,String.class,"neu://superbux/reserve");
             pico.instantiateComponents();
         } catch (DuplicateComponentKeyRegistrationException e) {
             e.printStackTrace();  //To change body of catch statement use Options | File Templates.
@@ -129,5 +160,6 @@ public final class PaymentProcessor extends AssetController {
     }
   */
     private final Ledger ledger;
-    protected final Issuer issuerAccount;
+    private final Asset asset;
+    private final Book issuerBook;
 }

@@ -2,10 +2,10 @@ package org.neuclear.pay.receiver;
 
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
+import org.neuclear.asset.contracts.builders.TransferRequestBuilder;
 import org.neuclear.commons.configuration.ConfigurationException;
 import org.neuclear.id.NSTools;
 import org.neuclear.id.builders.NamedObjectBuilder;
-import org.neuclear.pay.contracts.builders.TransferRequestBuilder;
 import org.neuclear.signers.commandline.CommandLineSigner;
 
 import java.io.IOException;
@@ -31,8 +31,20 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: CreateTestPayments.java,v 1.2 2003/10/29 21:14:44 pelle Exp $
+$Id: CreateTestPayments.java,v 1.3 2003/11/08 01:39:58 pelle Exp $
 $Log: CreateTestPayments.java,v $
+Revision 1.3  2003/11/08 01:39:58  pelle
+WARNING this rev is majorly unstable and will almost certainly not compile.
+More major refactoring in neuclear-pay.
+Got rid of neuclear-ledger like features of pay such as Account and Issuer.
+Accounts have been replaced by Identity from neuclear-id
+Issuer is now Asset which is a subclass of Identity
+AssetController supports more than one Asset. Which is important for most non ecurrency implementations.
+TransferRequest/Receipt and its Held companions are now SignedNamedObjects. Thus to create them you must use
+their matching TransferRequest/ReceiptBuilder classes.
+PaymentProcessor has been renamed CurrencyController. I will extract a superclass later to be named AbstractLedgerController
+which will handle all neuclear-ledger based AssetControllers.
+
 Revision 1.2  2003/10/29 21:14:44  pelle
 Refactored the whole signing process. Now we have an interface called Signer which is the old SignerStore.
 To use it you pass a byte array and an alias. The sign method then returns the signature.

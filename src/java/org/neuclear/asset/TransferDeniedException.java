@@ -1,5 +1,7 @@
 package org.neuclear.asset;
 
+import org.neuclear.asset.contracts.TransferRequest;
+
 /*
 NeuClear Distributed Transaction Clearing Platform
 (C) 2003 Pelle Braendgaard
@@ -18,10 +20,22 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: TransferDeniedException.java,v 1.1 2003/11/06 23:47:43 pelle Exp $
+$Id: TransferDeniedException.java,v 1.2 2003/11/08 01:39:58 pelle Exp $
 $Log: TransferDeniedException.java,v $
+Revision 1.2  2003/11/08 01:39:58  pelle
+WARNING this rev is majorly unstable and will almost certainly not compile.
+More major refactoring in neuclear-pay.
+Got rid of neuclear-ledger like features of pay such as Account and Issuer.
+Accounts have been replaced by Identity from neuclear-id
+Issuer is now Asset which is a subclass of Identity
+AssetController supports more than one Asset. Which is important for most non ecurrency implementations.
+TransferRequest/Receipt and its Held companions are now SignedNamedObjects. Thus to create them you must use
+their matching TransferRequest/ReceiptBuilder classes.
+PaymentProcessor has been renamed CurrencyController. I will extract a superclass later to be named AbstractLedgerController
+which will handle all neuclear-ledger based AssetControllers.
+
 Revision 1.1  2003/11/06 23:47:43  pelle
-Major Refactoring of PaymentProcessor.
+Major Refactoring of CurrencyController.
 Factored out AssetController to be new abstract parent class together with most of its support classes.
 Created (Half way) RemoteAssetController, which can perform transactions on external AssetControllers via NeuClear.
 Created the first attempt at the ExchangeAgent. This will need use of the RemoteAssetController.
