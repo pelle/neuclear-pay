@@ -32,8 +32,15 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: TransferBuilder.java,v 1.7 2003/11/28 00:11:50 pelle Exp $
+$Id: TransferBuilder.java,v 1.8 2003/12/06 00:16:10 pelle Exp $
 $Log: TransferBuilder.java,v $
+Revision 1.8  2003/12/06 00:16:10  pelle
+Updated various areas in NSTools.
+Updated URI Validation in particular to support new expanded format
+Updated createUniqueID and friends to be a lot more unique and more efficient.
+In CryptoTools updated getRandom() to finally use a SecureRandom.
+Changed CryptoTools.getFormatURLSafe to getBase36 because that is what it really is.
+
 Revision 1.7  2003/11/28 00:11:50  pelle
 Getting the NeuClear web transactions working.
 
@@ -89,7 +96,7 @@ TransferReceiptBuilder has been created for use by Transfer processors. It is us
  */
 public abstract class TransferBuilder extends NamedObjectBuilder {
     protected TransferBuilder(final String tagname, final Asset asset, final Identity signer, final Identity to, final double amount, final Date valuetime, final String comment) throws InvalidTransferException, NegativeTransferException, NeuClearException {
-        super(NSTools.createUniqueNamedID(signer.getName(), to.getName()), TransferGlobals.createQName(tagname));
+        super(NSTools.createUniqueTransactionID(signer.getName(), to.getName()), TransferGlobals.createQName(tagname));
         if (amount < 0)
             throw new NegativeTransferException(amount);
         if (Utility.isEmpty(asset))
