@@ -1,7 +1,6 @@
 package org.neuclear.asset.orders;
 
 import org.dom4j.Element;
-import org.neuclear.asset.contracts.AssetGlobals;
 import org.neuclear.id.InvalidNamedObjectException;
 import org.neuclear.id.NamedObjectReader;
 import org.neuclear.id.SignedNamedCore;
@@ -41,8 +40,8 @@ public class TransferReceipt extends AssetTransactionContract {
          * @return
          */
         public final SignedNamedObject read(final SignedNamedCore core, final Element elem) throws InvalidNamedObjectException {
-            if (!elem.getNamespace().equals(AssetGlobals.NS_ASSET))
-                throw new InvalidNamedObjectException(core.getName(),"Not in XML NameSpace: "+AssetGlobals.NS_ASSET.getURI());
+            if (!elem.getNamespace().getURI().equals(TransferGlobals.XFER_NSURI))
+                throw new InvalidNamedObjectException(core.getName(),"Not in XML NameSpace: "+TransferGlobals.XFER_NSURI);
             if (!elem.getName().equals(TransferGlobals.XFER_RCPT_TAGNAME))
                 throw new InvalidNamedObjectException(core.getName(),"Incorrect XML Tagname for reader: "+TransferGlobals.XFER_TAGNAME);
 

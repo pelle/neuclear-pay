@@ -43,9 +43,9 @@ public final class TransferOrder extends AssetTransactionContract {
          * @return
          */
         public final SignedNamedObject read(final SignedNamedCore core, final Element elem) throws InvalidNamedObjectException {
-            if (!elem.getNamespace().equals(AssetGlobals.NS_ASSET))
+            if (!elem.getNamespace().getURI().equals(TransferGlobals.XFER_NSURI))
                 throw new InvalidNamedObjectException(core.getName(),"Not in XML NameSpace: "+AssetGlobals.NS_ASSET.getURI());
-            if (elem.getName().equals(TransferGlobals.XFER_TAGNAME))
+            if (!elem.getName().equals(TransferGlobals.XFER_TAGNAME))
                 throw new InvalidNamedObjectException(core.getName(),"Incorrect XML Tagname for reader: "+TransferGlobals.XFER_TAGNAME);
 
             return new TransferOrder(core,

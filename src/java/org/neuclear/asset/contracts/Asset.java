@@ -29,8 +29,11 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: Asset.java,v 1.12 2004/01/10 00:00:44 pelle Exp $
+$Id: Asset.java,v 1.13 2004/01/21 23:41:02 pelle Exp $
 $Log: Asset.java,v $
+Revision 1.13  2004/01/21 23:41:02  pelle
+Started the unit tests for the new payment message format.
+
 Revision 1.12  2004/01/10 00:00:44  pelle
 Implemented new Schema for Transfer*
 Working on it for Exchange*, so far all Receipts are implemented.
@@ -124,6 +127,14 @@ public final class Asset extends Identity {
         this.minimumTransaction = minimumTransaction;
     }
 
+    //TODO drop. This is for testing purposes only
+    public Asset(final String serviceurl,final PublicKey pub, final int decimal, final double minimumTransaction) {
+        super(pub);
+        this.serviceurl=serviceurl;
+        this.decimal = decimal;
+        this.multiplier = (int) Math.round(Math.pow(10, -decimal));
+        this.minimumTransaction = minimumTransaction;
+    }
 
     /**
      * Checks if an amount is valid within the boundaries of the assetName.
