@@ -10,8 +10,11 @@ import org.neuclear.tests.AbstractObjectCreationTest;
 import java.security.GeneralSecurityException;
 
 /*
-$Id: AssetBuilderTest.java,v 1.4 2004/04/23 23:33:14 pelle Exp $
+$Id: AssetBuilderTest.java,v 1.5 2004/05/01 00:23:12 pelle Exp $
 $Log: AssetBuilderTest.java,v $
+Revision 1.5  2004/05/01 00:23:12  pelle
+Added Ledger field to Transaction as well as to getBalance() and friends.
+
 Revision 1.4  2004/04/23 23:33:14  pelle
 Major update. Added an original url and nickname to Identity and friends.
 
@@ -48,8 +51,8 @@ public class AssetBuilderTest extends AbstractObjectCreationTest {
         assertEqualPublicKeys(getSigner().getPublicKey("bux"), asset.getServiceKey());
         assertNotNull(asset.getServiceUrl());
         assertEquals(URL, asset.getServiceUrl());
-        assertNotNull(asset.getIssuerKey());
-        assertEqualPublicKeys(getAlice().getPublicKey(), asset.getIssuerKey());
+        assertNotNull(asset.getIssuer());
+        assertEquals(getAlice().getName(), asset.getIssuer().getName());
         assertEquals(DECIMAL, asset.getDecimal());
         assertEquals(MINIMUM, asset.getMinimumTransaction(), 0);
     }

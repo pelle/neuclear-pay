@@ -58,7 +58,7 @@
             }
         }
     }
-    final double balance = ledger.getAvailableBalance(userns.getName());
+    final double balance = ledger.getAvailableBalance(null, userns.getName());
     if (submit&&(amount>balance||amount<0))
         submit=false;
 %>

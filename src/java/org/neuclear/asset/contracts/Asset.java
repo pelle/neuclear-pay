@@ -28,8 +28,11 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: Asset.java,v 1.19 2004/04/23 23:33:13 pelle Exp $
+$Id: Asset.java,v 1.20 2004/05/01 00:23:11 pelle Exp $
 $Log: Asset.java,v $
+Revision 1.20  2004/05/01 00:23:11  pelle
+Added Ledger field to Transaction as well as to getBalance() and friends.
+
 Revision 1.19  2004/04/23 23:33:13  pelle
 Major update. Added an original url and nickname to Identity and friends.
 
@@ -142,7 +145,7 @@ SOAPTools was changed to return a stream. This is required by the VerifyingReade
 public final class Asset extends Service {
     protected Asset(final SignedNamedCore core, final String nickname, final String original, final String serviceUrl, final PublicKey servicekey, final PublicKey issuerKey, final Targets targets, final int decimal, final double minimumTransaction, final String units) {
         super(core, nickname, original, serviceUrl, servicekey, targets);
-        this.issuerKey = issuerKey;
+        this.issuer = new Signatory(issuerKey);
         this.decimal = decimal;
         this.multiplier = (int) Math.round(Math.pow(10, -decimal));
         this.minimumTransaction = minimumTransaction;
@@ -184,8 +187,8 @@ public final class Asset extends Service {
         return Math.round(amount * multiplier) / multiplier;
     }
 
-    public final PublicKey getIssuerKey() {
-        return issuerKey;
+    public final Signatory getIssuer() {
+        return issuer;
     }
 
     public int getDecimal() {
@@ -252,7 +255,7 @@ public final class Asset extends Service {
 
     }
 
-    private final PublicKey issuerKey;
+    private final Signatory issuer;
     private final int decimal;
     private final int multiplier;
     private final double minimumTransaction;

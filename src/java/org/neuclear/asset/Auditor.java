@@ -31,8 +31,11 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: Auditor.java,v 1.6 2004/04/27 15:24:55 pelle Exp $
+$Id: Auditor.java,v 1.7 2004/05/01 00:23:12 pelle Exp $
 $Log: Auditor.java,v $
+Revision 1.7  2004/05/01 00:23:12  pelle
+Added Ledger field to Transaction as well as to getBalance() and friends.
+
 Revision 1.6  2004/04/27 15:24:55  pelle
 Due to a new API change in 0.5 I have changed the name of Ledger and it's implementers to LedgerController.
 
@@ -202,7 +205,7 @@ public class Auditor implements Receiver {
 
     public final void process(final TransferOrder req) throws InvalidTransferException, LowLevelPaymentException {
         try {
-            ledger.transfer(req.getDigest(), req.getSignatory().getName(), req.getRecipient(), req.getAmount().getAmount(), req.getComment());
+            ledger.transfer("CHANGEME", req.getDigest(), req.getSignatory().getName(), req.getRecipient(), req.getAmount().getAmount(), req.getComment());
         } catch (LowlevelLedgerException e) {
             throw new LowLevelPaymentException(e);
         } catch (InvalidTransactionException e) {
@@ -215,7 +218,7 @@ public class Auditor implements Receiver {
     public final void process(final IssueReceipt receipt) throws InvalidTransferException, LowLevelPaymentException, TransferDeniedException, NeuClearException {
         try {
             final IssueOrder req = receipt.getOrder();
-            if (req.getSignatory().getPublicKey().equals(asset.getIssuerKey())) {
+            if (req.getSignatory().getPublicKey().equals(asset.getIssuer())) {
                 if (!ledger.transactionExists(req.getDigest()))
                     process(req);
                 ledger.setReceiptId(req.getDigest(), receipt.getDigest());
@@ -229,8 +232,8 @@ public class Auditor implements Receiver {
 
     public final void process(final IssueOrder req) throws InvalidTransferException, LowLevelPaymentException {
         try {
-            if (req.getSignatory().getPublicKey().equals(asset.getIssuerKey()))
-                ledger.transfer(req.getDigest(), req.getSignatory().getName(), req.getRecipient(), req.getAmount().getAmount(), req.getComment());
+            if (req.getSignatory().getPublicKey().equals(asset.getIssuer()))
+                ledger.transfer("CHANGEME", req.getDigest(), req.getSignatory().getName(), req.getRecipient(), req.getAmount().getAmount(), req.getComment());
         } catch (LowlevelLedgerException e) {
             throw new LowLevelPaymentException(e);
         } catch (InvalidTransactionException e) {
@@ -255,7 +258,7 @@ public class Auditor implements Receiver {
 
     public final void process(final ExchangeOrder req) throws InvalidTransferException, LowLevelPaymentException {
         try {
-            ledger.hold(req.getDigest(), req.getSignatory().getName(), req.getAgent().getSignatory().getName(), req.getExpiry(), req.getAmount().getAmount(), req.getComment());
+            ledger.hold("CHANGEME", req.getDigest(), req.getSignatory().getName(), req.getAgent().getSignatory().getName(), req.getExpiry(), req.getAmount().getAmount(), req.getComment());
         } catch (LowlevelLedgerException e) {
             throw new LowLevelPaymentException(e);
         } catch (InvalidTransactionException e) {

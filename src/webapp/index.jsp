@@ -84,8 +84,8 @@ For more information about what this is visit <a href="http://neuclear.org">NeuC
 
 <%}else{
         Book book=(Book) session.getAttribute("book");
-        double balance=ledger.getBalance(userns.getName());
-        double available=ledger.getAvailableBalance(userns.getName());
+        double balance=ledger.getBalance(null, userns.getName());
+        double available=ledger.getAvailableBalance(null, userns.getName());
 %>
     <tr><th>Account</th><th  title="<%=book.getId()%>" ><%=book.getNickname()%></th></tr>
 <tr class="even"><td>Balance</td><td align="right"><%=balance%> <%=asset.getUnits()%></td></tr>

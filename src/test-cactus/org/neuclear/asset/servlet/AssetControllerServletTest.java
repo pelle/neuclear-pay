@@ -47,8 +47,11 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: AssetControllerServletTest.java,v 1.2 2004/04/23 19:09:35 pelle Exp $
+$Id: AssetControllerServletTest.java,v 1.3 2004/05/01 00:23:13 pelle Exp $
 $Log: AssetControllerServletTest.java,v $
+Revision 1.3  2004/05/01 00:23:13  pelle
+Added Ledger field to Transaction as well as to getBalance() and friends.
+
 Revision 1.2  2004/04/23 19:09:35  pelle
 Lots of cleanups and improvements to the userinterface and look of the bux application.
 
@@ -121,12 +124,12 @@ public class AssetControllerServletTest extends ServletTestCase {
         final Asset asset = loadAsset();
 //        servlet.setAsset(asset);
         servlet.init(config);
-        assertEquals(0, servlet.getLedger().getBalance(getPublicKeyName("bob")), 0);
-        servlet.getLedger().transfer(getPublicKeyName(asset.getIssuerKey()), getPublicKeyName("bob"), 110, "fund");
-        assertEquals(110, servlet.getLedger().getBalance(getPublicKeyName("bob")), 0);
+        assertEquals(0, servlet.getLedger().getBalance(null, getPublicKeyName("bob")), 0);
+        servlet.getLedger().transfer(asset.getIssuer().getName(), getPublicKeyName("bob"), 110, "fund");
+        assertEquals(110, servlet.getLedger().getBalance(null, getPublicKeyName("bob")), 0);
         servlet.service(request, response);
-        assertEquals(10, servlet.getLedger().getBalance(getPublicKeyName("bob")), 0);
-        assertEquals(100, servlet.getLedger().getBalance(getPublicKeyName("alice")), 0);
+        assertEquals(10, servlet.getLedger().getBalance(null, getPublicKeyName("bob")), 0);
+        assertEquals(100, servlet.getLedger().getBalance(null, getPublicKeyName("alice")), 0);
     }
 /*
 

@@ -42,10 +42,10 @@ public final class IssuanceTests extends AbstractSigningTest {
         assertAudit(getBob().getName());
         assertAudit(getAlice().getName());
 
-        double issuerBalance = ledger.getBalance(getAlice().getName());
-        double bobBalance = ledger.getBalance(getBob().getName());
+        double issuerBalance = ledger.getBalance(null, getAlice().getName());
+        double bobBalance = ledger.getBalance(null, getBob().getName());
 
-        assertEquals(bobBalance, ledger.getAvailableBalance(getBob().getName()), 0);
+        assertEquals(bobBalance, ledger.getAvailableBalance(null, getBob().getName()), 0);
 
         final int amount = 1000;
 
@@ -53,10 +53,10 @@ public final class IssuanceTests extends AbstractSigningTest {
         SignedNamedObject receipt = process(builder);
         assertNotNull(receipt);
         assertTrue(receipt instanceof IssueReceipt);
-        assertEquals(issuerBalance - amount, ledger.getAvailableBalance(getAlice().getName()), 0);
-        assertEquals(issuerBalance - amount, ledger.getBalance(getAlice().getName()), 0);
-        assertEquals(bobBalance + amount, ledger.getAvailableBalance(getBob().getName()), 0);
-        assertEquals(bobBalance + amount, ledger.getBalance(getBob().getName()), 0);
+        assertEquals(issuerBalance - amount, ledger.getAvailableBalance(null, getAlice().getName()), 0);
+        assertEquals(issuerBalance - amount, ledger.getBalance(null, getAlice().getName()), 0);
+        assertEquals(bobBalance + amount, ledger.getAvailableBalance(null, getBob().getName()), 0);
+        assertEquals(bobBalance + amount, ledger.getBalance(null, getBob().getName()), 0);
         assertAudit(getBob().getName());
         assertAudit(getAlice().getName());
         assertTrue(ledger.isBalanced());
@@ -98,10 +98,10 @@ public final class IssuanceTests extends AbstractSigningTest {
         assertAudit(getBob().getName());
         assertAudit(getAlice().getName());
 
-        double issuerBalance = ledger.getBalance(getAlice().getName());
-        double bobBalance = ledger.getBalance(getBob().getName());
+        double issuerBalance = ledger.getBalance(null, getAlice().getName());
+        double bobBalance = ledger.getBalance(null, getBob().getName());
 
-        assertEquals(bobBalance, ledger.getAvailableBalance(getBob().getName()), 0);
+        assertEquals(bobBalance, ledger.getAvailableBalance(null, getBob().getName()), 0);
 
         final int amount = 1000;
 
@@ -116,10 +116,10 @@ public final class IssuanceTests extends AbstractSigningTest {
         } catch (InvalidTransferException e) {
             assertTrue(true);
         }
-        assertEquals(issuerBalance, ledger.getAvailableBalance(getAlice().getName()), 0);
-        assertEquals(issuerBalance, ledger.getBalance(getAlice().getName()), 0);
-        assertEquals(bobBalance, ledger.getAvailableBalance(getBob().getName()), 0);
-        assertEquals(bobBalance, ledger.getBalance(getBob().getName()), 0);
+        assertEquals(issuerBalance, ledger.getAvailableBalance(null, getAlice().getName()), 0);
+        assertEquals(issuerBalance, ledger.getBalance(null, getAlice().getName()), 0);
+        assertEquals(bobBalance, ledger.getAvailableBalance(null, getBob().getName()), 0);
+        assertEquals(bobBalance, ledger.getBalance(null, getBob().getName()), 0);
         assertAudit(getBob().getName());
         assertAudit(getAlice().getName());
         assertTrue(ledger.isBalanced());
@@ -132,10 +132,10 @@ public final class IssuanceTests extends AbstractSigningTest {
         assertAudit(getBob().getName());
         assertAudit(getAlice().getName());
 
-        double issuerBalance = ledger.getBalance(getAlice().getName());
-        double bobBalance = ledger.getBalance(getBob().getName());
+        double issuerBalance = ledger.getBalance(null, getAlice().getName());
+        double bobBalance = ledger.getBalance(null, getBob().getName());
 
-        assertEquals(bobBalance, ledger.getAvailableBalance(getBob().getName()), 0);
+        assertEquals(bobBalance, ledger.getAvailableBalance(null, getBob().getName()), 0);
 
         final int amount = -1000;
 
@@ -150,10 +150,10 @@ public final class IssuanceTests extends AbstractSigningTest {
         } catch (InvalidTransferException e) {
             assertTrue(true);
         }
-        assertEquals(issuerBalance, ledger.getAvailableBalance(getAlice().getName()), 0);
-        assertEquals(issuerBalance, ledger.getBalance(getAlice().getName()), 0);
-        assertEquals(bobBalance, ledger.getAvailableBalance(getBob().getName()), 0);
-        assertEquals(bobBalance, ledger.getBalance(getBob().getName()), 0);
+        assertEquals(issuerBalance, ledger.getAvailableBalance(null, getAlice().getName()), 0);
+        assertEquals(issuerBalance, ledger.getBalance(null, getAlice().getName()), 0);
+        assertEquals(bobBalance, ledger.getAvailableBalance(null, getBob().getName()), 0);
+        assertEquals(bobBalance, ledger.getBalance(null, getBob().getName()), 0);
         assertAudit(getBob().getName());
         assertAudit(getAlice().getName());
         assertTrue(ledger.isBalanced());
@@ -161,8 +161,8 @@ public final class IssuanceTests extends AbstractSigningTest {
     }
 
     public void assertAudit(String name) throws LowlevelLedgerException {
-        assertEquals(auditLedger.getBalance(name), ledger.getBalance(name), 0);
-        assertEquals(auditLedger.getAvailableBalance(name), ledger.getAvailableBalance(name), 0);
+        assertEquals(auditLedger.getBalance(null, name), ledger.getBalance(null, name), 0);
+        assertEquals(auditLedger.getAvailableBalance(null, name), ledger.getAvailableBalance(null, name), 0);
     }
 
     private SignedNamedObject process(Builder builder) throws NeuClearException {
