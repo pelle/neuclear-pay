@@ -1,6 +1,9 @@
 package org.neuclear.asset.contracts;
 
-import org.dom4j.*;
+import org.dom4j.DocumentHelper;
+import org.dom4j.Element;
+import org.dom4j.Namespace;
+import org.dom4j.QName;
 import org.neuclear.id.verifier.VerifyingReader;
 
 /*
@@ -21,8 +24,12 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: AssetGlobals.java,v 1.9 2004/01/05 23:47:09 pelle Exp $
+$Id: AssetGlobals.java,v 1.10 2004/04/02 16:58:54 pelle Exp $
 $Log: AssetGlobals.java,v $
+Revision 1.10  2004/04/02 16:58:54  pelle
+Updated Asset and Asset Builder with semi fully featured functionality.
+It now has Issuer, Service etc.
+
 Revision 1.9  2004/01/05 23:47:09  pelle
 Create new Document classification "order", which is really just inherint in the new
 package layout.
@@ -119,18 +126,22 @@ public final class AssetGlobals {
         return DocumentHelper.createQName(name, NS_ASSET);
     }
 
-    public static Attribute createAttribute(final Element elem, final String name, final String value) {
-        return DocumentHelper.createAttribute(elem, createQName(name), value);
+    public static void addAttribute(final Element elem, final String name, final String value) {
+        elem.addAttribute(createQName(name), value);
     }
 
-    public static Element createElement(final String name, final String value) {
+    public static Element createElement(final String name) {
         return DocumentHelper.createElement(createQName(name));
     }
 
     public static final String ASSET_TAGNAME = "Asset";
     public static final String XFER_ASSETS = "http://neuclear.org/neu/assets";
-    public static final String ASSET_NSPREFIX = "asset";
-    public static final Namespace NS_ASSET=createNameSpace();
+    public static final String ASSET_NSPREFIX = "as";
+    public static final String ISSUER_TAGNAME = "Issuer";
+    public static final String DECIMAL_POINT_TAGNAME = "DecimalPoints";
+    public static final String MINIMUM_TAGNAME = "MinimumTransaction";
+    public static final Namespace NS_ASSET = createNameSpace();
+
     public static void registerReaders() {
         VerifyingReader.getInstance().registerReader(AssetGlobals.ASSET_TAGNAME, new Asset.Reader());
     }

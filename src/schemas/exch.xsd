@@ -1,7 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-$Id: exch.xsd,v 1.5 2004/01/12 22:39:15 pelle Exp $
+$Id: exch.xsd,v 1.6 2004/04/02 16:58:54 pelle Exp $
 $Log: exch.xsd,v $
+Revision 1.6  2004/04/02 16:58:54  pelle
+Updated Asset and Asset Builder with semi fully featured functionality.
+It now has Issuer, Service etc.
+
 Revision 1.5  2004/01/12 22:39:15  pelle
 Completed all the builders and contracts.
 Added a new abstract Value class to contain either an amount or a list of serial numbers.
@@ -33,8 +37,8 @@ the xfer and exch schemas.
     xmlns="http://neuclear.org/neu/exch.xsd"
     xmlns:xfer="http://neuclear.org/neu/xfer.xsd"
     xmlns:id="http://neuclear.org/neu/neuid.xsd"
-    elementFormDefault="qualified" version="0.3" id="xfer">
- 	<xs:import namespace="http://neuclear.org/neu/neuid.xsd" schemaLocation="../../../neuclear-id/src/schemas/neuid.xsd" />
+    elementFormDefault="qualified" version="0.3" id="ex">
+    <xs:import namespace="http://neuclear.org/neu/neuid.xsd" schemaLocation="../../../neuclear-id/src/schemas/neuid.xsd"/>
     <xs:import namespace="http://neuclear.org/neu/xfer.xsd" schemaLocation="xfer.xsd"/>
 
     <xs:element name="Agent" type="id:NamedObjectReference" nillable="false"/>
@@ -65,12 +69,12 @@ the xfer and exch schemas.
         </xs:annotation>
         <xs:complexType>
             <xs:sequence>
-                <xs:element ref="Agent" minOccurs="1" maxOccurs="1" />
-                <xs:element ref="xfer:Asset" minOccurs="1" maxOccurs="1" />
+                <xs:element ref="Agent" minOccurs="1" maxOccurs="1"/>
+                <xs:element ref="xfer:Asset" minOccurs="1" maxOccurs="1"/>
                 <xs:element ref="ExpiryTime" minOccurs="1" maxOccurs="1"/>
                 <xs:element ref="xfer:Value" minOccurs="1" maxOccurs="1"/>
                 <xs:element ref="BidItem" minOccurs="1" maxOccurs="unbounded"/>
-                <xs:element ref="xfer:Comment"  minOccurs="0" maxOccurs="1" />
+                <xs:element ref="xfer:Comment" minOccurs="0" maxOccurs="1"/>
                 <xs:group ref="id:SignedObjectGroup" minOccurs="0" maxOccurs="1"/>
             </xs:sequence>
         </xs:complexType>
@@ -96,7 +100,7 @@ the xfer and exch schemas.
                 <xs:element ref="ExchangeTime" minOccurs="1" maxOccurs="1"/>
                 <xs:element ref="xfer:Value" minOccurs="1" maxOccurs="1"/>
                 <xs:element ref="ExchangeOrderReceipt" minOccurs="1" maxOccurs="1"/>
-                <xs:element ref="xfer:Comment"  minOccurs="0" maxOccurs="1" />
+                <xs:element ref="xfer:Comment" minOccurs="0" maxOccurs="1"/>
                 <xs:group ref="id:SignedObjectGroup" minOccurs="0" maxOccurs="1"/>
             </xs:sequence>
         </xs:complexType>
@@ -105,17 +109,17 @@ the xfer and exch schemas.
     <xs:element name="ExchangeOrderReceipt" nillable="false">
         <xs:complexType>
             <xs:sequence>
-                <xs:element ref="xfer:ValueTime"  minOccurs="1" maxOccurs="1" />
+                <xs:element ref="xfer:ValueTime" minOccurs="1" maxOccurs="1"/>
                 <xs:element ref="ExchangeOrder" minOccurs="1" maxOccurs="1"/>
                 <xs:group ref="id:SignedObjectGroup" minOccurs="0" maxOccurs="1"/>
-           </xs:sequence>
+            </xs:sequence>
         </xs:complexType>
     </xs:element>
 
-    <xs:element name="CancelExchangeOrderReceipt" nillable="false" >
+    <xs:element name="CancelExchangeOrderReceipt" nillable="false">
         <xs:complexType>
             <xs:sequence>
-                <xs:element ref="xfer:ValueTime"  minOccurs="1" maxOccurs="1" />
+                <xs:element ref="xfer:ValueTime" minOccurs="1" maxOccurs="1"/>
                 <xs:element ref="CancelExchangeOrder" minOccurs="1" maxOccurs="1"/>
                 <xs:group ref="id:SignedObjectGroup" minOccurs="0" maxOccurs="1"/>
             </xs:sequence>
@@ -125,7 +129,7 @@ the xfer and exch schemas.
     <xs:element name="ExchangeCompletedReceipt" nillable="false">
         <xs:complexType>
             <xs:sequence>
-                <xs:element ref="xfer:ValueTime"  minOccurs="1" maxOccurs="1" />
+                <xs:element ref="xfer:ValueTime" minOccurs="1" maxOccurs="1"/>
                 <xs:element ref="ExchangeCompletionOrder" minOccurs="1" maxOccurs="1"/>
                 <xs:group ref="id:SignedObjectGroup" minOccurs="0" maxOccurs="1"/>
             </xs:sequence>

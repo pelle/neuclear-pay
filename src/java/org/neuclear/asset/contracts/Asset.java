@@ -4,6 +4,11 @@ import org.dom4j.Element;
 import org.neuclear.commons.Utility;
 import org.neuclear.id.*;
 import org.neuclear.id.targets.Targets;
+import org.neuclear.xml.xmlsec.KeyInfo;
+import org.neuclear.xml.xmlsec.XMLSecTools;
+import org.neuclear.xml.xmlsec.XMLSecurityException;
+
+import java.security.PublicKey;
 
 /*
 NeuClear Distributed Transaction Clearing Platform
@@ -23,8 +28,12 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: Asset.java,v 1.15 2004/04/01 23:18:32 pelle Exp $
+$Id: Asset.java,v 1.16 2004/04/02 16:58:53 pelle Exp $
 $Log: Asset.java,v $
+Revision 1.16  2004/04/02 16:58:53  pelle
+Updated Asset and Asset Builder with semi fully featured functionality.
+It now has Issuer, Service etc.
+
 Revision 1.15  2004/04/01 23:18:32  pelle
 Split Identity into Signatory and Identity class.
 Identity remains a signed named object and will in the future just be used for self declared information.
@@ -122,8 +131,11 @@ SOAPTools was changed to return a stream. This is required by the VerifyingReade
  * @see org.neuclear.asset.contracts.builders.AssetBuilder
  */
 public final class Asset extends Identity {
-    protected Asset(final SignedNamedCore core, final Targets targets, final int decimal, final double minimumTransaction) {
-        super(core, null, targets); //Web services dont have signing urls
+    protected Asset(final SignedNamedCore core, final String serviceUrl, final PublicKey servicekey, final PublicKey issuerKey, final Targets targets, final int decimal, final double minimumTransaction) {
+        super(core, null, targets);
+        this.serviceUrl = serviceUrl;
+        this.issuerKey = issuerKey;
+        this.serviceKey = servicekey;
         this.decimal = decimal;
         this.multiplier = (int) Math.round(Math.pow(10, -decimal));
         this.minimumTransaction = minimumTransaction;
@@ -164,6 +176,29 @@ public final class Asset extends Identity {
         return Math.round(amount * multiplier) / multiplier;
     }
 
+    public final PublicKey getIssuerKey() {
+        return issuerKey;
+    }
+
+    public final PublicKey getServiceKey() {
+        return serviceKey;
+    }
+
+    public final String getServiceUrl() {
+        return serviceUrl;
+    }
+
+    public int getDecimal() {
+        return decimal;
+    }
+
+    public int getMultiplier() {
+        return multiplier;
+    }
+
+    public double getMinimumTransaction() {
+        return minimumTransaction;
+    }
 
     public static final class Reader implements NamedObjectReader {
         /**
@@ -175,18 +210,50 @@ public final class Asset extends Identity {
         public final SignedNamedObject read(final SignedNamedCore core, final Element elem) throws InvalidNamedObjectException {
             if (!elem.getNamespace().equals(AssetGlobals.NS_ASSET))
                 throw new InvalidNamedObjectException(core.getName(), "Not in XML NameSpace: " + AssetGlobals.NS_ASSET.getURI());
-
-            final String dec = elem.attributeValue("decimalpoints");
-            final int decimal = (!Utility.isEmpty(dec)) ? Integer.parseInt(dec) : 0;
-            final String min = elem.attributeValue("minimumxact");
-            final double minimum = (!Utility.isEmpty(min)) ? Double.parseDouble(min) : 0;
-            final Targets targets = Targets.parseList(elem);
-            return new Asset(core, targets, decimal, minimum);
+            final Element issuerElement = InvalidNamedObjectException.assertContainsElementQName(core, elem, AssetGlobals.createQName("Issuer"));
+            final Element serviceElement = InvalidNamedObjectException.assertContainsElementQName(core, elem, AssetGlobals.createQName("Service"));
+            final Element serviceKeyElement = InvalidNamedObjectException.assertContainsElementQName(core, serviceElement, XMLSecTools.createQName("KeyInfo"));
+            final Element serviceUrlElement = InvalidNamedObjectException.assertContainsElementQName(core, serviceElement, AssetGlobals.createQName("Url"));
+            try {
+                final PublicKey sPub = extractPublicKey(serviceKeyElement);
+                final String serviceurl = serviceUrlElement.getTextTrim();
+                final PublicKey iPub = extractPublicKey(InvalidNamedObjectException.assertContainsElementQName(issuerElement, XMLSecTools.createQName("KeyInfo")));
+                final int decimal = extractDecimalPoints(elem);
+                final double minimum = extractMinimumTransactionAmount(elem);
+                final Targets targets = Targets.parseList(elem);
+                return new Asset(core, serviceurl, sPub, iPub, targets, decimal, minimum);
+            } catch (XMLSecurityException e) {
+                throw new InvalidNamedObjectException("invalid asset xml");
+            }
         }
 
 
     }
 
+    private static PublicKey extractPublicKey(Element kiElem) throws XMLSecurityException {
+        final KeyInfo sKi = new KeyInfo(kiElem);
+        return sKi.getPublicKey();
+    }
+
+    private static double extractMinimumTransactionAmount(Element elem) {
+        Element melem = elem.element(AssetGlobals.createQName(AssetGlobals.MINIMUM_TAGNAME));
+        if (melem == null || Utility.isEmpty(melem.getTextTrim()))
+            return 0.0;
+        return Double.parseDouble(melem.getTextTrim());
+
+    }
+
+    private static int extractDecimalPoints(Element elem) {
+        Element melem = elem.element(AssetGlobals.createQName(AssetGlobals.DECIMAL_POINT_TAGNAME));
+        if (melem == null || Utility.isEmpty(melem.getTextTrim()))
+            return 0;
+        return Integer.parseInt(melem.getTextTrim());
+
+    }
+
+    private final PublicKey issuerKey;
+    private final String serviceUrl;
+    private final PublicKey serviceKey;
     private final int decimal;
     private final int multiplier;
     private final double minimumTransaction;

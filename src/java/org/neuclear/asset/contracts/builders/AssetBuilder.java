@@ -7,6 +7,9 @@ import org.neuclear.commons.NeuClearException;
 import org.neuclear.commons.crypto.signers.JCESigner;
 import org.neuclear.commons.crypto.signers.TestCaseSigner;
 import org.neuclear.id.builders.IdentityBuilder;
+import org.neuclear.xml.xmlsec.KeyInfo;
+
+import java.security.PublicKey;
 
 /*
 NeuClear Distributed Transaction Clearing Platform
@@ -26,8 +29,12 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: AssetBuilder.java,v 1.9 2004/04/01 23:18:31 pelle Exp $
+$Id: AssetBuilder.java,v 1.10 2004/04/02 16:58:53 pelle Exp $
 $Log: AssetBuilder.java,v $
+Revision 1.10  2004/04/02 16:58:53  pelle
+Updated Asset and Asset Builder with semi fully featured functionality.
+It now has Issuer, Service etc.
+
 Revision 1.9  2004/04/01 23:18:31  pelle
 Split Identity into Signatory and Identity class.
 Identity remains a signed named object and will in the future just be used for self declared information.
@@ -108,37 +115,44 @@ TransferReceiptBuilder has been created for use by Transfer processors. It is us
  */
 public final class AssetBuilder extends IdentityBuilder {
     /**
-     * Used to create new Assets
-     * 
-     * @param signer     URL of default interactive signing service for namespace. If null it doesnt allow interactive signing
-     * @param receiver   URL of default receiver for namespace
-     * @param controller URL of AssetController This should be a http web url
-     * @param decimal    The amount of decimal points.
-     * @param minimum    Minimum transaction size
+     * @param serviceUrl
+     * @param serviceKey
+     * @param issuerKey
+     * @param decimal
+     * @param minimum
+     * @throws NeuClearException
      */
-    public AssetBuilder(final String signer, final String logger, final String receiver, final String controller, final int decimal, final double minimum) throws NeuClearException {
-        super(AssetGlobals.createQName(AssetGlobals.ASSET_TAGNAME), signer, logger, receiver);
+    public AssetBuilder(final String serviceUrl, final PublicKey serviceKey, final PublicKey issuerKey, final int decimal, final double minimum) throws NeuClearException {
+        super(AssetGlobals.createQName(AssetGlobals.ASSET_TAGNAME), null);
         final Element elem = getElement();
-        AssetGlobals.createAttribute(elem, "controller", controller);
-        AssetGlobals.createAttribute(elem, "decimalpoints", Integer.toString(decimal));
-        AssetGlobals.createAttribute(elem, "minimumxact", Double.toString(minimum));
-
+        final Element issuerElem = AssetGlobals.createElement("Issuer");
+        issuerElem.add(new KeyInfo(issuerKey).getElement());
+        elem.add(issuerElem);
+        final Element serviceElem = AssetGlobals.createElement("Service");
+        serviceElem.add(new KeyInfo(serviceKey).getElement());
+        final Element urlElem = AssetGlobals.createElement("Url");
+        urlElem.setText(serviceUrl);
+        serviceElem.add(urlElem);
+        elem.add(serviceElem);
+        final Element dec = AssetGlobals.createElement(AssetGlobals.DECIMAL_POINT_TAGNAME);
+        dec.setText(Integer.toString(decimal));
+        elem.add(dec);
+        final Element min = AssetGlobals.createElement(AssetGlobals.MINIMUM_TAGNAME);
+        min.setText(Double.toString(minimum));
+        elem.add(min);
     }
 
     public static void main(final String[] args) {
         try {
             final JCESigner signer = new TestCaseSigner();
-            String assetname = "neu://test/bux";
-            if (args.length > 0)
-                assetname = args[0];
 
-            final AssetBuilder assetraw = new AssetBuilder("http://bux.neuclear.org:8080",
-                    "http://logger.neuclear.org",
-                    "http://bux.neuclear.org:8080",
-                    "http://bux.neuclear.org:8080",
+            final AssetBuilder assetraw = new AssetBuilder("http://bux.neuclear.org",
+                    signer.getPublicKey("neu://test/bux"),
+                    signer.getPublicKey("neu://alice@test"),
                     2,
                     0.01);
-            final Asset asset = (Asset) assetraw.convert(assetname, signer);
+            final Asset asset = (Asset) assetraw.convert("neu://bob@test", signer);
+
 
         } catch (Exception e) {
             e.printStackTrace();
