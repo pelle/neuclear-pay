@@ -288,8 +288,8 @@ public class CurrencyTests extends AbstractSigningTest {
 
 
     public Asset createTestAsset() throws NeuClearException {
-        AssetBuilder builder = new AssetBuilder("http://bux.neuclear.org",
-                getSigner().getPublicKey("neu://test/bux"),
+        AssetBuilder builder = new AssetBuilder("http://bux.neuclear.org", "bux",
+                getSigner().getPublicKey("bux"),
                 getIssuer().getPublicKey(),
                 2, 0);
         return (Asset) builder.convert("neu://test/bux", getSigner());
@@ -297,8 +297,8 @@ public class CurrencyTests extends AbstractSigningTest {
     }
 
     public Asset createShoeAsset() throws NeuClearException {
-        AssetBuilder builder = new AssetBuilder("http://shoes.neuclear.org",
-                getSigner().getPublicKey("neu://test/bux"),
+        AssetBuilder builder = new AssetBuilder("http://shoes.neuclear.org", "shoes",
+                getSigner().getPublicKey("shoes"),
                 getIssuer().getPublicKey(),
                 2, 0);
         return (Asset) builder.convert("neu://test", getSigner());
@@ -306,7 +306,7 @@ public class CurrencyTests extends AbstractSigningTest {
     }
 
     public ExchangeAgent createTestExchangeAgent() throws NeuClearException {
-        ExchangeAgentBuilder builder = new ExchangeAgentBuilder("http://tradex.neuclear.org",
+        ExchangeAgentBuilder builder = new ExchangeAgentBuilder("http://tradex.neuclear.org", "Tradex",
                 getSigner().getPublicKey("neu://bob@test"));
         return (ExchangeAgent) builder.convert("neu://test", getSigner());
 

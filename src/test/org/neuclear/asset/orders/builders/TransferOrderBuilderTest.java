@@ -32,8 +32,15 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: TransferOrderBuilderTest.java,v 1.7 2004/04/05 16:31:43 pelle Exp $
+$Id: TransferOrderBuilderTest.java,v 1.8 2004/04/17 19:28:00 pelle Exp $
 $Log: TransferOrderBuilderTest.java,v $
+Revision 1.8  2004/04/17 19:28:00  pelle
+Identity is now fully html based as is the ServiceBuilder.
+VerifyingReader correctly identifies html files and parses them as such.
+Targets and Target now parse html link tags
+AssetBuilder and ExchangeAgentBuilder have been updated to support it and provide html formatted contracts.
+The Asset.Reader and ExchangeAgent.Reader still need to be updated.
+
 Revision 1.7  2004/04/05 16:31:43  pelle
 Created new ServiceBuilder class for creating services. A service is an identity that has a seperate service URL and Service Public Key.
 
@@ -94,7 +101,7 @@ public class TransferOrderBuilderTest extends AbstractObjectCreationTest {
     }
 
     public Service createTestAsset() throws NeuClearException {
-        AssetBuilder builder = new AssetBuilder("http://bux.neuclear.org",
+        AssetBuilder builder = new AssetBuilder("http://bux.neuclear.org", "bux",
                 getSigner().getPublicKey("neu://test/bux"),
                 getAlice().getPublicKey(),
                 2, 0);

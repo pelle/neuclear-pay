@@ -10,8 +10,15 @@ import org.neuclear.tests.AbstractObjectCreationTest;
 import java.security.GeneralSecurityException;
 
 /*
-$Id: AbstractExchangeOrderTest.java,v 1.2 2004/04/14 23:51:12 pelle Exp $
+$Id: AbstractExchangeOrderTest.java,v 1.3 2004/04/17 19:28:01 pelle Exp $
 $Log: AbstractExchangeOrderTest.java,v $
+Revision 1.3  2004/04/17 19:28:01  pelle
+Identity is now fully html based as is the ServiceBuilder.
+VerifyingReader correctly identifies html files and parses them as such.
+Targets and Target now parse html link tags
+AssetBuilder and ExchangeAgentBuilder have been updated to support it and provide html formatted contracts.
+The Asset.Reader and ExchangeAgent.Reader still need to be updated.
+
 Revision 1.2  2004/04/14 23:51:12  pelle
 Fixed Exchange tests and Cactus tests working on web app.
 
@@ -34,7 +41,7 @@ public abstract class AbstractExchangeOrderTest extends AbstractObjectCreationTe
     }
 
     public Asset createTestAsset() throws NeuClearException {
-        AssetBuilder builder = new AssetBuilder("http://bux.neuclear.org",
+        AssetBuilder builder = new AssetBuilder("http://bux.neuclear.org", "bux",
                 getSigner().getPublicKey("bux"),
                 getSigner().getPublicKey("buxissuer"),
                 2, 0);
@@ -43,7 +50,7 @@ public abstract class AbstractExchangeOrderTest extends AbstractObjectCreationTe
     }
 
     public Asset createShoeAsset() throws NeuClearException {
-        AssetBuilder builder = new AssetBuilder("http://shoes.neuclear.org",
+        AssetBuilder builder = new AssetBuilder("http://shoes.neuclear.org", "shoes",
                 getSigner().getPublicKey("shoes"),
                 getSigner().getPublicKey("shoesissuer"),
                 2, 0);
@@ -52,7 +59,7 @@ public abstract class AbstractExchangeOrderTest extends AbstractObjectCreationTe
     }
 
     public ExchangeAgent createTestExchangeAgent() throws NeuClearException {
-        ExchangeAgentBuilder builder = new ExchangeAgentBuilder("http://tradex.neuclear.org",
+        ExchangeAgentBuilder builder = new ExchangeAgentBuilder("http://tradex.neuclear.org", "tradex",
                 getSigner().getPublicKey("exchange"));
         return (ExchangeAgent) builder.convert("carol", getSigner());
 

@@ -24,8 +24,15 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: ExchangeAgentBuilder.java,v 1.1 2004/04/05 16:31:42 pelle Exp $
+$Id: ExchangeAgentBuilder.java,v 1.2 2004/04/17 19:28:00 pelle Exp $
 $Log: ExchangeAgentBuilder.java,v $
+Revision 1.2  2004/04/17 19:28:00  pelle
+Identity is now fully html based as is the ServiceBuilder.
+VerifyingReader correctly identifies html files and parses them as such.
+Targets and Target now parse html link tags
+AssetBuilder and ExchangeAgentBuilder have been updated to support it and provide html formatted contracts.
+The Asset.Reader and ExchangeAgent.Reader still need to be updated.
+
 Revision 1.1  2004/04/05 16:31:42  pelle
 Created new ServiceBuilder class for creating services. A service is an identity that has a seperate service URL and Service Public Key.
 
@@ -118,8 +125,8 @@ public final class ExchangeAgentBuilder extends ServiceBuilder {
      * @throws org.neuclear.commons.NeuClearException
      *
      */
-    public ExchangeAgentBuilder(final String serviceUrl, final PublicKey serviceKey) throws NeuClearException {
-        super(ExchangeAgentGlobals.createQName(ExchangeAgentGlobals.EXCHANGEAGENT_TAGNAME), serviceUrl, serviceKey);
+    public ExchangeAgentBuilder(final String title, final String serviceUrl, final PublicKey serviceKey) throws NeuClearException {
+        super(ExchangeAgentGlobals.EXCHANGEAGENT_TAGNAME, title, serviceUrl, serviceKey);
     }
 
 }

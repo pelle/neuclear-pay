@@ -175,7 +175,7 @@ public final class IssuanceTests extends AbstractSigningTest {
     }
 
     public Asset createTestAsset() throws NeuClearException {
-        AssetBuilder builder = new AssetBuilder("http://bux.neuclear.org",
+        AssetBuilder builder = new AssetBuilder("http://bux.neuclear.org", "bux",
                 getSigner().getPublicKey("neu://test/bux"),
                 getAlice().getPublicKey(),
                 2, 0);

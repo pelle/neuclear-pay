@@ -9,8 +9,15 @@ import org.neuclear.tests.AbstractObjectCreationTest;
 import java.security.GeneralSecurityException;
 
 /*
-$Id: AssetBuilderTest.java,v 1.1 2004/04/02 16:58:55 pelle Exp $
+$Id: AssetBuilderTest.java,v 1.2 2004/04/17 19:28:00 pelle Exp $
 $Log: AssetBuilderTest.java,v $
+Revision 1.2  2004/04/17 19:28:00  pelle
+Identity is now fully html based as is the ServiceBuilder.
+VerifyingReader correctly identifies html files and parses them as such.
+Targets and Target now parse html link tags
+AssetBuilder and ExchangeAgentBuilder have been updated to support it and provide html formatted contracts.
+The Asset.Reader and ExchangeAgent.Reader still need to be updated.
+
 Revision 1.1  2004/04/02 16:58:55  pelle
 Updated Asset and Asset Builder with semi fully featured functionality.
 It now has Issuer, Service etc.
@@ -44,8 +51,8 @@ public class AssetBuilderTest extends AbstractObjectCreationTest {
     }
 
     protected Builder createBuilder() throws Exception {
-        return new AssetBuilder(URL,
-                getSigner().getPublicKey("neu://test/bux"),
+        return new AssetBuilder(URL, "bux",
+                getSigner().getPublicKey("bux"),
                 getAlice().getPublicKey(),
                 DECIMAL, MINIMUM);
     }

@@ -9,8 +9,15 @@ import org.neuclear.tests.AbstractObjectCreationTest;
 import java.security.GeneralSecurityException;
 
 /*
-$Id: ExchangeAgentBuilderTest.java,v 1.1 2004/04/05 16:31:44 pelle Exp $
+$Id: ExchangeAgentBuilderTest.java,v 1.2 2004/04/17 19:28:01 pelle Exp $
 $Log: ExchangeAgentBuilderTest.java,v $
+Revision 1.2  2004/04/17 19:28:01  pelle
+Identity is now fully html based as is the ServiceBuilder.
+VerifyingReader correctly identifies html files and parses them as such.
+Targets and Target now parse html link tags
+AssetBuilder and ExchangeAgentBuilder have been updated to support it and provide html formatted contracts.
+The Asset.Reader and ExchangeAgent.Reader still need to be updated.
+
 Revision 1.1  2004/04/05 16:31:44  pelle
 Created new ServiceBuilder class for creating services. A service is an identity that has a seperate service URL and Service Public Key.
 
@@ -43,7 +50,7 @@ public class ExchangeAgentBuilderTest extends AbstractObjectCreationTest {
     }
 
     protected Builder createBuilder() throws Exception {
-        return new ExchangeAgentBuilder(URL,
+        return new ExchangeAgentBuilder(URL, "bux",
                 getSigner().getPublicKey("neu://test/bux"));
     }
 

@@ -32,8 +32,15 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: IssueOrderBuilderTest.java,v 1.1 2004/04/06 16:24:35 pelle Exp $
+$Id: IssueOrderBuilderTest.java,v 1.2 2004/04/17 19:28:00 pelle Exp $
 $Log: IssueOrderBuilderTest.java,v $
+Revision 1.2  2004/04/17 19:28:00  pelle
+Identity is now fully html based as is the ServiceBuilder.
+VerifyingReader correctly identifies html files and parses them as such.
+Targets and Target now parse html link tags
+AssetBuilder and ExchangeAgentBuilder have been updated to support it and provide html formatted contracts.
+The Asset.Reader and ExchangeAgent.Reader still need to be updated.
+
 Revision 1.1  2004/04/06 16:24:35  pelle
 Added two new Data Objects IssuerOrder and IssueReceipt for managing the issuance process.
 Added Issuance support to the Asset and Audit Controllers.
@@ -99,7 +106,7 @@ public class IssueOrderBuilderTest extends AbstractObjectCreationTest {
     }
 
     public Service createTestAsset() throws NeuClearException {
-        AssetBuilder builder = new AssetBuilder("http://bux.neuclear.org",
+        AssetBuilder builder = new AssetBuilder("http://bux.neuclear.org", "bux",
                 getSigner().getPublicKey("neu://test/bux"),
                 getSigner().getPublicKey(NAME),
                 2, 0);
