@@ -7,7 +7,7 @@ import org.neuclear.asset.contracts.builders.TransferRequestBuilder;
 import org.neuclear.commons.configuration.ConfigurationException;
 import org.neuclear.id.builders.NamedObjectBuilder;
 import org.neuclear.id.resolver.NSResolver;
-import org.neuclear.signers.commandline.CommandLineSigner;
+import org.neuclear.id.tools.commandline.CommandLineSigner;
 
 import java.io.IOException;
 import java.security.KeyStoreException;
@@ -33,8 +33,11 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: CreateTestPayments.java,v 1.4 2003/11/21 04:43:04 pelle Exp $
+$Id: CreateTestPayments.java,v 1.5 2003/12/09 18:11:30 pelle Exp $
 $Log: CreateTestPayments.java,v $
+Revision 1.5  2003/12/09 18:11:30  pelle
+Moved Command Line tools to org.neuclear.id.tools.commandline
+
 Revision 1.4  2003/11/21 04:43:04  pelle
 EncryptedFileStore now works. It uses the PBECipher with DES3 afair.
 Otherwise You will Finaliate.
