@@ -4,6 +4,7 @@ import org.dom4j.Element;
 import org.neuclear.id.Identity;
 import org.neuclear.id.NamedObjectReader;
 import org.neuclear.id.SignedNamedObject;
+import org.neuclear.receiver.UnsupportedTransaction;
 import org.neudist.utils.NeudistException;
 
 import java.sql.Timestamp;
@@ -42,21 +43,21 @@ public class TransferContract extends SignedNamedObject {
         this.toaccount = toaccount;
     }
 
-    public double getAmount() {
+    public final double getAmount() {
         return amount;
     }
 
-    public String getAsset() {
+    public final String getAsset() {
         return asset;
     }
 
-    public String getRecipient() {
+    public final String getRecipient() {
         return toaccount;
     }
 
-    private double amount;
-    private String toaccount;
-    private String asset;
+    private final double amount;
+    private final String toaccount;
+    private final String asset;
 
     public static class Reader implements NamedObjectReader {
         /**
@@ -65,6 +66,10 @@ public class TransferContract extends SignedNamedObject {
          * @return
          */
         public SignedNamedObject read(Element elem, String name, Identity signatory, String digest, Timestamp timestamp) throws NeudistException {
+            if (!(elem.getName().equals(TransferGlobals.XFER_TAGNAME) &&
+                    elem.getNamespaceURI().equals(TransferGlobals.XFER_NSURI)))
+                throw new UnsupportedTransaction(null);
+
             double amount = Double.parseDouble(elem.attributeValue("amount"));
             String asset = elem.attributeValue("asset");
             String to = elem.attributeValue("recipient");

@@ -9,37 +9,38 @@ import java.util.Date;
  * Time: 5:37:10 PM
  */
 public class PaymentReceipt extends Payment {
-    private PaymentRequest preq;
-    private String id;
-    private PaymentProcessor proc;
+    private final PaymentRequest preq;
+    private final String id;
+    private final PaymentProcessor proc;
 
 
-    PaymentReceipt(PaymentProcessor proc,PaymentRequest preq,String id) {
-        this.preq=preq;
-        this.id=id;
-        this.proc=proc;
+    PaymentReceipt(PaymentProcessor proc, PaymentRequest preq, String id) {
+        this.preq = preq;
+        this.id = id;
+        this.proc = proc;
     }
 
-    public double getAmount() {
+    public final double getAmount() {
         return preq.getAmount();
     }
 
-    public Date getValuedate() {
+    public final Date getValuedate() {
         return preq.getValuedate();
     }
 
-    public Account getTo() {
+    public final Account getTo() {
         return preq.getTo();
     }
 
-    public Account getFrom() {
+    public final Account getFrom() {
         return preq.getFrom();
     }
 
-    public PaymentProcessor getProc() {
+    public final PaymentProcessor getProc() {
         return proc;
     }
-    public String getId() {
+
+    public final String getId() {
         return id;
     }
 }

@@ -7,9 +7,13 @@ import org.neuclear.ledger.UnBalancedTransactionException;
 import org.neuclear.ledger.UnknownBookException;
 import org.neuclear.pay.*;
 import org.neuclear.pay.contracts.TransferContract;
+import org.neuclear.pay.contracts.builders.TransferReceiptBuilder;
 import org.neuclear.receiver.Receiver;
 import org.neuclear.receiver.UnsupportedTransaction;
 import org.neudist.utils.NeudistException;
+import org.neudist.xml.ElementProxy;
+
+import java.security.PrivateKey;
 
 /*
 NeuClear Distributed Transaction Clearing Platform
@@ -42,6 +46,7 @@ public class PaymentReceiver implements Receiver {
     public PaymentReceiver(PaymentProcessor proc, String asset) {
         this.proc = proc;
         this.asset = asset;
+        this.signer = null;
     }
 
     /**
@@ -49,7 +54,7 @@ public class PaymentReceiver implements Receiver {
      * @param obj
      * @throws UnsupportedTransaction
      */
-    public void receive(SignedNamedObject obj) throws UnsupportedTransaction {
+    public final ElementProxy receive(SignedNamedObject obj) throws UnsupportedTransaction {
         if (obj instanceof TransferContract) {
             TransferContract transfer = (TransferContract) obj;
             if (!transfer.getAsset().equals(asset))
@@ -58,6 +63,9 @@ public class PaymentReceiver implements Receiver {
                 Account from = proc.getAccount(transfer.getName());
                 Account to = proc.getAccount(transfer.getName());
                 PaymentReceipt receipt = from.pay(to, transfer.getAmount(), transfer.getTimeStamp(), "transfer");
+                TransferReceiptBuilder sigReceipt = new TransferReceiptBuilder(receipt);
+                sigReceipt.sign(signer);
+                return sigReceipt;
                 //TODO do something with receipt
             } catch (UnknownBookException e) {
                 throw new UnsupportedTransaction(obj);
@@ -74,10 +82,13 @@ public class PaymentReceiver implements Receiver {
             } catch (NegativePaymentException e) {
                 e.printStackTrace();
             }
+
         } else
             throw new UnsupportedTransaction(obj);
+        return null;
     }
 
-    private PaymentProcessor proc;
-    private String asset;
+    private final PaymentProcessor proc;
+    private final String asset;
+    private PrivateKey signer;
 }

@@ -13,60 +13,61 @@ import java.util.Date;
  */
 public class Account {
 
-    private Book book;
-    private PaymentProcessor proc;
+    private final Book book;
+    private final PaymentProcessor proc;
 
-    Account(PaymentProcessor proc,Book book) {
-        this.book=book;
-        this.proc=proc;
+    Account(PaymentProcessor proc, Book book) {
+        this.book = book;
+        this.proc = proc;
     }
 
-    public PaymentProcessor getProc() {
+    public final PaymentProcessor getProc() {
         return proc;
     }
 
-    Book getBook() {
+    final Book getBook() {
         return book;
     }
 
-    public String getID()  {
+    final public String getID() {
         return book.getBookID();
     }
 
-    public double getBalance() throws LowlevelLedgerException {
+    final public double getBalance() throws LowlevelLedgerException {
         return book.getBalance();
     }
 
-    public double getAvailableBalance() throws LowlevelLedgerException {
+    final public double getAvailableBalance() throws LowlevelLedgerException {
         return book.getAvailableBalance();
     }
 
-    public double getBalance(Date time) throws LowlevelLedgerException {
+    final public double getBalance(Date time) throws LowlevelLedgerException {
         return book.getBalance(time);
     }
 
-    public double getAvailableBalance(Date time) throws LowlevelLedgerException {
+    final public double getAvailableBalance(Date time) throws LowlevelLedgerException {
         return book.getAvailableBalance(time);
     }
 
-    public String getDisplayName() {
+    final public String getDisplayName() {
         return book.getDisplayName();
     }
 
     final public PaymentReceipt pay(Account to, double amount, Date valuedate, String comment) throws UnknownBookException, UnBalancedTransactionException, InvalidTransactionException, LowlevelLedgerException, NegativePaymentException, InsufficientFundsException {
-        if ( amount < 0 )
+        if (amount < 0)
             throw new NegativePaymentException(proc, amount);
-        if ( getAvailableBalance(valuedate) - amount < 0 )
-            throw new InsufficientFundsException(proc, this, amount);
-        
-        return proc.processPayment(new PaymentRequest(this, to, amount, valuedate, comment));
-    }
-    final public HeldPaymentReceipt hold(Account to, double amount, Date valuedate,Date helduntil, String comment) throws UnknownBookException, UnBalancedTransactionException, InvalidTransactionException, LowlevelLedgerException, NegativePaymentException, InsufficientFundsException {
-        if ( amount < 0 )
-            throw new NegativePaymentException(proc, amount);
-        if ( getAvailableBalance(valuedate) - amount < 0 )
+        if (getAvailableBalance(valuedate) - amount < 0)
             throw new InsufficientFundsException(proc, this, amount);
 
-        return proc.processHeldPayment(new HeldPaymentRequest(this, to, amount, valuedate,helduntil, comment));
+        return proc.processPayment(new PaymentRequest(this, to, amount, valuedate, comment));
+    }
+
+    final public HeldPaymentReceipt hold(Account to, double amount, Date valuedate, Date helduntil, String comment) throws UnknownBookException, UnBalancedTransactionException, InvalidTransactionException, LowlevelLedgerException, NegativePaymentException, InsufficientFundsException {
+        if (amount < 0)
+            throw new NegativePaymentException(proc, amount);
+        if (getAvailableBalance(valuedate) - amount < 0)
+            throw new InsufficientFundsException(proc, this, amount);
+
+        return proc.processHeldPayment(new HeldPaymentRequest(this, to, amount, valuedate, helduntil, comment));
     }
 }

@@ -9,7 +9,7 @@ import java.util.Date;
  */
 public abstract class Payment {
 
-    protected Payment() {
+    Payment() {
     }
 
     public abstract double getAmount();

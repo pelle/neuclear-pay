@@ -9,15 +9,16 @@ import java.util.Date;
  * Time: 12:01:03 PM
  */
 public class HeldPaymentRequest extends PaymentRequest implements Held {
-    public HeldPaymentRequest(Account from, Account to, double amount, Date valuedate,Date helduntil, String comment) throws NegativePaymentException {
+    public HeldPaymentRequest(Account from, Account to, double amount, Date valuedate, Date helduntil, String comment) throws NegativePaymentException {
 
         super(from, to, amount, valuedate, comment);
 
-        this.helduntil=helduntil;
+        this.helduntil = helduntil;
     }
 
-    public Date getHeldUntil() {
+    public final Date getHeldUntil() {
         return helduntil;
     }
-    private Date helduntil;
+
+    private final Date helduntil;
 }

@@ -93,7 +93,7 @@ public class PaymentProcessor {
         return new Account(this, ledger.createNewBook(id, title));
     }
 
-    public Issuer getIssuerAccount() throws UnknownBookException, LowlevelLedgerException {
+    public Issuer getIssuerAccount() {
         return issuerAccount;
     }
 
@@ -130,7 +130,7 @@ public class PaymentProcessor {
         return pico;
     }
   */
-    private Ledger ledger;
-    private Issuer issuerAccount;
-    private String title;
+    private final Ledger ledger;
+    private final Issuer issuerAccount;
+    private final String title;
 }
