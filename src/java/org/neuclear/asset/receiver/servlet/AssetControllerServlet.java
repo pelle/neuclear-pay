@@ -7,6 +7,7 @@ import org.neuclear.asset.controllers.currency.CurrencyController;
 import org.neuclear.asset.receiver.AssetControllerReceiver;
 import org.neuclear.commons.crypto.signers.TestCaseSigner;
 import org.neuclear.commons.sql.JNDIConnectionSource;
+import org.neuclear.commons.servlets.ServletTools;
 import org.neuclear.id.resolver.NSResolver;
 import org.neuclear.ledger.implementations.SQLLedger;
 import org.neuclear.receiver.ReceiverServlet;
@@ -32,8 +33,11 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: AssetControllerServlet.java,v 1.6 2003/12/15 23:31:54 pelle Exp $
+$Id: AssetControllerServlet.java,v 1.7 2003/12/17 23:52:57 pelle Exp $
 $Log: AssetControllerServlet.java,v $
+Revision 1.7  2003/12/17 23:52:57  pelle
+Added SignatureRequestServlet which is abstract and can be used for building SignatureRequests for various applications.
+
 Revision 1.6  2003/12/15 23:31:54  pelle
 added ServletTools.getInitParam() which first tries the ServletConfig, then the context config.
 All the web.xml's have been updated to support this. Also various further generalizations have been done throughout
@@ -80,10 +84,9 @@ Payment Web Application is getting there.
 public final class AssetControllerServlet extends ReceiverServlet {
     public final void init(final ServletConfig config) throws ServletException {
         super.init(config);
-        datasource = config.getInitParameter("datasource");
+        datasource = ServletTools.getInitParam("datasource",config);
         AssetGlobals.registerReaders();
         TransferGlobals.registerReaders();
-        INSTANCE = this;
         try {
             asset = (Asset) NSResolver.resolveIdentity(getServiceid());
             final AssetControllerReceiver receiver = new AssetControllerReceiver(
@@ -114,11 +117,6 @@ public final class AssetControllerServlet extends ReceiverServlet {
         return datasource;
     }
 
-    public static AssetControllerServlet getInstance() {
-        return INSTANCE;
-    }
-
     private Asset asset;
     private String datasource;
-    private static AssetControllerServlet INSTANCE;
 }

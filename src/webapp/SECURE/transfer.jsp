@@ -14,9 +14,9 @@
 <%
     AssetGlobals.registerReaders();
     TransferGlobals.registerReaders();
-    AssetControllerServlet controller=AssetControllerServlet.getInstance();
     Identity userns=(Identity) request.getUserPrincipal();
-
+    String service=ServletTools.getInitParam("service",config);
+    Asset asset=(Asset)NSResolver.resolveIdentity(service);
     String recipient=Utility.denullString(request.getParameter("recipient"));
     double amount=Double.parseDouble(Utility.denullString(request.getParameter("amount"),"0"));
     boolean submit=!Utility.isEmpty(request.getParameter("submit"));
@@ -46,17 +46,16 @@ if (!submit){
 </form>
 </p>
 <% } else {
-    Servlet servlet=config.getServletContext().getServlet("");
     TransferRequestBuilder transfer=new TransferRequestBuilder(
-            controller.getAsset(),
+            asset,
             userns,
             NSResolver.resolveIdentity(recipient),
             amount,
             TimeTools.now(),
             comment
     ) ;
-    SignatureRequestBuilder sigreq=new SignatureRequestBuilder(controller.getServiceid(),userns.getName(),transfer,comment);
-    SignedNamedObject sig=sigreq.sign(controller.getSigner());
+    SignatureRequestBuilder sigreq=new SignatureRequestBuilder(service,userns.getName(),transfer,comment);
+    SignedNamedObject sig=sigreq.sign(getSigner());
 
 %>
 <form action="<%=userns.getSigner()%>" method="POST">

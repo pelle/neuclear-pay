@@ -24,6 +24,10 @@
              <param-name>passphraseagent</param-name>
              <param-value>test</param-value>
     </context-param>
+     <context-param>
+         <param-name>datasource</param-name>
+         <param-value>jdbc/AssetDS</param-value>
+     </context-param>
     <filter>
         <filter-name>authfilter</filter-name>
         <filter-class>org.neuclear.auth.AuthenticationFilter</filter-class>
@@ -48,11 +52,11 @@
      </servlet>
     <servlet-mapping>
         <servlet-name>assetcontroller</servlet-name>
-        <url-pattern>Asset</url-pattern>
+        <url-pattern>/Asset</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>authenticator</servlet-name>
-        <url-pattern>Authorize</url-pattern>
+        <url-pattern>/Authorize</url-pattern>
     </servlet-mapping>
     <welcome-file-list>
         <welcome-file>index.jsp</welcome-file>
