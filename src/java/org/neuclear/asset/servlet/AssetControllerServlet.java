@@ -4,10 +4,10 @@ import org.neuclear.asset.AssetController;
 import org.neuclear.asset.contracts.AssetGlobals;
 import org.neuclear.asset.controllers.currency.CurrencyController;
 import org.neuclear.asset.orders.TransferGlobals;
-import org.neuclear.commons.servlets.ServletTools;
 import org.neuclear.id.Service;
 import org.neuclear.id.receiver.ReceiverServlet;
 import org.neuclear.id.resolver.Resolver;
+import org.neuclear.ledger.simple.SimpleLedger;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -30,8 +30,12 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: AssetControllerServlet.java,v 1.6 2004/04/05 22:08:23 pelle Exp $
+$Id: AssetControllerServlet.java,v 1.7 2004/04/15 20:03:18 pelle Exp $
 $Log: AssetControllerServlet.java,v $
+Revision 1.7  2004/04/15 20:03:18  pelle
+Added license screen to Personal Signer.
+Added Sign document menu to  Personal Signer.
+
 Revision 1.6  2004/04/05 22:08:23  pelle
 CurrencyController and AuditController now now pass all unit tests in CurrencyTests.
 
@@ -117,12 +121,11 @@ Payment Web Application is getting there.
 public final class AssetControllerServlet extends ReceiverServlet {
     public final void init(final ServletConfig config) throws ServletException {
         super.init(config);
-        datasource = ServletTools.getInitParam("datasource", config);
         AssetGlobals.registerReaders();
         TransferGlobals.registerReaders();
         try {
             asset = (Service) Resolver.resolveIdentity(getServiceid());
-            final AssetController receiver = new CurrencyController(null, null,
+            final AssetController receiver = new CurrencyController(new SimpleLedger(getServiceid()), null,
                     getSigner(),
                     getServiceid());
             setReceiver(receiver);
@@ -138,10 +141,5 @@ public final class AssetControllerServlet extends ReceiverServlet {
     }
 
 
-    public final String getDatasource() {
-        return datasource;
-    }
-
     private Service asset;
-    private String datasource;
 }
