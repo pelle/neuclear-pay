@@ -1,7 +1,7 @@
 package org.neuclear.asset;
 
 import org.neuclear.asset.contracts.TransferRequest;
-import org.neuclear.asset.contracts.CancelHeldTransferRequest;
+import org.neuclear.asset.contracts.CancelExchangeRequest;
 import org.neuclear.asset.contracts.AssetTransactionContract;
 import org.neuclear.id.SignedNamedObject;
 
@@ -23,8 +23,13 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: TransferDeniedException.java,v 1.4 2003/11/21 04:43:04 pelle Exp $
+$Id: TransferDeniedException.java,v 1.5 2004/01/03 20:36:26 pelle Exp $
 $Log: TransferDeniedException.java,v $
+Revision 1.5  2004/01/03 20:36:26  pelle
+Renamed HeldTransfer to Exchange
+Dropped valuetime from the request objects.
+Doesnt yet compile. New commit to follow soon.
+
 Revision 1.4  2003/11/21 04:43:04  pelle
 EncryptedFileStore now works. It uses the PBECipher with DES3 afair.
 Otherwise You will Finaliate.
@@ -43,7 +48,7 @@ Got rid of neuclear-ledger like features of pay such as Account and Issuer.
 Accounts have been replaced by Identity from neuclear-id
 Issuer is now Asset which is a subclass of Identity
 AssetController supports more than one Asset. Which is important for most non ecurrency implementations.
-TransferRequest/Receipt and its Held companions are now SignedNamedObjects. Thus to create them you must use
+TransferRequest/Receipt and its Exchange companions are now SignedNamedObjects. Thus to create them you must use
 their matching TransferRequest/ReceiptBuilder classes.
 PaymentProcessor has been renamed CurrencyController. I will extract a superclass later to be named AbstractLedgerController
 which will handle all neuclear-ledger based AssetControllers.
@@ -66,7 +71,7 @@ public final class TransferDeniedException extends TransferException {
     public TransferDeniedException(final AssetTransactionContract req) {
         this.req = req;
     }
-    public TransferDeniedException(final CancelHeldTransferRequest req) {
+    public TransferDeniedException(final CancelExchangeRequest req) {
         this.req = req;
     }
 

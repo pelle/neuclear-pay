@@ -21,8 +21,13 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: TransferGlobals.java,v 1.5 2003/11/28 00:11:50 pelle Exp $
+$Id: TransferGlobals.java,v 1.6 2004/01/03 20:36:25 pelle Exp $
 $Log: TransferGlobals.java,v $
+Revision 1.6  2004/01/03 20:36:25  pelle
+Renamed HeldTransfer to Exchange
+Dropped valuetime from the request objects.
+Doesnt yet compile. New commit to follow soon.
+
 Revision 1.5  2003/11/28 00:11:50  pelle
 Getting the NeuClear web transactions working.
 
@@ -119,8 +124,8 @@ public final class TransferGlobals {
 
     public static final String XFER_TAGNAME = "TransferRequest";
     public static final String XFER_RCPT_TAGNAME = "TransferReceipt";
-    public static final String HELD_XFER_TAGNAME = "HeldTransferRequest";
-    public static final String HELD_XFER_RCPT_TAGNAME = "HeldTransferReceipt";
+    public static final String HELD_XFER_TAGNAME = "ExchangeRequest";
+    public static final String HELD_XFER_RCPT_TAGNAME = "ExchangeReceipt";
     public static final String COMPLETE_TAGNAME = "CompleteHoldRequest";
     public static final String CANCEL_TAGNAME = "CancelHoldRequest";
     public static final String CANCEL_RCPT_TAGNAME = "CancelHoldReceipt";

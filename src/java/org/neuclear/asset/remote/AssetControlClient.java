@@ -1,7 +1,7 @@
 package org.neuclear.asset.remote;
 
-import org.neuclear.asset.contracts.CancelHeldTransferReceipt;
-import org.neuclear.asset.contracts.HeldTransferReceipt;
+import org.neuclear.asset.contracts.CancelExchangeReceipt;
+import org.neuclear.asset.contracts.ExchangeReceipt;
 import org.neuclear.asset.contracts.TransferReceipt;
 import org.neuclear.asset.contracts.builders.*;
 import org.neuclear.commons.NeuClearException;
@@ -27,8 +27,13 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: AssetControlClient.java,v 1.8 2003/12/10 23:52:39 pelle Exp $
+$Id: AssetControlClient.java,v 1.9 2004/01/03 20:36:25 pelle Exp $
 $Log: AssetControlClient.java,v $
+Revision 1.9  2004/01/03 20:36:25  pelle
+Renamed HeldTransfer to Exchange
+Dropped valuetime from the request objects.
+Doesnt yet compile. New commit to follow soon.
+
 Revision 1.8  2003/12/10 23:52:39  pelle
 Did some cleaning up in the builders
 Fixed some stuff in IdentityCreator
@@ -83,7 +88,7 @@ Got rid of neuclear-ledger like features of pay such as Account and Issuer.
 Accounts have been replaced by Identity from neuclear-id
 Issuer is now Asset which is a subclass of Identity
 AssetController supports more than one Asset. Which is important for most non ecurrency implementations.
-TransferRequest/Receipt and its Held companions are now SignedNamedObjects. Thus to create them you must use
+TransferRequest/Receipt and its Exchange companions are now SignedNamedObjects. Thus to create them you must use
 their matching TransferRequest/ReceiptBuilder classes.
 PaymentProcessor has been renamed CurrencyController. I will extract a superclass later to be named AbstractLedgerController
 which will handle all neuclear-ledger based AssetControllers.
@@ -110,16 +115,16 @@ public final class AssetControlClient {
     }
 
 
-    public final HeldTransferReceipt performHeldTransfer(final HeldTransferRequestBuilder req) throws NeuClearException, XMLException {
-        return (HeldTransferReceipt) send(req);
+    public final ExchangeReceipt performHeldTransfer(final ExchangeRequestBuilder req) throws NeuClearException, XMLException {
+        return (ExchangeReceipt) send(req);
     }
 
-    public final TransferReceipt performCompleteHeld(final CompleteHeldTransferRequestBuilder req) throws NeuClearException, XMLException {
+    public final TransferReceipt performCompleteHeld(final CompleteExchangeRequestBuilder req) throws NeuClearException, XMLException {
         return (TransferReceipt) send(req);
     }
 
-    public final CancelHeldTransferReceipt performCancelHeld(final CancelHeldTransferRequestBuilder req) throws NeuClearException, XMLException {
-        return (CancelHeldTransferReceipt) req.getAsset().receive(req.sign(signer));
+    public final CancelExchangeReceipt performCancelHeld(final CancelExchangeRequestBuilder req) throws NeuClearException, XMLException {
+        return (CancelExchangeReceipt) req.getAsset().receive(req.sign(signer));
     }
 
     private SignedNamedObject send(final TransferBuilder req) throws NeuClearException, XMLException {

@@ -44,25 +44,16 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  * Time: 3:07:54 PM
  */
 public abstract class TransferContract extends AssetTransactionContract {
-    TransferContract(final SignedNamedCore core, final Asset asset, final Identity to, final double amount,  final Date valuetime, final String comment)  {
+    TransferContract(final SignedNamedCore core, final Asset asset, final double amount,  final String comment)  {
         super(core, asset);
         this.amount = amount;
         this.comment = (comment != null) ? comment : "";
-        this.to = to;
-        this.valuetime = valuetime.getTime();
     }
 
     public final double getAmount() {
         return amount;
     }
 
-    public final Date getValueTime() {
-        return new Timestamp(valuetime);
-    }
-
-    public final Identity getTo() {
-        return to;
-    }
 
     public abstract Identity getFrom();
 
@@ -72,8 +63,6 @@ public abstract class TransferContract extends AssetTransactionContract {
 
 
     private final double amount;
-    private final Identity to;
-    private final long valuetime;
     private final String comment;
 
 }

@@ -16,8 +16,13 @@ import java.text.ParseException;
  * User: pelleb
  * Date: Nov 10, 2003
  * Time: 11:06:37 AM
- * $Id: AssetTransactionContract.java,v 1.10 2003/12/19 18:02:35 pelle Exp $
+ * $Id: AssetTransactionContract.java,v 1.11 2004/01/03 20:36:25 pelle Exp $
  * $Log: AssetTransactionContract.java,v $
+ * Revision 1.11  2004/01/03 20:36:25  pelle
+ * Renamed HeldTransfer to Exchange
+ * Dropped valuetime from the request objects.
+ * Doesnt yet compile. New commit to follow soon.
+ *
  * Revision 1.10  2003/12/19 18:02:35  pelle
  * Revamped a lot of exception handling throughout the framework, it has been simplified in most places:
  * - For most cases the main exception to worry about now is InvalidNamedObjectException.
@@ -105,9 +110,9 @@ public class AssetTransactionContract extends SignedNamedObject {
 
                 final String holdid = elem.attributeValue("holdid");
                 if (elem.getName().equals(TransferGlobals.CANCEL_TAGNAME))
-                    return new CancelHeldTransferRequest(core, asset, holdid);
+                    return new CancelExchangeRequest(core, asset, holdid);
                 if (elem.getName().equals(TransferGlobals.CANCEL_RCPT_TAGNAME))
-                    return new CancelHeldTransferReceipt(core, asset, holdid);
+                    return new CancelExchangeReceipt(core, asset, holdid);
 
                 final double amount = Double.parseDouble(elem.attributeValue("amount"));
                 final Date valuetime = TimeTools.parseTimeStamp(elem.attributeValue("valuetime"));
@@ -116,13 +121,13 @@ public class AssetTransactionContract extends SignedNamedObject {
 
                 final String comment = (commentElement != null) ? commentElement.getText() : "";
                 if (elem.getName().equals(TransferGlobals.XFER_TAGNAME))
-                    return new TransferRequest(core, asset, to, amount, valuetime, comment);
+                    return new TransferRequest(core, asset, to, amount,  comment);
 
                 Date helduntil = null;
                 if (!Utility.isEmpty(elem.attributeValue("valuetime")))
                     helduntil = TimeTools.parseTimeStamp(elem.attributeValue("valuetime"));
                 if (elem.getName().equals(TransferGlobals.HELD_XFER_TAGNAME))
-                    return new HeldTransferRequest(core, asset, to, amount, valuetime, comment, helduntil);
+                    return new ExchangeRequest(core, asset, to, amount,  comment, helduntil);
 
                 final Identity from = NSResolver.resolveIdentity(elem.attributeValue("sender"));
                 final String reqid = elem.attributeValue("reqid");
@@ -130,10 +135,10 @@ public class AssetTransactionContract extends SignedNamedObject {
                     return new TransferReceipt(core, asset, from, to, reqid, amount, valuetime, comment);
 
                 if (elem.getName().equals(TransferGlobals.HELD_XFER_RCPT_TAGNAME))
-                    return new HeldTransferReceipt(core, asset, from, to, reqid, amount, valuetime, comment, helduntil);
+                    return new ExchangeReceipt(core, asset, from, to, reqid, amount, valuetime, comment, helduntil);
 
                 if (elem.getName().equals(TransferGlobals.COMPLETE_TAGNAME))
-                    return new CompleteHeldTransferRequest(core, asset, from, to, amount, valuetime, comment, holdid);
+                    return new CompleteExchangeRequest(core, asset, from, to, amount, valuetime, comment, holdid);
             } catch (ParseException e) {
                 throw new InvalidNamedObjectException(core.getName(),e);
             } catch (NameResolutionException e) {

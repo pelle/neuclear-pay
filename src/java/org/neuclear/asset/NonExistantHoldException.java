@@ -4,8 +4,13 @@ package org.neuclear.asset;
  * User: pelleb
  * Date: Nov 10, 2003
  * Time: 10:20:02 AM
- * $Id: NonExistantHoldException.java,v 1.2 2003/11/21 04:43:04 pelle Exp $
+ * $Id: NonExistantHoldException.java,v 1.3 2004/01/03 20:36:26 pelle Exp $
  * $Log: NonExistantHoldException.java,v $
+ * Revision 1.3  2004/01/03 20:36:26  pelle
+ * Renamed HeldTransfer to Exchange
+ * Dropped valuetime from the request objects.
+ * Doesnt yet compile. New commit to follow soon.
+ *
  * Revision 1.2  2003/11/21 04:43:04  pelle
  * EncryptedFileStore now works. It uses the PBECipher with DES3 afair.
  * Otherwise You will Finaliate.
@@ -20,6 +25,6 @@ package org.neuclear.asset;
  */
 public final class NonExistantHoldException extends InvalidTransferException{
     public NonExistantHoldException(final String holdid) {
-        super("Held transaction:"+holdid+" doesnt exist");
+        super("Exchange transaction:"+holdid+" doesnt exist");
     }
 }

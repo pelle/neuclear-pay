@@ -13,13 +13,19 @@ import java.util.Date;
  * Time: 5:35:26 PM
  */
 public class TransferRequest extends TransferContract {
+    private final Identity to;
 
-    TransferRequest(final SignedNamedCore core, final Asset asset, final Identity to, final double amount, final Date valuetime, final String comment)  {
-        super(core, asset, to, amount, valuetime, comment);
+    TransferRequest(final SignedNamedCore core, final Asset asset, final Identity to, final double amount, final String comment)  {
+        super(core, asset,  amount,  comment);
+        this.to=to;
     }
 
     public final Identity getFrom() {
         return getSignatory();
+    }
+
+    public final Identity getTo() {
+        return to;
     }
 
 

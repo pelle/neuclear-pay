@@ -13,9 +13,9 @@ import java.util.Date;
  * Date: Jul 21, 2003
  * Time: 5:35:26 PM
  */
-public final class CancelHeldTransferReceipt extends AssetTransactionContract{
+public final class CancelExchangeRequest extends AssetTransactionContract{
 
-    CancelHeldTransferReceipt(final SignedNamedCore core, final Asset asset, final String holdid)  {
+    CancelExchangeRequest(final SignedNamedCore core, final Asset asset, final String holdid)  {
         super(core, asset);
         this.holdid = holdid;
     }

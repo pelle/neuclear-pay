@@ -4,7 +4,7 @@ import org.dom4j.Element;
 import org.neuclear.asset.contracts.TransferReceipt;
 import org.neuclear.asset.contracts.TransferGlobals;
 import org.neuclear.asset.contracts.TransferRequest;
-import org.neuclear.asset.contracts.HeldTransferReceipt;
+import org.neuclear.asset.contracts.ExchangeReceipt;
 import org.neuclear.asset.InvalidTransferException;
 import org.neuclear.asset.NegativeTransferException;
 import org.neuclear.id.Identity;
@@ -30,8 +30,13 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: CompleteHeldTransferRequestBuilder.java,v 1.2 2003/11/21 04:43:03 pelle Exp $
-$Log: CompleteHeldTransferRequestBuilder.java,v $
+$Id: CompleteExchangeRequestBuilder.java,v 1.1 2004/01/03 20:36:25 pelle Exp $
+$Log: CompleteExchangeRequestBuilder.java,v $
+Revision 1.1  2004/01/03 20:36:25  pelle
+Renamed HeldTransfer to Exchange
+Dropped valuetime from the request objects.
+Doesnt yet compile. New commit to follow soon.
+
 Revision 1.2  2003/11/21 04:43:03  pelle
 EncryptedFileStore now works. It uses the PBECipher with DES3 afair.
 Otherwise You will Finaliate.
@@ -72,14 +77,13 @@ TransferReceiptBuilder has been created for use by Transfer processors. It is us
  * Date: Oct 3, 2003
  * Time: 6:28:26 PM
  */
-public final class CompleteHeldTransferRequestBuilder extends TransferBuilder {
-    public CompleteHeldTransferRequestBuilder(final HeldTransferReceipt req,final Identity signatory,final String id,final Date valuetime,final double amount, final String comment) throws InvalidTransferException, NegativeTransferException, NeuClearException {
+public final class CompleteExchangeRequestBuilder extends TransferBuilder {
+    public CompleteExchangeRequestBuilder(final ExchangeReceipt req,final Identity signatory,final String id,final double amount, final String comment) throws InvalidTransferException, NegativeTransferException, NeuClearException {
         super(TransferGlobals.COMPLETE_TAGNAME,
                 req.getAsset(),
                 signatory,
-                req.getTo(),
+                req.getAgent(),
                 amount,
-                valuetime,
                 comment);
         final Element element = getElement();
         element.add(TransferGlobals.createAttribute(element, "sender", req.getFrom().getName()));

@@ -2,8 +2,8 @@ package org.neuclear.asset.controllers.currency;
 
 import org.neuclear.asset.*;
 import org.neuclear.asset.contracts.*;
-import org.neuclear.asset.contracts.builders.CancelHeldTransferReceiptBuilder;
-import org.neuclear.asset.contracts.builders.HeldTransferReceiptBuilder;
+import org.neuclear.asset.contracts.builders.CancelExchangeReceiptBuilder;
+import org.neuclear.asset.contracts.builders.ExchangeReceiptBuilder;
 import org.neuclear.asset.contracts.builders.TransferReceiptBuilder;
 import org.neuclear.commons.NeuClearException;
 import org.neuclear.id.Identity;
@@ -90,17 +90,17 @@ public final class CurrencyController extends AssetController {
         }
     }
 
-    public final HeldTransferReceiptBuilder process(final HeldTransferRequest req) throws InvalidTransferException, LowLevelPaymentException, TransferDeniedException, NeuClearException {
+    public final ExchangeReceiptBuilder process(final ExchangeRequest req) throws InvalidTransferException, LowLevelPaymentException, TransferDeniedException, NeuClearException {
         try {
             if (!req.getSignatory().equals(req.getFrom()))
                 throw new TransferDeniedException(req);
             final Book from = getBook(req.getFrom());
             final Book to = getBook(req.getTo());
 
-            final PostedHeldTransaction posted = from.hold(to, req.getAmount(), req.getComment(), req.getValueTime(), req.getHeldUntil());
+            final PostedHeldTransaction posted = from.hold(to, req.getAmount(), req.getComment(), req.getValueTime(), req.getValidTo());
 
 
-            return new HeldTransferReceiptBuilder(req, createTransactionId(req, posted));
+            return new ExchangeReceiptBuilder(req, createTransactionId(req, posted));
         } catch (UnknownBookException e) { //TODO Implement something like this eg. AccountNotValidException
             throw new InvalidTransferException(e.getSubMessage());
         } catch (LowlevelLedgerException e) {
@@ -114,7 +114,7 @@ public final class CurrencyController extends AssetController {
         }
     }
 
-    public final TransferReceiptBuilder process(final CompleteHeldTransferRequest complete) throws LowLevelPaymentException, InvalidTransferException, TransferDeniedException, NeuClearException {
+    public final TransferReceiptBuilder process(final CompleteExchangeRequest complete) throws LowLevelPaymentException, InvalidTransferException, TransferDeniedException, NeuClearException {
         try {
             if (!complete.getSignatory().equals(complete.getTo()))
                 throw new TransferDeniedException(complete);
@@ -143,13 +143,13 @@ public final class CurrencyController extends AssetController {
         }
     }
 
-    public final CancelHeldTransferReceiptBuilder process(final CancelHeldTransferRequest cancel) throws InvalidTransferException, LowLevelPaymentException, TransferDeniedException, NeuClearException {
+    public final CancelExchangeReceiptBuilder process(final CancelExchangeRequest cancel) throws InvalidTransferException, LowLevelPaymentException, TransferDeniedException, NeuClearException {
         try {
             final PostedHeldTransaction heldTran = ledger.findHeldTransaction(cancel.getHoldId());
             if (!isRecipient(cancel.getSignatory(), heldTran))
                 throw new TransferDeniedException(cancel);
             heldTran.cancel();
-            return new CancelHeldTransferReceiptBuilder(cancel);
+            return new CancelExchangeReceiptBuilder(cancel);
         } catch (UnknownTransactionException e) {
             throw new NonExistantHoldException(cancel.getHoldId());
         } catch (LowlevelLedgerException e) {

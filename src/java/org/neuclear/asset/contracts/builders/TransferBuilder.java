@@ -32,8 +32,13 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: TransferBuilder.java,v 1.8 2003/12/06 00:16:10 pelle Exp $
+$Id: TransferBuilder.java,v 1.9 2004/01/03 20:36:25 pelle Exp $
 $Log: TransferBuilder.java,v $
+Revision 1.9  2004/01/03 20:36:25  pelle
+Renamed HeldTransfer to Exchange
+Dropped valuetime from the request objects.
+Doesnt yet compile. New commit to follow soon.
+
 Revision 1.8  2003/12/06 00:16:10  pelle
 Updated various areas in NSTools.
 Updated URI Validation in particular to support new expanded format
@@ -95,7 +100,7 @@ TransferReceiptBuilder has been created for use by Transfer processors. It is us
  * Time: 3:13:27 PM
  */
 public abstract class TransferBuilder extends NamedObjectBuilder {
-    protected TransferBuilder(final String tagname, final Asset asset, final Identity signer, final Identity to, final double amount, final Date valuetime, final String comment) throws InvalidTransferException, NegativeTransferException, NeuClearException {
+    protected TransferBuilder(final String tagname, final Asset asset, final Identity signer, final Identity to, final double amount, final String comment) throws InvalidTransferException, NegativeTransferException, NeuClearException {
         super(NSTools.createUniqueTransactionID(signer.getName(), to.getName()), TransferGlobals.createQName(tagname));
         if (amount < 0)
             throw new NegativeTransferException(amount);
@@ -103,15 +108,12 @@ public abstract class TransferBuilder extends NamedObjectBuilder {
             throw new InvalidTransferException("assetName");
         if (to == null)
             throw new InvalidTransferException("to");
-        if (valuetime == null)
-            throw new InvalidTransferException("valuetime");
 
         this.asset = asset;
         final Element element = getElement();
         element.add(TransferGlobals.createAttribute(element, "recipient", to.getName()));
         element.add(TransferGlobals.createAttribute(element, "assetName", asset.getName()));
         element.add(TransferGlobals.createAttribute(element, "amount", Double.toString(amount)));
-        element.add(TransferGlobals.createAttribute(element, "valuetime", TimeTools.formatTimeStamp(valuetime)));
         if (!Utility.isEmpty(comment))
             element.add(TransferGlobals.createElement("comment", comment));
     }

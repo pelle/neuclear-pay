@@ -28,8 +28,13 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: TransferRequestBuilder.java,v 1.4 2003/11/21 04:43:03 pelle Exp $
+$Id: TransferRequestBuilder.java,v 1.5 2004/01/03 20:36:25 pelle Exp $
 $Log: TransferRequestBuilder.java,v $
+Revision 1.5  2004/01/03 20:36:25  pelle
+Renamed HeldTransfer to Exchange
+Dropped valuetime from the request objects.
+Doesnt yet compile. New commit to follow soon.
+
 Revision 1.4  2003/11/21 04:43:03  pelle
 EncryptedFileStore now works. It uses the PBECipher with DES3 afair.
 Otherwise You will Finaliate.
@@ -71,10 +76,10 @@ TransferReceiptBuilder has been created for use by Transfer processors. It is us
  * Time: 6:26:13 PM
  */
 public class TransferRequestBuilder extends TransferBuilder {
-    public TransferRequestBuilder(final Asset asset, final Identity signer, final Identity to, final double amount, final Date valuetime, final String comment) throws InvalidTransferException, NegativeTransferException, NeuClearException {
-        this(TransferGlobals.XFER_TAGNAME, asset, signer, to, amount, valuetime, comment);
+    public TransferRequestBuilder(final Asset asset, final Identity signer, final Identity to, final double amount, final String comment) throws InvalidTransferException, NegativeTransferException, NeuClearException {
+        this(TransferGlobals.XFER_TAGNAME, asset, signer, to, amount,  comment);
     }
-     TransferRequestBuilder(final String tagname,final Asset asset, final Identity signer, final Identity to, final double amount, final Date valuetime, final String comment) throws InvalidTransferException, NegativeTransferException, NeuClearException {
-        super(tagname, asset, signer, to, amount, valuetime, comment);
+     TransferRequestBuilder(final String tagname,final Asset asset, final Identity signer, final Identity to, final double amount, final String comment) throws InvalidTransferException, NegativeTransferException, NeuClearException {
+        super(tagname, asset, signer, to, amount,  comment);
     }
 }

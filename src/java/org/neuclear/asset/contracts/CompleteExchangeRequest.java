@@ -10,15 +10,15 @@ import java.util.Date;
 /**
  * User: pelleb
  * Date: Jul 21, 2003
- * Time: 5:37:10 PM
+ * Time: 5:35:26 PM
  */
-public class TransferReceipt extends TransferContract {
+public final class CompleteExchangeRequest extends TransferContract {
 
-    TransferReceipt(final SignedNamedCore core, final Asset asset, final Identity from, final Identity to, final String reqid, final double amount, final Date valuetime, final String comment)  {
-        super(core, asset,  amount, comment);
+    CompleteExchangeRequest(final SignedNamedCore core, final Asset asset, final Identity from, final Identity to, final double amount, final Date valuetime, final String comment, final String holdid)  {
+        super(core, asset, amount,  comment);
         this.from = from;
-        this.reqid = reqid;
-        this.to=to;
+        this.holdid = holdid;
+        this.to = to;
         this.valuetime=valuetime.getTime();
     }
 
@@ -26,10 +26,9 @@ public class TransferReceipt extends TransferContract {
         return from;
     }
 
-    public final String getRequestId() {
-        return reqid;
+    public final String getHoldId() {
+        return holdid;
     }
-
     public final Identity getTo() {
         return to;
     }
@@ -37,8 +36,9 @@ public class TransferReceipt extends TransferContract {
         return new Timestamp(valuetime);
     }
     private final long valuetime;
+
     private final Identity from;
-    private final String reqid;
+    private final String holdid;
     private final Identity to;
 
 }

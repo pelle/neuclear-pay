@@ -5,8 +5,10 @@ import org.neuclear.asset.contracts.*;
 import org.neuclear.asset.InvalidTransferException;
 import org.neuclear.asset.NegativeTransferException;
 import org.neuclear.commons.NeuClearException;
+import org.neuclear.commons.time.TimeTools;
 
 import java.util.Date;
+import java.sql.Timestamp;
 
 /*
 NeuClear Distributed Transaction Clearing Platform
@@ -26,8 +28,13 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: TransferReceiptBuilder.java,v 1.4 2003/11/21 04:43:03 pelle Exp $
+$Id: TransferReceiptBuilder.java,v 1.5 2004/01/03 20:36:25 pelle Exp $
 $Log: TransferReceiptBuilder.java,v $
+Revision 1.5  2004/01/03 20:36:25  pelle
+Renamed HeldTransfer to Exchange
+Dropped valuetime from the request objects.
+Doesnt yet compile. New commit to follow soon.
+
 Revision 1.4  2003/11/21 04:43:03  pelle
 EncryptedFileStore now works. It uses the PBECipher with DES3 afair.
 Otherwise You will Finaliate.
@@ -69,31 +76,33 @@ TransferReceiptBuilder has been created for use by Transfer processors. It is us
  * Time: 6:28:26 PM
  */
 public class TransferReceiptBuilder extends TransferBuilder {
-    public TransferReceiptBuilder(final TransferRequest req,final String id) throws InvalidTransferException, NegativeTransferException, NeuClearException {
-        this(TransferGlobals.XFER_RCPT_TAGNAME,req,id);
-    }
-    public TransferReceiptBuilder(final CompleteHeldTransferRequest req,final String id) throws InvalidTransferException, NegativeTransferException, NeuClearException {
+    public TransferReceiptBuilder(final CompleteExchangeRequest req,final String id,Timestamp valuetime) throws InvalidTransferException, NegativeTransferException, NeuClearException {
         super(TransferGlobals.XFER_RCPT_TAGNAME,
                 req.getAsset(),
                 req.getAsset(),
                 req.getTo(),
                 req.getAmount(),
-                req.getValueTime(),
                 req.getComment());
         final Element element = getElement();
+        if (valuetime == null)
+            throw new InvalidTransferException("valuetime");
+        element.add(TransferGlobals.createAttribute(element, "valuetime", TimeTools.formatTimeStamp(valuetime)));
+
         element.add(TransferGlobals.createAttribute(element, "sender", req.getFrom().getName()));
         element.add(TransferGlobals.createAttribute(element, "holdid", req.getHoldId()));
     }
 
-    TransferReceiptBuilder(final String tagname,final TransferRequest req,final String id) throws InvalidTransferException, NegativeTransferException, NeuClearException {
-        super(tagname,
+    public TransferReceiptBuilder(final TransferRequest req,final String id,Timestamp valuetime) throws InvalidTransferException, NegativeTransferException, NeuClearException {
+        super(TransferGlobals.XFER_RCPT_TAGNAME,
                 req.getAsset(),
                 req.getAsset(),
                 req.getTo(),
                 req.getAmount(),
-                req.getValueTime(),
                 req.getComment());
         final Element element = getElement();
+        if (valuetime == null)
+            throw new InvalidTransferException("valuetime");
+        element.add(TransferGlobals.createAttribute(element, "valuetime", TimeTools.formatTimeStamp(valuetime)));
         element.add(TransferGlobals.createAttribute(element, "sender", req.getFrom().getName()));
         element.add(TransferGlobals.createAttribute(element, "reqid", req.getName()));
     }

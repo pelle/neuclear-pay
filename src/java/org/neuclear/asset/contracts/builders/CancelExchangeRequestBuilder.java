@@ -2,7 +2,7 @@ package org.neuclear.asset.contracts.builders;
 
 import org.neuclear.asset.InvalidTransferException;
 import org.neuclear.asset.NegativeTransferException;
-import org.neuclear.asset.contracts.HeldTransferReceipt;
+import org.neuclear.asset.contracts.ExchangeReceipt;
 import org.neuclear.asset.contracts.TransferGlobals;
 import org.neuclear.commons.NeuClearException;
 import org.neuclear.id.NSTools;
@@ -12,8 +12,13 @@ import org.neuclear.id.NSTools;
  * User: pelleb
  * Date: Nov 10, 2003
  * Time: 10:46:12 AM
- * $Id: CancelHeldTransferRequestBuilder.java,v 1.3 2003/12/06 00:16:10 pelle Exp $
- * $Log: CancelHeldTransferRequestBuilder.java,v $
+ * $Id: CancelExchangeRequestBuilder.java,v 1.1 2004/01/03 20:36:25 pelle Exp $
+ * $Log: CancelExchangeRequestBuilder.java,v $
+ * Revision 1.1  2004/01/03 20:36:25  pelle
+ * Renamed HeldTransfer to Exchange
+ * Dropped valuetime from the request objects.
+ * Doesnt yet compile. New commit to follow soon.
+ *
  * Revision 1.3  2003/12/06 00:16:10  pelle
  * Updated various areas in NSTools.
  * Updated URI Validation in particular to support new expanded format
@@ -32,9 +37,9 @@ import org.neuclear.id.NSTools;
  * CurrencyController fully implemented
  * AssetControlClient implementes a remote client for communicating with AssetControllers
  */
-public final class CancelHeldTransferRequestBuilder extends CancelHeldTransferBuilder {
-    public CancelHeldTransferRequestBuilder(final HeldTransferReceipt held) throws InvalidTransferException, NegativeTransferException, NeuClearException {
-        super(NSTools.createUniqueTransactionID(held.getTo().getName(), held.getAsset().getName()), TransferGlobals.CANCEL_TAGNAME, held.getAsset(), held.getName());
+public final class CancelExchangeRequestBuilder extends CancelExchangeBuilder {
+    public CancelExchangeRequestBuilder(final ExchangeReceipt held) throws InvalidTransferException, NegativeTransferException, NeuClearException {
+        super(NSTools.createUniqueTransactionID(held.getAgent().getName(), held.getAsset().getName()), TransferGlobals.CANCEL_TAGNAME, held.getAsset(), held.getName());
     }
 
 }

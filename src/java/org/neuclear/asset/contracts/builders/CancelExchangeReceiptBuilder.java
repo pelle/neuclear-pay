@@ -2,7 +2,7 @@ package org.neuclear.asset.contracts.builders;
 
 import org.neuclear.asset.InvalidTransferException;
 import org.neuclear.asset.NegativeTransferException;
-import org.neuclear.asset.contracts.CancelHeldTransferRequest;
+import org.neuclear.asset.contracts.CancelExchangeRequest;
 import org.neuclear.asset.contracts.TransferGlobals;
 import org.neuclear.commons.NeuClearException;
 import org.neuclear.id.NSTools;
@@ -12,8 +12,13 @@ import org.neuclear.id.NSTools;
  * User: pelleb
  * Date: Nov 10, 2003
  * Time: 10:46:12 AM
- * $Id: CancelHeldTransferReceiptBuilder.java,v 1.3 2003/12/06 00:16:10 pelle Exp $
- * $Log: CancelHeldTransferReceiptBuilder.java,v $
+ * $Id: CancelExchangeReceiptBuilder.java,v 1.1 2004/01/03 20:36:25 pelle Exp $
+ * $Log: CancelExchangeReceiptBuilder.java,v $
+ * Revision 1.1  2004/01/03 20:36:25  pelle
+ * Renamed HeldTransfer to Exchange
+ * Dropped valuetime from the request objects.
+ * Doesnt yet compile. New commit to follow soon.
+ *
  * Revision 1.3  2003/12/06 00:16:10  pelle
  * Updated various areas in NSTools.
  * Updated URI Validation in particular to support new expanded format
@@ -32,8 +37,8 @@ import org.neuclear.id.NSTools;
  * CurrencyController fully implemented
  * AssetControlClient implementes a remote client for communicating with AssetControllers
  */
-public final class CancelHeldTransferReceiptBuilder extends CancelHeldTransferBuilder {
-    public CancelHeldTransferReceiptBuilder(final CancelHeldTransferRequest req) throws InvalidTransferException, NegativeTransferException, NeuClearException {
+public final class CancelExchangeReceiptBuilder extends CancelExchangeBuilder {
+    public CancelExchangeReceiptBuilder(final CancelExchangeRequest req) throws InvalidTransferException, NegativeTransferException, NeuClearException {
         super(NSTools.createUniqueTransactionID(req.getAsset().getName(), req.getSignatory().getName()), TransferGlobals.CANCEL_RCPT_TAGNAME, req.getAsset(), req.getHoldId());
     }
 

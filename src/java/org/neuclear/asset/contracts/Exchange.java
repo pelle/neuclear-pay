@@ -1,5 +1,7 @@
 package org.neuclear.asset.contracts;
 
+import org.neuclear.id.Identity;
+
 import java.util.Date;
 
 /**
@@ -7,6 +9,7 @@ import java.util.Date;
  * Date: Jul 30, 2003
  * Time: 11:57:39 AM
  */
-public interface Held {
-    public Date getHeldUntil();
+public interface Exchange {
+    public Date getValidTo();
+    public Identity getAgent();
 }

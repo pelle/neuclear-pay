@@ -26,8 +26,13 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: CancelHeldTransferBuilder.java,v 1.4 2003/11/21 04:43:03 pelle Exp $
-$Log: CancelHeldTransferBuilder.java,v $
+$Id: CancelExchangeBuilder.java,v 1.1 2004/01/03 20:36:25 pelle Exp $
+$Log: CancelExchangeBuilder.java,v $
+Revision 1.1  2004/01/03 20:36:25  pelle
+Renamed HeldTransfer to Exchange
+Dropped valuetime from the request objects.
+Doesnt yet compile. New commit to follow soon.
+
 Revision 1.4  2003/11/21 04:43:03  pelle
 EncryptedFileStore now works. It uses the PBECipher with DES3 afair.
 Otherwise You will Finaliate.
@@ -78,8 +83,8 @@ TransferReceiptBuilder has been created for use by Transfer processors. It is us
  * Date: Oct 3, 2003
  * Time: 3:13:27 PM
  */
-public abstract class CancelHeldTransferBuilder extends NamedObjectBuilder {
-    protected CancelHeldTransferBuilder(final String tagname, final String name, final Asset asset, final String holdid) throws InvalidTransferException, NegativeTransferException, NeuClearException {
+public abstract class CancelExchangeBuilder extends NamedObjectBuilder {
+    protected CancelExchangeBuilder(final String tagname, final String name, final Asset asset, final String holdid) throws InvalidTransferException, NegativeTransferException, NeuClearException {
         super(name, TransferGlobals.createQName(tagname));
         if (asset == null)
             throw new InvalidTransferException("assetName");
