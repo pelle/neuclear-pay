@@ -21,8 +21,12 @@ import java.security.GeneralSecurityException;
 import java.security.PublicKey;
 
 /*
-$Id: IssueOrderReceiverTest.java,v 1.1 2004/07/22 00:19:03 pelle Exp $
+$Id: IssueOrderReceiverTest.java,v 1.2 2004/07/22 21:48:46 pelle Exp $
 $Log: IssueOrderReceiverTest.java,v $
+Revision 1.2  2004/07/22 21:48:46  pelle
+Further receivers and unit tests for for Exchanges etc.
+I've also changed the internal asset to ledger id from being the pk of the contract signer, to being the pk of the service key.
+
 Revision 1.1  2004/07/22 00:19:03  pelle
 Added unit test for IssueOrder
 
@@ -54,11 +58,11 @@ public class IssueOrderReceiverTest extends AbstractSigningTest {
     public void testIssueOrder() throws NeuClearException, InvalidTransferException, LowlevelLedgerException, UnknownBookException, InvalidTransactionException {
         Signatory recipient = new Signatory(signer.getPublicKey("alice"));
         Signatory sender = new Signatory(signer.getPublicKey("carol"));
-        final double senderstart = ledger.getBalance(asset.getSignatory().getName(), sender.getName());
-        double aliceBalance = ledger.getBalance(asset.getSignatory().getName(), recipient.getName());
+        final double senderstart = ledger.getBalance(asset.getServiceId(), sender.getName());
+        double aliceBalance = ledger.getBalance(asset.getServiceId(), recipient.getName());
         receiver.receive(new IssueOrderBuilder(asset, recipient, new Amount(10), "test").convert("carol", signer));
-        assertEquals(aliceBalance + 10, ledger.getBalance(asset.getSignatory().getName(), recipient.getName()), 0);
-        assertEquals(senderstart - 10, ledger.getBalance(asset.getSignatory().getName(), sender.getName()), 0);
+        assertEquals(aliceBalance + 10, ledger.getBalance(asset.getServiceId(), recipient.getName()), 0);
+        assertEquals(senderstart - 10, ledger.getBalance(asset.getServiceId(), sender.getName()), 0);
     }
 
     protected Receiver receiver;

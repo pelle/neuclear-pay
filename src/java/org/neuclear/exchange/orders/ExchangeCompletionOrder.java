@@ -65,7 +65,7 @@ public final class ExchangeCompletionOrder extends ExchangeTransactionContract {
 
             if (elem.getName().equals(ExchangeOrderGlobals.COMPLETE_TAGNAME)) {
                 final ExchangeOrderReceipt receipt = (ExchangeOrderReceipt) TransferGlobals.parseEmbedded(elem, ExchangeOrderGlobals.createQName(ExchangeOrderGlobals.EXCHANGE_RCPT_TAGNAME));
-                if (core.getSignatory().getPublicKey().equals(receipt.getOrder().getAgent().getServiceKey()))
+                if (core.getSignatory().getName().equals(receipt.getOrder().getAgent().getServiceId()))
                     return new ExchangeCompletionOrder(core,
                             receipt,
                             TransferGlobals.parseRecipientTag(elem),

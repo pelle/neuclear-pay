@@ -21,8 +21,12 @@ import java.security.GeneralSecurityException;
 import java.security.PublicKey;
 
 /*
-$Id: TransferOrderReceiverTest.java,v 1.1 2004/07/21 23:11:22 pelle Exp $
+$Id: TransferOrderReceiverTest.java,v 1.2 2004/07/22 21:48:46 pelle Exp $
 $Log: TransferOrderReceiverTest.java,v $
+Revision 1.2  2004/07/22 21:48:46  pelle
+Further receivers and unit tests for for Exchanges etc.
+I've also changed the internal asset to ledger id from being the pk of the contract signer, to being the pk of the service key.
+
 Revision 1.1  2004/07/21 23:11:22  pelle
 Added single function Receivers and a DelegatingAssetController. These will eventually replace the CurrencyController and Auditor.
 
@@ -51,13 +55,13 @@ public class TransferOrderReceiverTest extends AbstractSigningTest {
     public void testTransferOrder() throws NeuClearException, InvalidTransferException, LowlevelLedgerException, UnknownBookException, InvalidTransactionException {
         Signatory recipient = new Signatory(signer.getPublicKey("alice"));
         Signatory sender = new Signatory(signer.getPublicKey("bob"));
-        final double senderstart = ledger.getBalance(asset.getSignatory().getName(), sender.getName());
-        ledger.transfer(asset.getSignatory().getName(), "bluesky", sender.getName(), 10 - senderstart, "bla");
-        assertEquals(10, ledger.getBalance(asset.getSignatory().getName(), sender.getName()), 0);
-        double aliceBalance = ledger.getBalance(asset.getSignatory().getName(), recipient.getName());
+        final double senderstart = ledger.getBalance(asset.getServiceId(), sender.getName());
+        ledger.transfer(asset.getServiceId(), "bluesky", sender.getName(), 10 - senderstart, "bla");
+        assertEquals(10, ledger.getBalance(asset.getServiceId(), sender.getName()), 0);
+        double aliceBalance = ledger.getBalance(asset.getServiceId(), recipient.getName());
         receiver.receive(new TransferOrderBuilder(asset, recipient, new Amount(10), "test").convert("bob", signer));
-        assertEquals(aliceBalance + 10, ledger.getBalance(asset.getSignatory().getName(), recipient.getName()), 0);
-        assertEquals(0, ledger.getBalance(asset.getSignatory().getName(), sender.getName()), 0);
+        assertEquals(aliceBalance + 10, ledger.getBalance(asset.getServiceId(), recipient.getName()), 0);
+        assertEquals(0, ledger.getBalance(asset.getServiceId(), sender.getName()), 0);
     }
 
     protected Receiver receiver;

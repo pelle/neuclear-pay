@@ -2,20 +2,21 @@ package org.neuclear.asset.controllers.receivers;
 
 import org.neuclear.asset.InvalidTransferException;
 import org.neuclear.asset.NegativeTransferException;
-import org.neuclear.asset.orders.IssueOrder;
-import org.neuclear.asset.orders.IssueReceipt;
-import org.neuclear.asset.orders.builders.IssueReceiptBuilder;
 import org.neuclear.commons.NeuClearException;
 import org.neuclear.commons.crypto.signers.Signer;
+import org.neuclear.exchange.orders.ExchangeCompletedReceipt;
+import org.neuclear.exchange.orders.ExchangeCompletionOrder;
+import org.neuclear.exchange.orders.ExchangeOrderGlobals;
+import org.neuclear.exchange.orders.builders.ExchangeCompletedReceiptBuilder;
 import org.neuclear.id.SignedNamedObject;
 import org.neuclear.id.receiver.HandlingReceiver;
 import org.neuclear.id.receiver.UnsupportedTransaction;
 import org.neuclear.ledger.*;
 
 /*
-$Id: IssueOrderReceiver.java,v 1.2 2004/07/22 21:48:42 pelle Exp $
-$Log: IssueOrderReceiver.java,v $
-Revision 1.2  2004/07/22 21:48:42  pelle
+$Id: ExchangeCompletionOrderReceiver.java,v 1.1 2004/07/22 21:48:42 pelle Exp $
+$Log: ExchangeCompletionOrderReceiver.java,v $
+Revision 1.1  2004/07/22 21:48:42  pelle
 Further receivers and unit tests for for Exchanges etc.
 I've also changed the internal asset to ledger id from being the pk of the contract signer, to being the pk of the service key.
 
@@ -29,31 +30,29 @@ Added single function Receivers and a DelegatingAssetController. These will even
  * Date: Jul 21, 2004
  * Time: 12:45:42 PM
  */
-public class IssueOrderReceiver extends SigningLedgerReceiver implements HandlingReceiver {
-    public IssueOrderReceiver(Signer signer, LedgerController ledger) {
+public class ExchangeCompletionOrderReceiver extends SigningLedgerReceiver implements HandlingReceiver {
+    public ExchangeCompletionOrderReceiver(Signer signer, LedgerController ledger) {
         super(signer, ledger);
     }
 
     public SignedNamedObject receive(SignedNamedObject obj) throws UnsupportedTransaction, NeuClearException {
         try {
-            IssueOrder order = (IssueOrder) obj;
-            if (!order.getSignatory().getName().equals(order.getAsset().getIssuer().getName()))
-                throw new InvalidTransferException("Only Issuer is allowed to issue");
-
-            String name = order.getAsset().getServiceId();
-            ;
-            final PostedTransaction posted = ledger.transfer(name, order.getDigest(), order.getSignatory().getName(), order.getRecipient(), order.getAmount().getAmount(), order.getComment());
+            ExchangeCompletionOrder complete = (ExchangeCompletionOrder) obj;
+            String name = complete.getAsset().getServiceId();
+            if (!complete.getSignatory().getName().equals(complete.getReceipt().getOrder().getAgent().getServiceId()))
+                throw new InvalidTransferException("Only Agent is allowed to Sign Completion Order");
+            if (complete.getAmount().getAmount() > complete.getReceipt().getOrder().getAmount().getAmount())
+                throw new InvalidTransferException("Attempting to complete larger than authorized amount");
+            PostedTransaction tran = ledger.complete(complete.getReceipt().getOrder().getDigest(), complete.getAmount().getAmount(), complete.getComment());
             if (!signer.canSignFor(name))
                 return null;
-            final IssueReceipt receipt = (IssueReceipt) new IssueReceiptBuilder(order, posted.getTransactionTime()).convert(name, signer);
-            ledger.setReceiptId(order.getDigest(), receipt.getDigest());
+            ExchangeCompletedReceipt receipt = (ExchangeCompletedReceipt) new ExchangeCompletedReceiptBuilder(complete, tran.getTransactionTime()).convert(name, signer);
+            ledger.setReceiptId(complete.getReceipt().getOrder().getDigest(), receipt.getDigest());
             return receipt;
 
         } catch (ClassCastException e) {
             throw new UnsupportedTransaction(obj);
         } catch (UnknownTransactionException e) {
-            throw new NeuClearException(e);
-        } catch (UnknownBookException e) {
             throw new NeuClearException(e);
         } catch (InsufficientFundsException e) {
             throw new NeuClearException(e);
@@ -67,10 +66,12 @@ public class IssueOrderReceiver extends SigningLedgerReceiver implements Handlin
             throw new NeuClearException(e);
         } catch (InvalidTransactionException e) {
             throw new NeuClearException(e);
+        } catch (TransactionExpiredException e) {
+            throw new NeuClearException(e);
         }
     }
 
     public String handlesTagName() {
-        return "IssueOrder";
+        return ExchangeOrderGlobals.COMPLETE_TAGNAME;
     }
 }
