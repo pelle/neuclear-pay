@@ -1,0 +1,19 @@
+<project name="neudist" repository="neudist" href="http://neudist.org">
+
+	<title>NeuClear - Payment Processor</title>
+
+	<body>
+		<links>
+            <item name="NeuClear.org" href="http://neuclear.org/"/>
+			<item name="Talk.org" href="http://talk.org"/>
+			<item name="SourceForge" href="http://sourceforge.net/projects/neuclear/"/>
+		</links>
+		<menu name="NeuClear - Pay">
+			<item name="Front Page"            href="/index.html"/>
+            <item name="Credits and Dependencies" href="/credits.html"/>
+
+			<item name="SourceForge" href="http://sourceforge.net/projects/neuclear/"/>
+		</menu>
+	</body>
+
+</project>

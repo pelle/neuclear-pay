@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<document>
+
+	<properties>
+		<title>NeuClear Payment Processor</title>
+		<author email="pelle@neubia.com">Pelle Braendgaard</author>
+	</properties>
+
+	<body>
+		<section name="Introduction">
+			<p>
+                The NeuClear Payment Processor provides a simple abstraction for executing
+                book entry Payment transactions on the NeuClear clearing platform.
+            </p>
+            <p>
+                A fully functional implementation of the PaymentProcessor is implemented based on
+                the <a href="http://neuclear.org/ledger/">NeuClear Ledger API</a>.
+            </p>
+            <p>
+                Implementations based on other backends should be simple to create. If you wish to implement it ontop
+                of an existing SQL ledger. We recommend extending the NeuClear Ledger instead of writing a completely new
+                Payment Processor.
+            </p>
+		</section>
+	</body>
+
+</document>
