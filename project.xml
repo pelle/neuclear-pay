@@ -67,17 +67,13 @@
     <!-- Need to mark these as compile-time/run-time -->
     <dependencies>
         <dependency>
-            <id>neuclear-ledger</id>
-            <name>neuclear-ledger</name>
-            <version>0.3</version>
-            <properties>
-                <war.bundle>true</war.bundle>
-            </properties>
+            <id>hsqldb</id>
+            <version>1.7.1</version>
         </dependency>
         <dependency>
             <id>neuclear-commons</id>
             <name>neuclear-commons</name>
-            <version>0.5.1-SNAPSHOT</version>
+            <version>0.6-SNAPSHOT</version>
             <properties>
                 <war.bundle>true</war.bundle>
             </properties>
