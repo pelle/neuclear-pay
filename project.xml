@@ -3,7 +3,7 @@
 
     <name>NeuClear Pay</name>
     <id>neuclear-pay</id>
-    <currentVersion>1.0-beta4</currentVersion>
+    <currentVersion>1.0-beta5</currentVersion>
     <inceptionYear>2003</inceptionYear>
     <package>org.neuclear.asset</package>
     <logo>/images/logo.gif</logo>
@@ -75,7 +75,7 @@
         <dependency>
             <id>neuclear-commons</id>
             <name>neuclear-commons</name>
-            <version>1.0-beta8</version>
+            <version>1.0-beta10</version>
             <properties>
                 <war.bundle>true</war.bundle>
             </properties>
@@ -83,7 +83,7 @@
         <dependency>
             <id>neuclear-ledger</id>
             <name>neuclear-ledger</name>
-            <version>0.5</version>
+            <version>0.5.2</version>
             <properties>
                 <war.bundle>true</war.bundle>
             </properties>
@@ -107,7 +107,7 @@
         <dependency>
             <id>neuclear-id</id>
             <name>neuclear-id</name>
-            <version>1.0-beta8</version>
+            <version>1.0-beta10</version>
             <properties>
                 <war.bundle>true</war.bundle>
             </properties>
