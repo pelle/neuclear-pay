@@ -35,15 +35,19 @@ import java.util.Date;
  * Date: Jul 21, 2003
  * Time: 6:05:04 PM
  */
-public final class CurrencyTests extends AbstractSigningTest {
-    public CurrencyTests(final String s) throws LowlevelLedgerException, GeneralSecurityException, NeuClearException {
+public class CurrencyTests extends AbstractSigningTest {
+    public CurrencyTests(final String s) throws GeneralSecurityException, LowlevelLedgerException, NeuClearException {
+        this(s, new SimpleLedger("asset"), new SimpleLedger("test"));
+    }
+
+    public CurrencyTests(final String s, final Ledger assetLedger, final Ledger auditLedger) throws LowlevelLedgerException, GeneralSecurityException, NeuClearException {
         super(s);
         asset = createTestAsset();
         shoes = createShoeAsset();
         agent = createTestExchangeAgent();
-        ledger = new SimpleLedger("test");
+        ledger = assetLedger;
         proc = new CurrencyController(ledger, asset, getSigner(), "neu://test/bux");
-        auditLedger = new SimpleLedger("auditor");
+        this.auditLedger = auditLedger;
         auditor = new Auditor(asset, auditLedger);
     }
 
@@ -142,7 +146,7 @@ public final class CurrencyTests extends AbstractSigningTest {
         assertEquals(alicebalance, ledger.getAvailableBalance(getAlice().getName()), 0);
         assertAudit(getAlice().getName());
 
-        Builder builder = new ExchangeOrderBuilder(asset, agent, new Amount(20), new Date(System.currentTimeMillis() + 8000), new BidItem[]{new BidItem(shoes, new Amount(10))}, "give me shoes");
+        Builder builder = new ExchangeOrderBuilder(asset, agent, new Amount(20), new Date(System.currentTimeMillis() + 10000), new BidItem[]{new BidItem(shoes, new Amount(10))}, "give me shoes");
         SignedNamedObject receipt = process(builder);
         assertNotNull(receipt);
         assertTrue(receipt instanceof ExchangeOrderReceipt);
