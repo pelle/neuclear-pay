@@ -5,7 +5,7 @@ import org.neuclear.id.Identity;
 import org.neuclear.id.NamedObjectReader;
 import org.neuclear.id.SignedNamedObject;
 import org.neuclear.receiver.UnsupportedTransaction;
-import org.neudist.utils.NeudistException;
+import org.neuclear.commons.NeuClearException;
 
 import java.sql.Timestamp;
 
@@ -36,7 +36,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  * Time: 3:07:54 PM
  */
 public class TransferContract extends SignedNamedObject {
-    TransferContract(String name, Identity signer, Timestamp timestamp, String digest, String asset, String toaccount, double amount) throws NeudistException {
+    TransferContract(String name, Identity signer, Timestamp timestamp, String digest, String asset, String toaccount, double amount) throws NeuClearException {
         super(name, signer, timestamp, digest);
         this.asset = asset;
         this.amount = amount;
@@ -65,7 +65,7 @@ public class TransferContract extends SignedNamedObject {
          * @param elem
          * @return
          */
-        public SignedNamedObject read(Element elem, String name, Identity signatory, String digest, Timestamp timestamp) throws NeudistException {
+        public SignedNamedObject read(Element elem, String name, Identity signatory, String digest, Timestamp timestamp) throws NeuClearException {
             if (!(elem.getName().equals(TransferGlobals.XFER_TAGNAME) &&
                     elem.getNamespaceURI().equals(TransferGlobals.XFER_NSURI)))
                 throw new UnsupportedTransaction(null);

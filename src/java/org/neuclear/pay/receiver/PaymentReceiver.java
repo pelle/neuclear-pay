@@ -10,8 +10,9 @@ import org.neuclear.pay.contracts.TransferContract;
 import org.neuclear.pay.contracts.builders.TransferReceiptBuilder;
 import org.neuclear.receiver.Receiver;
 import org.neuclear.receiver.UnsupportedTransaction;
-import org.neudist.utils.NeudistException;
+import org.neuclear.commons.NeuClearException;
 import org.neudist.xml.ElementProxy;
+import org.neudist.xml.xmlsec.XMLSecurityException;
 
 import java.security.PrivateKey;
 
@@ -59,6 +60,7 @@ public class PaymentReceiver implements Receiver {
             TransferContract transfer = (TransferContract) obj;
             if (!transfer.getAsset().equals(asset))
                 throw new UnsupportedTransaction(obj);
+
             try {
                 Account from = proc.getAccount(transfer.getName());
                 Account to = proc.getAccount(transfer.getName());
@@ -71,7 +73,7 @@ public class PaymentReceiver implements Receiver {
                 throw new UnsupportedTransaction(obj);
             } catch (LowlevelLedgerException e) {
                 e.printStackTrace();
-            } catch (NeudistException e) {
+            } catch (NeuClearException e) {
                 e.printStackTrace();
             } catch (InsufficientFundsException e) {
                 e.printStackTrace();
@@ -80,6 +82,8 @@ public class PaymentReceiver implements Receiver {
             } catch (UnBalancedTransactionException e) {
                 e.printStackTrace();
             } catch (NegativePaymentException e) {
+                e.printStackTrace();
+            } catch (XMLSecurityException e) {
                 e.printStackTrace();
             }
 
