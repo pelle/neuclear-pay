@@ -57,7 +57,7 @@ if (!submit){
             comment
     ) ;
     SignatureRequestBuilder sigreq=new SignatureRequestBuilder(transfer,comment);
-    SignedNamedObject sig=sigreq.sign();
+//    SignedNamedObject sig=sigreq.sign();
 
 %>
 <form action="http://localhost:11870/Signer" method="POST">
