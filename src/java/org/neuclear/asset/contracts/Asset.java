@@ -9,6 +9,9 @@ import org.neuclear.xml.XMLTools;
 import org.neuclear.xml.xmlsec.XMLSecurityException;
 
 import java.security.PublicKey;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
+import java.util.Locale;
 
 /*
 NeuClear Distributed Transaction Clearing Platform
@@ -28,8 +31,12 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: Asset.java,v 1.20 2004/05/01 00:23:11 pelle Exp $
+$Id: Asset.java,v 1.21 2004/06/19 21:20:03 pelle Exp $
 $Log: Asset.java,v $
+Revision 1.21  2004/06/19 21:20:03  pelle
+Added TransferOrderServlet which is fully localized to Spanish and English
+Asset now has a getFormatter() method which returns a localized currency formatter for amounts of Asset.
+
 Revision 1.20  2004/05/01 00:23:11  pelle
 Added Ledger field to Transaction as well as to getBalance() and friends.
 
@@ -133,7 +140,7 @@ SOAPTools was changed to return a stream. This is required by the VerifyingReade
 
 /**
  * The assetName contains information about a tradeable Asset. The Asset is in itself a subclass of Identity, which
- * means that any transactions signed by it must be in the format of <tt>neu://assetname/1231q145452452345</tt>
+ * means that any transactions signed by it must be in the formatter of <tt>neu://assetname/1231q145452452345</tt>
  * where assetname is the unique NeuClear wide AssetCertificate.<p>
  * As a subclass of Identity you cant instantiate these classes your self, but must be gotten in this form:<p>
  * <tt>(Asset)NSResolver.resolveIdentity("neu://assetname");</tt><p>
@@ -205,6 +212,24 @@ public final class Asset extends Service {
 
     public String getUnits() {
         return units;
+    }
+
+    public NumberFormat getFormatter(Locale locale) {
+        NumberFormat format = NumberFormat.getCurrencyInstance(locale);
+
+        format.setMaximumFractionDigits(getDecimal());
+        format.setMinimumFractionDigits(getDecimal());
+        if (format instanceof DecimalFormat) {
+            DecimalFormat dec = (DecimalFormat) format;
+            String pattern = dec.toLocalizedPattern();
+            int loc = pattern.indexOf('\u00A4');
+            if (loc >= 0) {
+                final String p2 = pattern.substring(0, loc) + getUnits() + pattern.substring(loc + 1, pattern.length() - 1);
+                dec.applyLocalizedPattern(p2);
+//                System.out.println("New format: "+p2);
+            }
+        }
+        return format;
     }
 
     public static final class Reader implements NamedObjectReader {
