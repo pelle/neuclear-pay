@@ -24,8 +24,12 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: ExchangeAgentGlobals.java,v 1.1 2004/04/05 16:31:42 pelle Exp $
+$Id: ExchangeAgentGlobals.java,v 1.2 2004/04/20 17:47:18 pelle Exp $
 $Log: ExchangeAgentGlobals.java,v $
+Revision 1.2  2004/04/20 17:47:18  pelle
+Fixes to ExchangeAgent to make it work with html contracts
+CurrencyTests fail.
+
 Revision 1.1  2004/04/05 16:31:42  pelle
 Created new ServiceBuilder class for creating services. A service is an identity that has a seperate service URL and Service Public Key.
 
@@ -137,7 +141,7 @@ public final class ExchangeAgentGlobals {
         return DocumentHelper.createElement(createQName(name));
     }
 
-    public static final String EXCHANGEAGENT_TAGNAME = "ExchangeAgent";
+    public static final String EXCHANGEAGENT_TAGNAME = "exchange";
     public static final String EXAGENT_URI = "http://neuclear.org/neu/exchangeagent.xsd";
     public static final String EXA_NSPREFIX = "exa";
     public static final Namespace NS_EXAGENT = createNameSpace();

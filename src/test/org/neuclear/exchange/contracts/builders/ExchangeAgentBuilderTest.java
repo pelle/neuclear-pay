@@ -2,6 +2,7 @@ package org.neuclear.exchange.contracts.builders;
 
 import org.neuclear.commons.NeuClearException;
 import org.neuclear.exchange.contracts.ExchangeAgent;
+import org.neuclear.exchange.contracts.ExchangeAgentGlobals;
 import org.neuclear.id.SignedNamedObject;
 import org.neuclear.id.builders.Builder;
 import org.neuclear.tests.AbstractObjectCreationTest;
@@ -9,8 +10,12 @@ import org.neuclear.tests.AbstractObjectCreationTest;
 import java.security.GeneralSecurityException;
 
 /*
-$Id: ExchangeAgentBuilderTest.java,v 1.2 2004/04/17 19:28:01 pelle Exp $
+$Id: ExchangeAgentBuilderTest.java,v 1.3 2004/04/20 17:47:24 pelle Exp $
 $Log: ExchangeAgentBuilderTest.java,v $
+Revision 1.3  2004/04/20 17:47:24  pelle
+Fixes to ExchangeAgent to make it work with html contracts
+CurrencyTests fail.
+
 Revision 1.2  2004/04/17 19:28:01  pelle
 Identity is now fully html based as is the ServiceBuilder.
 VerifyingReader correctly identifies html files and parses them as such.
@@ -35,6 +40,7 @@ It now has Issuer, Service etc.
 public class ExchangeAgentBuilderTest extends AbstractObjectCreationTest {
     public ExchangeAgentBuilderTest(String string) throws NeuClearException, GeneralSecurityException {
         super(string);
+        ExchangeAgentGlobals.registerReaders();
     }
 
     protected void verifyObject(SignedNamedObject obj) throws Exception {
@@ -50,7 +56,7 @@ public class ExchangeAgentBuilderTest extends AbstractObjectCreationTest {
     }
 
     protected Builder createBuilder() throws Exception {
-        return new ExchangeAgentBuilder(URL, "bux",
+        return new ExchangeAgentBuilder("Exchange", URL,
                 getSigner().getPublicKey("neu://test/bux"));
     }
 

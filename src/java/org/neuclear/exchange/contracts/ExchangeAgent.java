@@ -1,9 +1,9 @@
 package org.neuclear.exchange.contracts;
 
+import org.dom4j.Attribute;
 import org.dom4j.Element;
 import org.neuclear.id.*;
 import org.neuclear.id.targets.Targets;
-import org.neuclear.xml.xmlsec.XMLSecTools;
 import org.neuclear.xml.xmlsec.XMLSecurityException;
 
 import java.security.PublicKey;
@@ -26,8 +26,12 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: ExchangeAgent.java,v 1.5 2004/04/05 16:31:42 pelle Exp $
+$Id: ExchangeAgent.java,v 1.6 2004/04/20 17:47:17 pelle Exp $
 $Log: ExchangeAgent.java,v $
+Revision 1.6  2004/04/20 17:47:17  pelle
+Fixes to ExchangeAgent to make it work with html contracts
+CurrencyTests fail.
+
 Revision 1.5  2004/04/05 16:31:42  pelle
 Created new ServiceBuilder class for creating services. A service is an identity that has a seperate service URL and Service Public Key.
 
@@ -70,16 +74,14 @@ public class ExchangeAgent extends Service {
          * @return
          */
         public final SignedNamedObject read(final SignedNamedCore core, final Element elem) throws InvalidNamedObjectException {
-            if (!elem.getNamespace().equals(ExchangeAgentGlobals.NS_EXAGENT))
-                throw new InvalidNamedObjectException(core.getName(), "Not in XML NameSpace: " + ExchangeAgentGlobals.NS_EXAGENT.getURI());
-            final Element serviceElement = InvalidNamedObjectException.assertContainsElementQName(core, elem, SignedNamedObject.createNEUIDQName("Service"));
-            final Element serviceKeyElement = InvalidNamedObjectException.assertContainsElementQName(core, serviceElement, XMLSecTools.createQName("KeyInfo"));
-            final Element serviceUrlElement = InvalidNamedObjectException.assertContainsElementQName(core, serviceElement, SignedNamedObject.createNEUIDQName("Url"));
+            final Element serviceKeyElement = InvalidNamedObjectException.assertContainsElementId(core, elem, "controller.publickey");
+            final Attribute url = (Attribute) elem.selectSingleNode("//html/head/link[starts-with(@rel,'neu:controller')]/@href");
+            if (url == null || url.getValue() == null)
+                throw new InvalidNamedObjectException(core.getName(), "Asset didnt contain a controller");
             try {
                 final PublicKey sPub = extractPublicKey(serviceKeyElement);
-                final String serviceurl = serviceUrlElement.getTextTrim();
                 final Targets targets = Targets.parseList(elem);
-                return new ExchangeAgent(core, serviceurl, sPub, targets);
+                return new ExchangeAgent(core, url.getValue(), sPub, targets);
             } catch (XMLSecurityException e) {
                 throw new InvalidNamedObjectException("invalid exchange agent xml");
             }

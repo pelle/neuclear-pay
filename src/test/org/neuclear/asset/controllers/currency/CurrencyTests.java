@@ -3,12 +3,14 @@ package org.neuclear.asset.controllers.currency;
 import org.neuclear.asset.Auditor;
 import org.neuclear.asset.InvalidTransferException;
 import org.neuclear.asset.contracts.Asset;
+import org.neuclear.asset.contracts.AssetGlobals;
 import org.neuclear.asset.contracts.builders.AssetBuilder;
 import org.neuclear.asset.orders.Amount;
 import org.neuclear.asset.orders.TransferReceipt;
 import org.neuclear.asset.orders.builders.TransferOrderBuilder;
 import org.neuclear.commons.NeuClearException;
 import org.neuclear.exchange.contracts.ExchangeAgent;
+import org.neuclear.exchange.contracts.ExchangeAgentGlobals;
 import org.neuclear.exchange.contracts.builders.ExchangeAgentBuilder;
 import org.neuclear.exchange.orders.BidItem;
 import org.neuclear.exchange.orders.CancelExchangeReceipt;
@@ -40,6 +42,8 @@ public class CurrencyTests extends AbstractSigningTest {
 
     public CurrencyTests(final String s) throws LowlevelLedgerException, GeneralSecurityException, NeuClearException {
         super(s);
+        AssetGlobals.registerReaders();
+        ExchangeAgentGlobals.registerReaders();
         asset = createTestAsset();
         shoes = createShoeAsset();
         agent = createTestExchangeAgent();
@@ -292,7 +296,9 @@ public class CurrencyTests extends AbstractSigningTest {
                 getSigner().getPublicKey("bux"),
                 getIssuer().getPublicKey(),
                 2, 0);
-        return (Asset) builder.convert("neu://test/bux", getSigner());
+        final SignedNamedObject object = builder.convert("ivan", getSigner());
+        System.out.println("Object type: " + object.getClass().getName());
+        return (Asset) object;
 
     }
 
