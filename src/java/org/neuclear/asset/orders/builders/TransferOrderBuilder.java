@@ -29,8 +29,11 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: TransferOrderBuilder.java,v 1.8 2004/04/28 00:22:28 pelle Exp $
+$Id: TransferOrderBuilder.java,v 1.9 2004/05/11 22:52:52 pelle Exp $
 $Log: TransferOrderBuilder.java,v $
+Revision 1.9  2004/05/11 22:52:52  pelle
+The update to ledger expectedly broke a few things around CurrencyController and friends. Most but not all is now fixed.
+
 Revision 1.8  2004/04/28 00:22:28  pelle
 Fixed the strange verification error
 Added bunch of new unit tests to support this.
@@ -154,7 +157,7 @@ TransferReceiptBuilder has been created for use by Transfer processors. It is us
  */
 public class TransferOrderBuilder extends Builder {
     public TransferOrderBuilder(final Service asset, final Signatory recipient, final Value amount, final String comment) throws InvalidTransferException, NegativeTransferException, NeuClearException {
-        this(asset.getName(), recipient.getName(), amount, comment);
+        this(asset.getDigest(), recipient.getName(), amount, comment);
     }
 
     public TransferOrderBuilder(final String assetname, final String recipient, final Value amount, final String comment) throws InvalidTransferException, NegativeTransferException, NeuClearException {

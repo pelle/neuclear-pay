@@ -34,8 +34,11 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: Auditor.java,v 1.1 2004/05/05 22:05:22 pelle Exp $
+$Id: Auditor.java,v 1.2 2004/05/11 22:52:48 pelle Exp $
 $Log: Auditor.java,v $
+Revision 1.2  2004/05/11 22:52:48  pelle
+The update to ledger expectedly broke a few things around CurrencyController and friends. Most but not all is now fixed.
+
 Revision 1.1  2004/05/05 22:05:22  pelle
 Moved the Auditor to its own package
 
@@ -211,7 +214,7 @@ public class Auditor implements Receiver {
 
     public final void process(final TransferOrder req) throws InvalidTransferException, LowLevelPaymentException {
         try {
-            ledger.transfer("CHANGEME", req.getDigest(), req.getSignatory().getName(), req.getRecipient(), req.getAmount().getAmount(), req.getComment());
+            ledger.transfer(req.getAsset().getDigest(), req.getDigest(), req.getSignatory().getName(), req.getRecipient(), req.getAmount().getAmount(), req.getComment());
         } catch (LowlevelLedgerException e) {
             throw new LowLevelPaymentException(e);
         } catch (InvalidTransactionException e) {
@@ -239,7 +242,7 @@ public class Auditor implements Receiver {
     public final void process(final IssueOrder req) throws InvalidTransferException, LowLevelPaymentException {
         try {
             if (req.getSignatory().getPublicKey().equals(asset.getIssuer()))
-                ledger.transfer("CHANGEME", req.getDigest(), req.getSignatory().getName(), req.getRecipient(), req.getAmount().getAmount(), req.getComment());
+                ledger.transfer(req.getAsset().getDigest(), req.getDigest(), req.getSignatory().getName(), req.getRecipient(), req.getAmount().getAmount(), req.getComment());
         } catch (LowlevelLedgerException e) {
             throw new LowLevelPaymentException(e);
         } catch (InvalidTransactionException e) {
@@ -264,7 +267,7 @@ public class Auditor implements Receiver {
 
     public final void process(final ExchangeOrder req) throws InvalidTransferException, LowLevelPaymentException {
         try {
-            ledger.hold("CHANGEME", req.getDigest(), req.getSignatory().getName(), req.getAgent().getSignatory().getName(), req.getExpiry(), req.getAmount().getAmount(), req.getComment());
+            ledger.hold(req.getAsset().getDigest(), req.getDigest(), req.getSignatory().getName(), req.getAgent().getSignatory().getName(), req.getExpiry(), req.getAmount().getAmount(), req.getComment());
         } catch (LowlevelLedgerException e) {
             throw new LowLevelPaymentException(e);
         } catch (InvalidTransactionException e) {
