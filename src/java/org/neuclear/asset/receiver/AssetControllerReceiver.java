@@ -60,6 +60,7 @@ public final class AssetControllerReceiver implements Receiver {
                 throw new UnsupportedTransaction(obj);
 
             try {
+                System.out.println("Processing: "+transfer.getName());
                 final NamedObjectBuilder sigReceipt = proc.process(transfer);
                 sigReceipt.sign(transfer.getAsset().getName(), signer);
                 return sigReceipt;
@@ -68,6 +69,7 @@ public final class AssetControllerReceiver implements Receiver {
                 throw new NeuClearException(e);
 
             } catch (TransferException e) {
+                System.out.println(e.getLocalizedMessage());
                 throw new NeuClearException(e);
             }
         } else

@@ -60,7 +60,7 @@ if (!submit){
 
 %>
 <form action="<%=userns.getSigner()%>" method="POST">
-<input name="base64xml" value="<%=Base64.encode(sig.getEncoded().getBytes())%>" type="hidden">
+<input name="neuclear-request" value="<%=Base64.encode(sig.getEncoded().getBytes())%>" type="hidden">
 <input name="endpoint" value="<%=ServletTools.getAbsoluteURL(request, "/Asset")%>" type="hidden">
 </form>
     Transfering to Signing Server
