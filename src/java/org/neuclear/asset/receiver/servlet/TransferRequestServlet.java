@@ -8,7 +8,7 @@ import org.neuclear.id.InvalidNamedObjectException;
 import org.neuclear.commons.NeuClearException;
 import org.neuclear.commons.Utility;
 import org.neuclear.commons.time.TimeTools;
-import org.neuclear.asset.contracts.builders.TransferRequestBuilder;
+import org.neuclear.asset.orders.builders.TransferRequestBuilder;
 import org.neuclear.asset.contracts.Asset;
 import org.neuclear.asset.InvalidTransferException;
 
@@ -32,8 +32,13 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: TransferRequestServlet.java,v 1.1 2003/12/20 00:17:41 pelle Exp $
+$Id: TransferRequestServlet.java,v 1.2 2004/01/05 23:47:09 pelle Exp $
 $Log: TransferRequestServlet.java,v $
+Revision 1.2  2004/01/05 23:47:09  pelle
+Create new Document classification "order", which is really just inherint in the new
+package layout.
+Got rid of much of the inheritance that was lying around and thought a bit further about the format of the exchange orders.
+
 Revision 1.1  2003/12/20 00:17:41  pelle
 overwrote the standard Object.toString(), hashCode() and equals() methods for SignedNamedObject/Core
 fixed cactus tests

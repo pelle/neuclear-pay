@@ -1,18 +1,12 @@
-package org.neuclear.asset.contracts.builders;
+package org.neuclear.exchange.orders.builders;
 
 import org.dom4j.Element;
 import org.neuclear.asset.InvalidTransferException;
 import org.neuclear.asset.NegativeTransferException;
 import org.neuclear.asset.contracts.Asset;
-import org.neuclear.asset.contracts.TransferGlobals;
-import org.neuclear.commons.NeuClearException;
-import org.neuclear.commons.Utility;
-import org.neuclear.commons.time.TimeTools;
-import org.neuclear.id.Identity;
-import org.neuclear.id.NSTools;
+import org.neuclear.asset.orders.transfers.TransferGlobals;
 import org.neuclear.id.builders.NamedObjectBuilder;
-
-import java.util.Date;
+import org.neuclear.commons.NeuClearException;
 
 /*
 NeuClear Distributed Transaction Clearing Platform
@@ -32,40 +26,35 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: TransferBuilder.java,v 1.9 2004/01/03 20:36:25 pelle Exp $
-$Log: TransferBuilder.java,v $
-Revision 1.9  2004/01/03 20:36:25  pelle
+$Id: CancelExchangeBuilder.java,v 1.1 2004/01/05 23:47:10 pelle Exp $
+$Log: CancelExchangeBuilder.java,v $
+Revision 1.1  2004/01/05 23:47:10  pelle
+Create new Document classification "order", which is really just inherint in the new
+package layout.
+Got rid of much of the inheritance that was lying around and thought a bit further about the format of the exchange orders.
+
+Revision 1.1  2004/01/03 20:36:25  pelle
 Renamed HeldTransfer to Exchange
 Dropped valuetime from the request objects.
 Doesnt yet compile. New commit to follow soon.
 
-Revision 1.8  2003/12/06 00:16:10  pelle
-Updated various areas in NSTools.
-Updated URI Validation in particular to support new expanded format
-Updated createUniqueID and friends to be a lot more unique and more efficient.
-In CryptoTools updated getRandom() to finally use a SecureRandom.
-Changed CryptoTools.getFormatURLSafe to getBase36 because that is what it really is.
-
-Revision 1.7  2003/11/28 00:11:50  pelle
-Getting the NeuClear web transactions working.
-
-Revision 1.6  2003/11/21 04:43:03  pelle
+Revision 1.4  2003/11/21 04:43:03  pelle
 EncryptedFileStore now works. It uses the PBECipher with DES3 afair.
 Otherwise You will Finaliate.
 Anything that can be final has been made final throughout everyting. We've used IDEA's Inspector tool to find all instance of variables that could be final.
 This should hopefully make everything more stable (and secure).
 
-Revision 1.5  2003/11/12 23:47:04  pelle
+Revision 1.3  2003/11/12 23:47:04  pelle
 Much work done in creating good test environment.
 PaymentReceiverTest works, but needs a abit more work in its environment to succeed testing.
 
-Revision 1.4  2003/11/11 21:17:19  pelle
+Revision 1.2  2003/11/11 21:17:19  pelle
 Further vital reshuffling.
 org.neudist.crypto.* and org.neudist.utils.* have been moved to respective areas under org.neuclear.commons
 org.neuclear.signers.* as well as org.neuclear.passphraseagents have been moved under org.neuclear.commons.crypto as well.
 Did a bit of work on the Canonicalizer and changed a few other minor bits.
 
-Revision 1.3  2003/11/10 17:42:07  pelle
+Revision 1.1  2003/11/10 17:42:07  pelle
 The AssetController interface has been more or less finalized.
 CurrencyController fully implemented
 AssetControlClient implementes a remote client for communicating with AssetControllers
@@ -99,23 +88,18 @@ TransferReceiptBuilder has been created for use by Transfer processors. It is us
  * Date: Oct 3, 2003
  * Time: 3:13:27 PM
  */
-public abstract class TransferBuilder extends NamedObjectBuilder {
-    protected TransferBuilder(final String tagname, final Asset asset, final Identity signer, final Identity to, final double amount, final String comment) throws InvalidTransferException, NegativeTransferException, NeuClearException {
-        super(NSTools.createUniqueTransactionID(signer.getName(), to.getName()), TransferGlobals.createQName(tagname));
-        if (amount < 0)
-            throw new NegativeTransferException(amount);
-        if (Utility.isEmpty(asset))
+public abstract class CancelExchangeBuilder extends NamedObjectBuilder {
+    protected CancelExchangeBuilder(final String tagname, final String name, final Asset asset, final String holdid) throws InvalidTransferException, NegativeTransferException, NeuClearException {
+        super(name, TransferGlobals.createQName(tagname));
+        if (asset == null)
             throw new InvalidTransferException("assetName");
-        if (to == null)
-            throw new InvalidTransferException("to");
+        if (holdid == null)
+            throw new InvalidTransferException("holdid");
 
         this.asset = asset;
         final Element element = getElement();
-        element.add(TransferGlobals.createAttribute(element, "recipient", to.getName()));
         element.add(TransferGlobals.createAttribute(element, "assetName", asset.getName()));
-        element.add(TransferGlobals.createAttribute(element, "amount", Double.toString(amount)));
-        if (!Utility.isEmpty(comment))
-            element.add(TransferGlobals.createElement("comment", comment));
+        element.add(TransferGlobals.createAttribute(element, "holdid", holdid));
     }
 
     public final Asset getAsset() {

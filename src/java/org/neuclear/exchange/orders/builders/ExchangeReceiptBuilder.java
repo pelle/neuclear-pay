@@ -1,15 +1,17 @@
-package org.neuclear.asset.contracts.builders;
+package org.neuclear.exchange.orders.builders;
 
 import org.dom4j.Element;
 import org.neuclear.asset.InvalidTransferException;
 import org.neuclear.asset.NegativeTransferException;
-import org.neuclear.asset.contracts.Asset;
-import org.neuclear.asset.contracts.TransferGlobals;
-import org.neuclear.id.Identity;
+import org.neuclear.asset.orders.builders.TransferBuilder;
+import org.neuclear.asset.orders.exchanges.ExchangeOrder;
+import org.neuclear.asset.orders.transfers.TransferGlobals;
+import org.neuclear.asset.orders.transfers.TransferGlobals;
+import org.neuclear.asset.orders.builders.TransferBuilder;
 import org.neuclear.commons.time.TimeTools;
 import org.neuclear.commons.NeuClearException;
 
-import java.util.Date;
+import java.sql.Timestamp;
 
 /*
 NeuClear Distributed Transaction Clearing Platform
@@ -29,8 +31,13 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: ExchangeRequestBuilder.java,v 1.1 2004/01/03 20:36:25 pelle Exp $
-$Log: ExchangeRequestBuilder.java,v $
+$Id: ExchangeReceiptBuilder.java,v 1.1 2004/01/05 23:47:10 pelle Exp $
+$Log: ExchangeReceiptBuilder.java,v $
+Revision 1.1  2004/01/05 23:47:10  pelle
+Create new Document classification "order", which is really just inherint in the new
+package layout.
+Got rid of much of the inheritance that was lying around and thought a bit further about the format of the exchange orders.
+
 Revision 1.1  2004/01/03 20:36:25  pelle
 Renamed HeldTransfer to Exchange
 Dropped valuetime from the request objects.
@@ -55,8 +62,8 @@ Got rid of neuclear-ledger like features of pay such as Account and Issuer.
 Accounts have been replaced by Identity from neuclear-id
 Issuer is now Asset which is a subclass of Identity
 AssetController supports more than one Asset. Which is important for most non ecurrency implementations.
-TransferRequest/Receipt and its Exchange companions are now SignedNamedObjects. Thus to create them you must use
-their matching TransferRequest/ReceiptBuilder classes.
+TransferOrder/Receipt and its Exchange companions are now SignedNamedObjects. Thus to create them you must use
+their matching TransferOrder/ReceiptBuilder classes.
 PaymentProcessor has been renamed CurrencyController. I will extract a superclass later to be named AbstractLedgerController
 which will handle all neuclear-ledger based AssetControllers.
 
@@ -65,16 +72,13 @@ which will handle all neuclear-ledger based AssetControllers.
 /**
  * User: pelleb
  * Date: Nov 7, 2003
- * Time: 7:59:13 PM
+ * Time: 8:05:15 PM
  */
-public final class ExchangeRequestBuilder extends TransferBuilder {
-
-    public ExchangeRequestBuilder(final Asset asset, final Identity signer, final Identity agent, final double amount,  final String comment, final Date helduntil) throws InvalidTransferException, NegativeTransferException, NeuClearException {
-        super(TransferGlobals.HELD_XFER_TAGNAME, asset, signer, agent, amount,  comment);
+public final class ExchangeReceiptBuilder extends TransferBuilder {
+    public ExchangeReceiptBuilder(final ExchangeOrder req, final String id,Timestamp valuetime) throws InvalidTransferException, NegativeTransferException, NeuClearException {
+        super(TransferGlobals.HELD_XFER_RCPT_TAGNAME, req.getAsset(),req.getAsset(),req.getAmount());
         final Element element = getElement();
-        element.add(TransferGlobals.createAttribute(element, "helduntil", TimeTools.formatTimeStamp(helduntil)));
-        element.add(TransferGlobals.createAttribute(element, "agent", agent.getName()));
-
+        element.add(TransferGlobals.createAttribute(element, "helduntil", TimeTools.formatTimeStamp(req.getValidTo())));
 
     }
 }

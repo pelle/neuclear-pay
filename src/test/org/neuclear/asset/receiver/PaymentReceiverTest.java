@@ -1,11 +1,14 @@
 package org.neuclear.asset.receiver;
 
 import org.neuclear.asset.InvalidTransferException;
+import org.neuclear.asset.orders.transfers.TransferGlobals;
 import org.neuclear.asset.contracts.Asset;
 import org.neuclear.asset.contracts.AssetGlobals;
-import org.neuclear.asset.contracts.TransferGlobals;
-import org.neuclear.asset.contracts.TransferRequest;
-import org.neuclear.asset.contracts.builders.TransferRequestBuilder;
+import org.neuclear.asset.orders.TransferGlobals;
+import org.neuclear.asset.orders.TransferOrder;
+import org.neuclear.asset.orders.TransferOrder;
+import org.neuclear.asset.orders.builders.TransferRequestBuilder;
+import org.neuclear.asset.orders.builders.TransferRequestBuilder;
 import org.neuclear.asset.controllers.currency.CurrencyController;
 import org.neuclear.commons.NeuClearException;
 import org.neuclear.commons.sql.DefaultConnectionSource;
@@ -45,8 +48,13 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: PaymentReceiverTest.java,v 1.11 2004/01/03 20:36:26 pelle Exp $
+$Id: PaymentReceiverTest.java,v 1.12 2004/01/05 23:47:10 pelle Exp $
 $Log: PaymentReceiverTest.java,v $
+Revision 1.12  2004/01/05 23:47:10  pelle
+Create new Document classification "order", which is really just inherint in the new
+package layout.
+Got rid of much of the inheritance that was lying around and thought a bit further about the format of the exchange orders.
+
 Revision 1.11  2004/01/03 20:36:26  pelle
 Renamed HeldTransfer to Exchange
 Dropped valuetime from the request objects.
@@ -68,7 +76,7 @@ Getting the NeuClear web transactions working.
 Revision 1.7  2003/11/22 00:22:29  pelle
 All unit tests in commons, id and xmlsec now work.
 AssetController now successfully processes payments in the unit test.
-Payment Web App has working form that creates a TransferRequest presents it to the signer
+Payment Web App has working form that creates a TransferOrder presents it to the signer
 and forwards it to AssetControlServlet. (Which throws an XML Parser Exception) I think the XMLReaderServlet is bust.
 
 Revision 1.6  2003/11/21 04:43:04  pelle
@@ -111,8 +119,8 @@ Got rid of neuclear-ledger like features of pay such as Account and Issuer.
 Accounts have been replaced by Identity from neuclear-id
 Issuer is now Asset which is a subclass of Identity
 AssetController supports more than one Asset. Which is important for most non ecurrency implementations.
-TransferRequest/Receipt and its Exchange companions are now SignedNamedObjects. Thus to create them you must use
-their matching TransferRequest/ReceiptBuilder classes.
+TransferOrder/Receipt and its Exchange companions are now SignedNamedObjects. Thus to create them you must use
+their matching TransferOrder/ReceiptBuilder classes.
 PaymentProcessor has been renamed CurrencyController. I will extract a superclass later to be named AbstractLedgerController
 which will handle all neuclear-ledger based AssetControllers.
 
@@ -188,8 +196,8 @@ public final class PaymentReceiverTest extends AbstractSigningTest {
 
     public final Object getPreTransactionState(final SignedNamedObject obj) throws Exception {
 
-        if (obj instanceof TransferRequest) {
-            final TransferRequest transfer = (TransferRequest) obj;
+        if (obj instanceof TransferOrder) {
+            final TransferOrder transfer = (TransferOrder) obj;
             final double fromBalance = proc.getBalance(transfer.getFrom(), transfer.getTimeStamp());
             final double toBalance = proc.getBalance(transfer.getTo(), transfer.getTimeStamp());
 
@@ -200,8 +208,8 @@ public final class PaymentReceiverTest extends AbstractSigningTest {
     }
 
     public final boolean verifyTransaction(final SignedNamedObject obj, final Object state) throws Exception {
-        if (obj instanceof TransferRequest) {
-            final TransferRequest transfer = (TransferRequest) obj;
+        if (obj instanceof TransferOrder) {
+            final TransferOrder transfer = (TransferOrder) obj;
             final double fromBalance = proc.getBalance(transfer.getFrom(), transfer.getTimeStamp());
             final double toBalance = proc.getBalance(transfer.getTo(), transfer.getTimeStamp());
             final double prebalances[] = (double[]) state;

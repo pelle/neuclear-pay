@@ -1,7 +1,9 @@
-package org.neuclear.asset.contracts;
+package org.neuclear.asset.orders;
 
 import org.dom4j.*;
 import org.neuclear.id.verifier.VerifyingReader;
+import org.neuclear.asset.orders.AssetTransactionContract;
+import org.neuclear.asset.orders.AssetTransactionContract;
 
 /*
 NeuClear Distributed Transaction Clearing Platform
@@ -21,8 +23,13 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: TransferGlobals.java,v 1.6 2004/01/03 20:36:25 pelle Exp $
+$Id: TransferGlobals.java,v 1.1 2004/01/05 23:47:09 pelle Exp $
 $Log: TransferGlobals.java,v $
+Revision 1.1  2004/01/05 23:47:09  pelle
+Create new Document classification "order", which is really just inherint in the new
+package layout.
+Got rid of much of the inheritance that was lying around and thought a bit further about the format of the exchange orders.
+
 Revision 1.6  2004/01/03 20:36:25  pelle
 Renamed HeldTransfer to Exchange
 Dropped valuetime from the request objects.
@@ -34,7 +41,7 @@ Getting the NeuClear web transactions working.
 Revision 1.4  2003/11/22 00:22:28  pelle
 All unit tests in commons, id and xmlsec now work.
 AssetController now successfully processes payments in the unit test.
-Payment Web App has working form that creates a TransferRequest presents it to the signer
+Payment Web App has working form that creates a TransferOrder presents it to the signer
 and forwards it to AssetControlServlet. (Which throws an XML Parser Exception) I think the XMLReaderServlet is bust.
 
 Revision 1.3  2003/11/21 04:43:04  pelle
@@ -122,10 +129,10 @@ public final class TransferGlobals {
         registerReaders();
     }
 
-    public static final String XFER_TAGNAME = "TransferRequest";
+    public static final String XFER_TAGNAME = "TransferOrder";
     public static final String XFER_RCPT_TAGNAME = "TransferReceipt";
-    public static final String HELD_XFER_TAGNAME = "ExchangeRequest";
-    public static final String HELD_XFER_RCPT_TAGNAME = "ExchangeReceipt";
+    public static final String HELD_XFER_TAGNAME = "ExchangeOrder";
+    public static final String HELD_XFER_RCPT_TAGNAME = "ExchangeOrderReceipt";
     public static final String COMPLETE_TAGNAME = "CompleteHoldRequest";
     public static final String CANCEL_TAGNAME = "CancelHoldRequest";
     public static final String CANCEL_RCPT_TAGNAME = "CancelHoldReceipt";

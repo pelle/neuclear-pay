@@ -1,8 +1,9 @@
 package org.neuclear.asset;
 
 
-import org.neuclear.asset.contracts.ExchangeReceipt;
-import org.neuclear.asset.contracts.CompleteExchangeRequest;
+import org.neuclear.exchange.orders.ExchangeOrderReceipt;
+import org.neuclear.exchange.orders.ExchangeCompletionOrder;
+import org.neuclear.exchange.orders.ExchangeCompletionOrder;
 
 /**
  * User: pelleb
@@ -10,17 +11,17 @@ import org.neuclear.asset.contracts.CompleteExchangeRequest;
  * Time: 11:38:10 AM
  */
 public final class TransferLargerThanHeldException extends InvalidTransferException {
-    public TransferLargerThanHeldException(final CompleteExchangeRequest complete,final double amount) {
+    public TransferLargerThanHeldException(final ExchangeCompletionOrder complete,final double amount) {
         super("amount too large");
         this.complete = complete;
         this.amount=amount;
 
     }
 
-    private final CompleteExchangeRequest complete;
+    private final ExchangeCompletionOrder complete;
     private final double amount;
 
-    public final CompleteExchangeRequest getRequest() {
+    public final ExchangeCompletionOrder getRequest() {
         return complete;
     }
 

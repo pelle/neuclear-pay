@@ -3,8 +3,8 @@ package org.neuclear.asset.controllers.currency;
 import junit.framework.TestCase;
 import org.neuclear.asset.*;
 import org.neuclear.asset.controllers.currency.CurrencyController;
-import org.neuclear.asset.contracts.ExchangeReceipt;
-import org.neuclear.asset.contracts.TransferReceipt;
+import org.neuclear.exchange.orders.ExchangeOrderReceipt;
+import org.neuclear.asset.orders.TransferReceipt;
 import org.neuclear.commons.configuration.ConfigurationException;
 import org.neuclear.ledger.*;
 
@@ -107,7 +107,7 @@ public final class CurrencyTests extends TestCase {
         proc.getIssuer().issue(bob, initial, t1);
         assertEquals(bob.getBalance(t1), initial, 0);
 
-        ExchangeReceipt hold = bob.hold(alice, payment, t2, t4, "Test Hold");
+        ExchangeOrderReceipt hold = bob.hold(alice, payment, t2, t4, "Test Hold");
         assertEquals(bob.getBalance(t2), initial, 0);
         assertEquals(bob.getBalance(t3), initial, 0);
         assertEquals(bob.getBalance(t4), initial, 0);

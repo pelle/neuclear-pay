@@ -1,7 +1,9 @@
 package org.neuclear.asset;
 
-import org.neuclear.asset.contracts.Exchange;
-import org.neuclear.asset.contracts.CompleteExchangeRequest;
+import org.neuclear.asset.orders.exchanges.Exchange;
+import org.neuclear.exchange.orders.ExchangeCompletionOrder;
+import org.neuclear.exchange.orders.ExchangeCompletionOrder;
+import org.neuclear.exchange.orders.ExchangeCompletionOrder;
 
 import java.util.Date;
 
@@ -11,14 +13,14 @@ import java.util.Date;
  * Time: 11:38:10 AM
  */
 public final class ExpiredHeldTransferException extends InvalidTransferException {
-    public ExpiredHeldTransferException(final CompleteExchangeRequest held) {
+    public ExpiredHeldTransferException(final ExchangeCompletionOrder held) {
         super("expired");
         this.held = held;
     }
 
-    private final CompleteExchangeRequest held;
+    private final ExchangeCompletionOrder held;
 
-    public CompleteExchangeRequest getRequest() {
+    public ExchangeCompletionOrder getRequest() {
         return held;
     }
 

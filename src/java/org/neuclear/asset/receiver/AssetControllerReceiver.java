@@ -2,6 +2,10 @@ package org.neuclear.asset.receiver;
 
 import org.neuclear.asset.AssetController;
 import org.neuclear.asset.TransferException;
+import org.neuclear.asset.orders.transfers.TransferGlobals;
+import org.neuclear.asset.orders.AssetTransactionContract;
+import org.neuclear.asset.orders.TransferContract;
+import org.neuclear.asset.orders.*;
 import org.neuclear.asset.contracts.*;
 import org.neuclear.commons.NeuClearException;
 import org.neuclear.commons.crypto.signers.Signer;
@@ -83,7 +87,7 @@ public final class AssetControllerReceiver implements Receiver {
         // Registers the readers for transfers
         VerifyingReader.getInstance().registerReader(TransferGlobals.XFER_TAGNAME, new TransferContract.Reader());
         VerifyingReader.getInstance().registerReader(TransferGlobals.COMPLETE_TAGNAME, new TransferContract.Reader());
-        VerifyingReader.getInstance().registerReader(TransferGlobals.CANCEL_TAGNAME, new TransferContract.Reader());
+        VerifyingReader.getInstance().registerReader(org.neuclear.asset.orders.TransferGlobals.CANCEL_TAGNAME, new TransferContract.Reader());
         VerifyingReader.getInstance().registerReader(TransferGlobals.XFER_RCPT_TAGNAME, new TransferContract.Reader());
         VerifyingReader.getInstance().registerReader(TransferGlobals.HELD_XFER_TAGNAME, new TransferContract.Reader());
         VerifyingReader.getInstance().registerReader(TransferGlobals.HELD_XFER_RCPT_TAGNAME, new TransferContract.Reader());

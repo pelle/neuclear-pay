@@ -1,9 +1,12 @@
-package org.neuclear.asset.contracts.builders;
+package org.neuclear.exchange.orders.builders;
 
 import org.neuclear.asset.InvalidTransferException;
 import org.neuclear.asset.NegativeTransferException;
-import org.neuclear.asset.contracts.CancelExchangeRequest;
-import org.neuclear.asset.contracts.TransferGlobals;
+import org.neuclear.exchange.orders.ExchangeOrderReceipt;
+import org.neuclear.exchange.orders.ExchangeOrderReceipt;
+import org.neuclear.exchange.orders.builders.CancelExchangeBuilder;
+import org.neuclear.asset.orders.transfers.TransferGlobals;
+import org.neuclear.asset.orders.transfers.TransferGlobals;
 import org.neuclear.commons.NeuClearException;
 import org.neuclear.id.NSTools;
 
@@ -12,8 +15,13 @@ import org.neuclear.id.NSTools;
  * User: pelleb
  * Date: Nov 10, 2003
  * Time: 10:46:12 AM
- * $Id: CancelExchangeReceiptBuilder.java,v 1.1 2004/01/03 20:36:25 pelle Exp $
- * $Log: CancelExchangeReceiptBuilder.java,v $
+ * $Id: CancelExchangeRequestBuilder.java,v 1.1 2004/01/05 23:47:10 pelle Exp $
+ * $Log: CancelExchangeRequestBuilder.java,v $
+ * Revision 1.1  2004/01/05 23:47:10  pelle
+ * Create new Document classification "order", which is really just inherint in the new
+ * package layout.
+ * Got rid of much of the inheritance that was lying around and thought a bit further about the format of the exchange orders.
+ *
  * Revision 1.1  2004/01/03 20:36:25  pelle
  * Renamed HeldTransfer to Exchange
  * Dropped valuetime from the request objects.
@@ -37,9 +45,9 @@ import org.neuclear.id.NSTools;
  * CurrencyController fully implemented
  * AssetControlClient implementes a remote client for communicating with AssetControllers
  */
-public final class CancelExchangeReceiptBuilder extends CancelExchangeBuilder {
-    public CancelExchangeReceiptBuilder(final CancelExchangeRequest req) throws InvalidTransferException, NegativeTransferException, NeuClearException {
-        super(NSTools.createUniqueTransactionID(req.getAsset().getName(), req.getSignatory().getName()), TransferGlobals.CANCEL_RCPT_TAGNAME, req.getAsset(), req.getHoldId());
+public final class CancelExchangeRequestBuilder extends CancelExchangeBuilder {
+    public CancelExchangeRequestBuilder(final ExchangeOrderReceipt held) throws InvalidTransferException, NegativeTransferException, NeuClearException {
+        super(NSTools.createUniqueTransactionID(held.getAgent().getName(), held.getAsset().getName()), TransferGlobals.CANCEL_TAGNAME, held.getAsset(), held.getName());
     }
 
 }

@@ -1,8 +1,9 @@
 package org.neuclear.asset;
 
-import org.neuclear.asset.contracts.TransferRequest;
-import org.neuclear.asset.contracts.CancelExchangeRequest;
-import org.neuclear.asset.contracts.AssetTransactionContract;
+import org.neuclear.asset.orders.TransferOrder;
+import org.neuclear.exchange.orders.CancelExchangeOrder;
+import org.neuclear.asset.orders.AssetTransactionContract;
+import org.neuclear.exchange.orders.CancelExchangeOrder;
 import org.neuclear.id.SignedNamedObject;
 
 /*
@@ -23,8 +24,13 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: TransferDeniedException.java,v 1.5 2004/01/03 20:36:26 pelle Exp $
+$Id: TransferDeniedException.java,v 1.6 2004/01/05 23:47:10 pelle Exp $
 $Log: TransferDeniedException.java,v $
+Revision 1.6  2004/01/05 23:47:10  pelle
+Create new Document classification "order", which is really just inherint in the new
+package layout.
+Got rid of much of the inheritance that was lying around and thought a bit further about the format of the exchange orders.
+
 Revision 1.5  2004/01/03 20:36:26  pelle
 Renamed HeldTransfer to Exchange
 Dropped valuetime from the request objects.
@@ -48,8 +54,8 @@ Got rid of neuclear-ledger like features of pay such as Account and Issuer.
 Accounts have been replaced by Identity from neuclear-id
 Issuer is now Asset which is a subclass of Identity
 AssetController supports more than one Asset. Which is important for most non ecurrency implementations.
-TransferRequest/Receipt and its Exchange companions are now SignedNamedObjects. Thus to create them you must use
-their matching TransferRequest/ReceiptBuilder classes.
+TransferOrder/Receipt and its Exchange companions are now SignedNamedObjects. Thus to create them you must use
+their matching TransferOrder/ReceiptBuilder classes.
 PaymentProcessor has been renamed CurrencyController. I will extract a superclass later to be named AbstractLedgerController
 which will handle all neuclear-ledger based AssetControllers.
 
@@ -71,7 +77,7 @@ public final class TransferDeniedException extends TransferException {
     public TransferDeniedException(final AssetTransactionContract req) {
         this.req = req;
     }
-    public TransferDeniedException(final CancelExchangeRequest req) {
+    public TransferDeniedException(final CancelExchangeOrder req) {
         this.req = req;
     }
 

@@ -1,4 +1,4 @@
-package org.neuclear.asset.contracts;
+package org.neuclear.asset.orders;
 
 import org.dom4j.Element;
 import org.neuclear.commons.NeuClearException;
@@ -7,6 +7,13 @@ import org.neuclear.commons.time.TimeTools;
 import org.neuclear.id.*;
 import org.neuclear.id.resolver.NSResolver;
 import org.neuclear.receiver.UnsupportedTransaction;
+import org.neuclear.asset.orders.exchanges.*;
+import org.neuclear.asset.contracts.Asset;
+import org.neuclear.asset.contracts.AssetGlobals;
+import org.neuclear.exchange.orders.CancelExchangeOrder;
+import org.neuclear.exchange.orders.CancelExchangeReceipt;
+import org.neuclear.exchange.orders.ExchangeCompletionOrder;
+import org.neuclear.exchange.orders.ExchangeOrderReceipt;
 
 import java.util.Date;
 import java.text.ParseException;
@@ -16,8 +23,13 @@ import java.text.ParseException;
  * User: pelleb
  * Date: Nov 10, 2003
  * Time: 11:06:37 AM
- * $Id: AssetTransactionContract.java,v 1.11 2004/01/03 20:36:25 pelle Exp $
+ * $Id: AssetTransactionContract.java,v 1.1 2004/01/05 23:47:09 pelle Exp $
  * $Log: AssetTransactionContract.java,v $
+ * Revision 1.1  2004/01/05 23:47:09  pelle
+ * Create new Document classification "order", which is really just inherint in the new
+ * package layout.
+ * Got rid of much of the inheritance that was lying around and thought a bit further about the format of the exchange orders.
+ *
  * Revision 1.11  2004/01/03 20:36:25  pelle
  * Renamed HeldTransfer to Exchange
  * Dropped valuetime from the request objects.
@@ -44,7 +56,7 @@ import java.text.ParseException;
  * Revision 1.7  2003/11/22 00:22:28  pelle
  * All unit tests in commons, id and xmlsec now work.
  * AssetController now successfully processes payments in the unit test.
- * Payment Web App has working form that creates a TransferRequest presents it to the signer
+ * Payment Web App has working form that creates a TransferOrder presents it to the signer
  * and forwards it to AssetControlServlet. (Which throws an XML Parser Exception) I think the XMLReaderServlet is bust.
  * <p/>
  * Revision 1.6  2003/11/21 04:43:04  pelle
@@ -80,10 +92,10 @@ import java.text.ParseException;
  * CurrencyController fully implemented
  * AssetControlClient implementes a remote client for communicating with AssetControllers
  */
-public class AssetTransactionContract extends SignedNamedObject {
+public abstract class AssetTransactionContract extends SignedNamedObject {
     private final Asset asset;
 
-    AssetTransactionContract(final SignedNamedCore core, final Asset asset)  {
+    protected AssetTransactionContract(final SignedNamedCore core, final Asset asset)  {
         super(core);
         this.asset = asset;
     }
@@ -110,7 +122,7 @@ public class AssetTransactionContract extends SignedNamedObject {
 
                 final String holdid = elem.attributeValue("holdid");
                 if (elem.getName().equals(TransferGlobals.CANCEL_TAGNAME))
-                    return new CancelExchangeRequest(core, asset, holdid);
+                    return new CancelExchangeOrder(core, asset, holdid);
                 if (elem.getName().equals(TransferGlobals.CANCEL_RCPT_TAGNAME))
                     return new CancelExchangeReceipt(core, asset, holdid);
 
@@ -121,13 +133,13 @@ public class AssetTransactionContract extends SignedNamedObject {
 
                 final String comment = (commentElement != null) ? commentElement.getText() : "";
                 if (elem.getName().equals(TransferGlobals.XFER_TAGNAME))
-                    return new TransferRequest(core, asset, to, amount,  comment);
+                    return new TransferOrder(core, asset, to, amount,  comment);
 
                 Date helduntil = null;
                 if (!Utility.isEmpty(elem.attributeValue("valuetime")))
                     helduntil = TimeTools.parseTimeStamp(elem.attributeValue("valuetime"));
                 if (elem.getName().equals(TransferGlobals.HELD_XFER_TAGNAME))
-                    return new ExchangeRequest(core, asset, to, amount,  comment, helduntil);
+                    return new ExchangeOrder(core, asset, to, amount,  comment, helduntil);
 
                 final Identity from = NSResolver.resolveIdentity(elem.attributeValue("sender"));
                 final String reqid = elem.attributeValue("reqid");
@@ -135,10 +147,10 @@ public class AssetTransactionContract extends SignedNamedObject {
                     return new TransferReceipt(core, asset, from, to, reqid, amount, valuetime, comment);
 
                 if (elem.getName().equals(TransferGlobals.HELD_XFER_RCPT_TAGNAME))
-                    return new ExchangeReceipt(core, asset, from, to, reqid, amount, valuetime, comment, helduntil);
+                    return new ExchangeOrderReceipt(core, asset, from, to, reqid, amount, valuetime, comment, helduntil);
 
                 if (elem.getName().equals(TransferGlobals.COMPLETE_TAGNAME))
-                    return new CompleteExchangeRequest(core, asset, from, to, amount, valuetime, comment, holdid);
+                    return new ExchangeCompletionOrder(core, asset, from, to, amount, valuetime, comment, holdid);
             } catch (ParseException e) {
                 throw new InvalidNamedObjectException(core.getName(),e);
             } catch (NameResolutionException e) {

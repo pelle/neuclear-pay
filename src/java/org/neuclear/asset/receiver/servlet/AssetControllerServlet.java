@@ -2,9 +2,10 @@ package org.neuclear.asset.receiver.servlet;
 
 import org.neuclear.asset.contracts.Asset;
 import org.neuclear.asset.contracts.AssetGlobals;
-import org.neuclear.asset.contracts.TransferGlobals;
+import org.neuclear.asset.orders.transfers.TransferGlobals;
 import org.neuclear.asset.controllers.currency.CurrencyController;
 import org.neuclear.asset.receiver.AssetControllerReceiver;
+import org.neuclear.asset.orders.transfers.TransferGlobals;
 import org.neuclear.commons.crypto.signers.TestCaseSigner;
 import org.neuclear.commons.sql.JNDIConnectionSource;
 import org.neuclear.commons.sql.statements.SimpleStatementFactory;
@@ -34,8 +35,13 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: AssetControllerServlet.java,v 1.8 2004/01/02 23:18:06 pelle Exp $
+$Id: AssetControllerServlet.java,v 1.9 2004/01/05 23:47:09 pelle Exp $
 $Log: AssetControllerServlet.java,v $
+Revision 1.9  2004/01/05 23:47:09  pelle
+Create new Document classification "order", which is really just inherint in the new
+package layout.
+Got rid of much of the inheritance that was lying around and thought a bit further about the format of the exchange orders.
+
 Revision 1.8  2004/01/02 23:18:06  pelle
 Added StatementFactory pattern and refactored the ledger to use it.
 
@@ -57,7 +63,7 @@ Will release shortly.
 Revision 1.4  2003/11/22 00:22:28  pelle
 All unit tests in commons, id and xmlsec now work.
 AssetController now successfully processes payments in the unit test.
-Payment Web App has working form that creates a TransferRequest presents it to the signer
+Payment Web App has working form that creates a TransferOrder presents it to the signer
 and forwards it to AssetControlServlet. (Which throws an XML Parser Exception) I think the XMLReaderServlet is bust.
 
 Revision 1.3  2003/11/21 04:43:04  pelle

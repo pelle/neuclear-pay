@@ -1,9 +1,18 @@
 package org.neuclear.asset;
 
 import org.neuclear.asset.contracts.*;
-import org.neuclear.asset.contracts.builders.CancelExchangeReceiptBuilder;
+import org.neuclear.exchange.orders.builders.CancelExchangeReceiptBuilder;
+import org.neuclear.asset.orders.exchanges.ExchangeOrder;
+import org.neuclear.asset.orders.AssetTransactionContract;
+import org.neuclear.asset.orders.TransferOrder;
+import org.neuclear.asset.orders.AssetTransactionContract;
+import org.neuclear.asset.orders.TransferOrder;
 import org.neuclear.commons.NeuClearException;
 import org.neuclear.id.builders.NamedObjectBuilder;
+import org.neuclear.exchange.orders.CancelExchangeOrder;
+import org.neuclear.exchange.orders.ExchangeCompletionOrder;
+import org.neuclear.exchange.orders.*;
+import org.neuclear.exchange.orders.builders.CancelExchangeReceiptBuilder;
 
 /*
 NeuClear Distributed Transaction Clearing Platform
@@ -23,8 +32,13 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: AssetController.java,v 1.9 2004/01/03 20:36:25 pelle Exp $
+$Id: AssetController.java,v 1.10 2004/01/05 23:47:10 pelle Exp $
 $Log: AssetController.java,v $
+Revision 1.10  2004/01/05 23:47:10  pelle
+Create new Document classification "order", which is really just inherint in the new
+package layout.
+Got rid of much of the inheritance that was lying around and thought a bit further about the format of the exchange orders.
+
 Revision 1.9  2004/01/03 20:36:25  pelle
 Renamed HeldTransfer to Exchange
 Dropped valuetime from the request objects.
@@ -33,7 +47,7 @@ Doesnt yet compile. New commit to follow soon.
 Revision 1.8  2003/11/22 00:22:29  pelle
 All unit tests in commons, id and xmlsec now work.
 AssetController now successfully processes payments in the unit test.
-Payment Web App has working form that creates a TransferRequest presents it to the signer
+Payment Web App has working form that creates a TransferOrder presents it to the signer
 and forwards it to AssetControlServlet. (Which throws an XML Parser Exception) I think the XMLReaderServlet is bust.
 
 Revision 1.7  2003/11/21 04:43:04  pelle
@@ -65,8 +79,8 @@ Got rid of neuclear-ledger like features of pay such as Account and Issuer.
 Accounts have been replaced by Identity from neuclear-id
 Issuer is now Asset which is a subclass of Identity
 AssetController supports more than one Asset. Which is important for most non ecurrency implementations.
-TransferRequest/Receipt and its Exchange companions are now SignedNamedObjects. Thus to create them you must use
-their matching TransferRequest/ReceiptBuilder classes.
+TransferOrder/Receipt and its Exchange companions are now SignedNamedObjects. Thus to create them you must use
+their matching TransferOrder/ReceiptBuilder classes.
 PaymentProcessor has been renamed CurrencyController. I will extract a superclass later to be named AbstractLedgerController
 which will handle all neuclear-ledger based AssetControllers.
 
@@ -98,14 +112,14 @@ public abstract class AssetController {
      * @throws InvalidTransferException 
      */
     public final NamedObjectBuilder process(final AssetTransactionContract contract) throws TransferDeniedException, LowLevelPaymentException, InvalidTransferException, NeuClearException {
-        if (contract instanceof TransferRequest)
-            return process((TransferRequest) contract);
-        if (contract instanceof ExchangeRequest)
-            return process((ExchangeRequest) contract);
-        if (contract instanceof CompleteExchangeRequest)
-            return process((CompleteExchangeRequest) contract);
-        if (contract instanceof CancelExchangeRequest)
-            return process((CancelExchangeRequest) contract);
+        if (contract instanceof TransferOrder)
+            return process((TransferOrder) contract);
+        if (contract instanceof org.neuclear.exchange.orders.ExchangeOrder)
+            return process((ExchangeOrder) contract);
+        if (contract instanceof ExchangeCompletionOrder)
+            return process((ExchangeCompletionOrder) contract);
+        if (contract instanceof CancelExchangeOrder)
+            return process((CancelExchangeOrder) contract);
 
         return null;
     }
@@ -122,26 +136,26 @@ public abstract class AssetController {
     /**
      * Performs an assetName transfer.
      * 
-     * @param req TransferRequest
+     * @param req TransferOrder
      * @return Unsigned Receipt
      * @throws LowLevelPaymentException 
      * @throws TransferDeniedException  
      * @throws InvalidTransferException 
      */
-    public abstract org.neuclear.asset.contracts.builders.TransferReceiptBuilder process(TransferRequest req) throws LowLevelPaymentException, TransferDeniedException, InvalidTransferException, NeuClearException;
+    public abstract org.neuclear.asset.orders.builders.TransferReceiptBuilder process(TransferOrder req) throws LowLevelPaymentException, TransferDeniedException, InvalidTransferException, NeuClearException;
 
     /**
      * Creates a HeldTransfer. This gives the recipient right within a limited period to "complete" the Transfer.
      * Completion means performing the actual transfer with an amount up to but not greater than the amount set in the
      * HeldTransfer Object.
      * 
-     * @param req Valid ExchangeRequest
+     * @param req Valid ExchangeOrder
      * @return Unsigned ExchangeReceiptBuilder
      * @throws LowLevelPaymentException 
      * @throws TransferDeniedException  
      * @throws InvalidTransferException 
      */
-    public abstract org.neuclear.asset.contracts.builders.ExchangeReceiptBuilder process(ExchangeRequest req) throws LowLevelPaymentException, TransferDeniedException, InvalidTransferException, NeuClearException;
+    public abstract org.neuclear.exchange.orders.builders.ExchangeReceiptBuilder process(ExchangeOrder req) throws LowLevelPaymentException, TransferDeniedException, InvalidTransferException, NeuClearException;
 
     /**
      * Completes a HeldTransfer. This must be signed by the recipient of the HeldTransfer.
@@ -152,7 +166,7 @@ public abstract class AssetController {
      * @throws TransferDeniedException  
      * @throws InvalidTransferException 
      */
-    public abstract org.neuclear.asset.contracts.builders.TransferReceiptBuilder process(CompleteExchangeRequest complete) throws LowLevelPaymentException, TransferDeniedException, InvalidTransferException, NeuClearException;
+    public abstract org.neuclear.asset.orders.builders.TransferReceiptBuilder process(ExchangeCompletionOrder complete) throws LowLevelPaymentException, TransferDeniedException, InvalidTransferException, NeuClearException;
 
     /**
      * Cancels a HeldTransfer. This must be signed by the recipient of the HeldTransfer.
@@ -164,7 +178,7 @@ public abstract class AssetController {
      * @throws InvalidTransferException 
      */
 
-    public abstract CancelExchangeReceiptBuilder process(CancelExchangeRequest cancel) throws LowLevelPaymentException, TransferDeniedException, InvalidTransferException, NeuClearException;
+    public abstract CancelExchangeReceiptBuilder process(CancelExchangeOrder cancel) throws LowLevelPaymentException, TransferDeniedException, InvalidTransferException, NeuClearException;
 
 
 

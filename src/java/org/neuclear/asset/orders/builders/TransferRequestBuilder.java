@@ -1,9 +1,11 @@
-package org.neuclear.asset.contracts.builders;
+package org.neuclear.asset.orders.builders;
 
-import org.neuclear.asset.contracts.TransferGlobals;
+import org.neuclear.asset.orders.transfers.TransferGlobals;
 import org.neuclear.asset.contracts.Asset;
 import org.neuclear.asset.InvalidTransferException;
 import org.neuclear.asset.NegativeTransferException;
+import org.neuclear.asset.orders.transfers.TransferGlobals;
+import org.neuclear.asset.orders.builders.TransferBuilder;
 import org.neuclear.id.Identity;
 import org.neuclear.id.NSTools;
 import org.neuclear.commons.NeuClearException;
@@ -28,8 +30,13 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: TransferRequestBuilder.java,v 1.5 2004/01/03 20:36:25 pelle Exp $
+$Id: TransferRequestBuilder.java,v 1.1 2004/01/05 23:47:09 pelle Exp $
 $Log: TransferRequestBuilder.java,v $
+Revision 1.1  2004/01/05 23:47:09  pelle
+Create new Document classification "order", which is really just inherint in the new
+package layout.
+Got rid of much of the inheritance that was lying around and thought a bit further about the format of the exchange orders.
+
 Revision 1.5  2004/01/03 20:36:25  pelle
 Renamed HeldTransfer to Exchange
 Dropped valuetime from the request objects.

@@ -1,4 +1,4 @@
-package org.neuclear.asset.contracts;
+package org.neuclear.asset.orders;
 
 import org.dom4j.Element;
 import org.neuclear.id.Identity;
@@ -10,6 +10,8 @@ import org.neuclear.receiver.UnsupportedTransaction;
 import org.neuclear.commons.NeuClearException;
 import org.neuclear.asset.NegativeTransferException;
 import org.neuclear.asset.InvalidTransferException;
+import org.neuclear.asset.contracts.Asset;
+import org.neuclear.asset.orders.AssetTransactionContract;
 import org.neuclear.commons.time.TimeTools;
 import org.neuclear.commons.Utility;
 import org.neuclear.xml.XMLTools;
@@ -50,12 +52,11 @@ public abstract class TransferContract extends AssetTransactionContract {
         this.comment = (comment != null) ? comment : "";
     }
 
+
+
     public final double getAmount() {
-        return amount;
-    }
-
-
-    public abstract Identity getFrom();
+            return amount;
+        }
 
     public final String getComment() {
         return comment;

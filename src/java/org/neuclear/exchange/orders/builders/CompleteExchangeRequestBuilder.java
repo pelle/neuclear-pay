@@ -1,14 +1,19 @@
-package org.neuclear.asset.contracts.builders;
+package org.neuclear.exchange.orders.builders;
 
 import org.dom4j.Element;
-import org.neuclear.asset.contracts.TransferReceipt;
-import org.neuclear.asset.contracts.TransferGlobals;
-import org.neuclear.asset.contracts.TransferRequest;
-import org.neuclear.asset.contracts.ExchangeReceipt;
+import org.neuclear.asset.orders.TransferReceipt;
+import org.neuclear.asset.orders.transfers.TransferGlobals;
+import org.neuclear.asset.orders.TransferOrder;
+import org.neuclear.asset.orders.builders.TransferBuilder;
+import org.neuclear.exchange.orders.ExchangeOrderReceipt;
 import org.neuclear.asset.InvalidTransferException;
 import org.neuclear.asset.NegativeTransferException;
+import org.neuclear.asset.orders.builders.TransferBuilder;
+import org.neuclear.exchange.orders.ExchangeOrderReceipt;
+import org.neuclear.asset.orders.transfers.TransferGlobals;
 import org.neuclear.id.Identity;
 import org.neuclear.commons.NeuClearException;
+import org.neuclear.exchange.orders.ExchangeOrderReceipt;
 
 import java.util.Date;
 
@@ -30,8 +35,13 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: CompleteExchangeRequestBuilder.java,v 1.1 2004/01/03 20:36:25 pelle Exp $
+$Id: CompleteExchangeRequestBuilder.java,v 1.1 2004/01/05 23:47:10 pelle Exp $
 $Log: CompleteExchangeRequestBuilder.java,v $
+Revision 1.1  2004/01/05 23:47:10  pelle
+Create new Document classification "order", which is really just inherint in the new
+package layout.
+Got rid of much of the inheritance that was lying around and thought a bit further about the format of the exchange orders.
+
 Revision 1.1  2004/01/03 20:36:25  pelle
 Renamed HeldTransfer to Exchange
 Dropped valuetime from the request objects.
@@ -78,7 +88,7 @@ TransferReceiptBuilder has been created for use by Transfer processors. It is us
  * Time: 6:28:26 PM
  */
 public final class CompleteExchangeRequestBuilder extends TransferBuilder {
-    public CompleteExchangeRequestBuilder(final ExchangeReceipt req,final Identity signatory,final String id,final double amount, final String comment) throws InvalidTransferException, NegativeTransferException, NeuClearException {
+    public CompleteExchangeRequestBuilder(final ExchangeOrderReceipt req,final Identity signatory,final String id,final double amount, final String comment) throws InvalidTransferException, NegativeTransferException, NeuClearException {
         super(TransferGlobals.COMPLETE_TAGNAME,
                 req.getAsset(),
                 signatory,

@@ -1,12 +1,20 @@
-package org.neuclear.asset.contracts.builders;
+package org.neuclear.asset.orders.builders;
 
 import org.dom4j.Element;
+import org.neuclear.asset.contracts.*;
 import org.neuclear.asset.InvalidTransferException;
 import org.neuclear.asset.NegativeTransferException;
-import org.neuclear.asset.contracts.Asset;
-import org.neuclear.asset.contracts.TransferGlobals;
-import org.neuclear.id.builders.NamedObjectBuilder;
+import org.neuclear.exchange.orders.ExchangeCompletionOrder;
+import org.neuclear.asset.orders.TransferGlobals;
+import org.neuclear.asset.orders.TransferOrder;
+import org.neuclear.asset.orders.TransferOrder;
+import org.neuclear.asset.orders.builders.TransferBuilder;
 import org.neuclear.commons.NeuClearException;
+import org.neuclear.commons.time.TimeTools;
+import org.neuclear.exchange.orders.ExchangeCompletionOrder;
+
+import java.util.Date;
+import java.sql.Timestamp;
 
 /*
 NeuClear Distributed Transaction Clearing Platform
@@ -26,9 +34,14 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-$Id: CancelExchangeBuilder.java,v 1.1 2004/01/03 20:36:25 pelle Exp $
-$Log: CancelExchangeBuilder.java,v $
-Revision 1.1  2004/01/03 20:36:25  pelle
+$Id: TransferReceiptBuilder.java,v 1.1 2004/01/05 23:47:09 pelle Exp $
+$Log: TransferReceiptBuilder.java,v $
+Revision 1.1  2004/01/05 23:47:09  pelle
+Create new Document classification "order", which is really just inherint in the new
+package layout.
+Got rid of much of the inheritance that was lying around and thought a bit further about the format of the exchange orders.
+
+Revision 1.5  2004/01/03 20:36:25  pelle
 Renamed HeldTransfer to Exchange
 Dropped valuetime from the request objects.
 Doesnt yet compile. New commit to follow soon.
@@ -39,17 +52,7 @@ Otherwise You will Finaliate.
 Anything that can be final has been made final throughout everyting. We've used IDEA's Inspector tool to find all instance of variables that could be final.
 This should hopefully make everything more stable (and secure).
 
-Revision 1.3  2003/11/12 23:47:04  pelle
-Much work done in creating good test environment.
-PaymentReceiverTest works, but needs a abit more work in its environment to succeed testing.
-
-Revision 1.2  2003/11/11 21:17:19  pelle
-Further vital reshuffling.
-org.neudist.crypto.* and org.neudist.utils.* have been moved to respective areas under org.neuclear.commons
-org.neuclear.signers.* as well as org.neuclear.passphraseagents have been moved under org.neuclear.commons.crypto as well.
-Did a bit of work on the Canonicalizer and changed a few other minor bits.
-
-Revision 1.1  2003/11/10 17:42:07  pelle
+Revision 1.3  2003/11/10 17:42:07  pelle
 The AssetController interface has been more or less finalized.
 CurrencyController fully implemented
 AssetControlClient implementes a remote client for communicating with AssetControllers
@@ -81,25 +84,37 @@ TransferReceiptBuilder has been created for use by Transfer processors. It is us
 /**
  * User: pelleb
  * Date: Oct 3, 2003
- * Time: 3:13:27 PM
+ * Time: 6:28:26 PM
  */
-public abstract class CancelExchangeBuilder extends NamedObjectBuilder {
-    protected CancelExchangeBuilder(final String tagname, final String name, final Asset asset, final String holdid) throws InvalidTransferException, NegativeTransferException, NeuClearException {
-        super(name, TransferGlobals.createQName(tagname));
-        if (asset == null)
-            throw new InvalidTransferException("assetName");
-        if (holdid == null)
-            throw new InvalidTransferException("holdid");
-
-        this.asset = asset;
+public class TransferReceiptBuilder extends TransferBuilder {
+    public TransferReceiptBuilder(final ExchangeCompletionOrder req,final String id,Timestamp valuetime) throws InvalidTransferException, NegativeTransferException, NeuClearException {
+        super(TransferGlobals.XFER_RCPT_TAGNAME,
+                req.getAsset(),
+                req.getAsset(),
+                req.getTo(),
+                req.getAmount(),
+                req.getComment());
         final Element element = getElement();
-        element.add(TransferGlobals.createAttribute(element, "assetName", asset.getName()));
-        element.add(TransferGlobals.createAttribute(element, "holdid", holdid));
+        if (valuetime == null)
+            throw new InvalidTransferException("valuetime");
+        element.add(TransferGlobals.createAttribute(element, "valuetime", TimeTools.formatTimeStamp(valuetime)));
+
+        element.add(TransferGlobals.createAttribute(element, "sender", req.getFrom().getName()));
+        element.add(TransferGlobals.createAttribute(element, "holdid", req.getHoldId()));
     }
 
-    public final Asset getAsset() {
-        return asset;
+    public TransferReceiptBuilder(final TransferOrder req,final String id,Timestamp valuetime) throws InvalidTransferException, NegativeTransferException, NeuClearException {
+        super(TransferGlobals.XFER_RCPT_TAGNAME,
+                req.getAsset(),
+                req.getAsset(),
+                req.getTo(),
+                req.getAmount(),
+                req.getComment());
+        final Element element = getElement();
+        if (valuetime == null)
+            throw new InvalidTransferException("valuetime");
+        element.add(TransferGlobals.createAttribute(element, "valuetime", TimeTools.formatTimeStamp(valuetime)));
+        element.add(TransferGlobals.createAttribute(element, "sender", req.getFrom().getName()));
+        element.add(TransferGlobals.createAttribute(element, "reqid", req.getName()));
     }
-
-    private final Asset asset;
 }

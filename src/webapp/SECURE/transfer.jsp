@@ -1,16 +1,17 @@
 <%@ page import="org.neuclear.id.Identity,
                  org.neuclear.commons.Utility,
-                 org.neuclear.asset.contracts.builders.TransferRequestBuilder,
+                 org.neuclear.asset.orders.builders.TransferRequestBuilder,
                  org.neuclear.id.resolver.NSResolver,
                  org.neuclear.asset.contracts.Asset,
                  org.neuclear.commons.time.TimeTools,
                  org.neuclear.id.builders.SignatureRequestBuilder,
                  org.neuclear.asset.contracts.AssetGlobals,
-                 org.neuclear.asset.contracts.TransferGlobals,
+                 org.neuclear.asset.orders.transfers.TransferGlobals,
                  org.neuclear.asset.receiver.servlet.AssetControllerServlet,
                  org.neuclear.id.SignedNamedObject,
                  org.neuclear.commons.crypto.Base64,
-                 org.neuclear.commons.servlets.ServletTools"%>
+                 org.neuclear.commons.servlets.ServletTools,
+                 org.neuclear.asset.orders.transfers.TransferGlobals"%>
 <%
     AssetGlobals.registerReaders();
     TransferGlobals.registerReaders();

@@ -1,10 +1,17 @@
 package org.neuclear.asset.controllers.currency;
 
 import org.neuclear.asset.*;
+import org.neuclear.exchange.orders.CancelExchangeOrder;
+import org.neuclear.exchange.orders.ExchangeCompletionOrder;
+import org.neuclear.exchange.orders.ExchangeCompletionOrder;
+import org.neuclear.exchange.orders.ExchangeOrder;
+import org.neuclear.asset.orders.TransferOrder;
+import org.neuclear.asset.orders.builders.TransferReceiptBuilder;
 import org.neuclear.asset.contracts.*;
-import org.neuclear.asset.contracts.builders.CancelExchangeReceiptBuilder;
-import org.neuclear.asset.contracts.builders.ExchangeReceiptBuilder;
-import org.neuclear.asset.contracts.builders.TransferReceiptBuilder;
+import org.neuclear.exchange.orders.builders.CancelExchangeReceiptBuilder;
+import org.neuclear.exchange.orders.builders.ExchangeReceiptBuilder;
+import org.neuclear.exchange.orders.builders.ExchangeReceiptBuilder;
+import org.neuclear.asset.orders.builders.TransferReceiptBuilder;
 import org.neuclear.commons.NeuClearException;
 import org.neuclear.id.Identity;
 import org.neuclear.id.resolver.NSResolver;
@@ -41,7 +48,7 @@ public final class CurrencyController extends AssetController {
         return this.asset.getName().equals(asset.getName());
     }
 
-    public final TransferReceiptBuilder process(final TransferRequest req) throws InvalidTransferException, LowLevelPaymentException, TransferDeniedException, NeuClearException {
+    public final TransferReceiptBuilder process(final TransferOrder req) throws InvalidTransferException, LowLevelPaymentException, TransferDeniedException, NeuClearException {
 
         try {
             if (!req.getSignatory().equals(req.getFrom()))
@@ -64,7 +71,7 @@ public final class CurrencyController extends AssetController {
         }
     }
 
-    private String createTransactionId(final TransferRequest req, final PostedTransaction posted) {
+    private String createTransactionId(final TransferOrder req, final PostedTransaction posted) {
         return req.getAsset().getName() + "/" + posted.getXid();
     }
 
@@ -90,7 +97,7 @@ public final class CurrencyController extends AssetController {
         }
     }
 
-    public final ExchangeReceiptBuilder process(final ExchangeRequest req) throws InvalidTransferException, LowLevelPaymentException, TransferDeniedException, NeuClearException {
+    public final ExchangeReceiptBuilder process(final ExchangeOrder req) throws InvalidTransferException, LowLevelPaymentException, TransferDeniedException, NeuClearException {
         try {
             if (!req.getSignatory().equals(req.getFrom()))
                 throw new TransferDeniedException(req);
@@ -114,7 +121,7 @@ public final class CurrencyController extends AssetController {
         }
     }
 
-    public final TransferReceiptBuilder process(final CompleteExchangeRequest complete) throws LowLevelPaymentException, InvalidTransferException, TransferDeniedException, NeuClearException {
+    public final TransferReceiptBuilder process(final ExchangeCompletionOrder complete) throws LowLevelPaymentException, InvalidTransferException, TransferDeniedException, NeuClearException {
         try {
             if (!complete.getSignatory().equals(complete.getTo()))
                 throw new TransferDeniedException(complete);
@@ -143,7 +150,7 @@ public final class CurrencyController extends AssetController {
         }
     }
 
-    public final CancelExchangeReceiptBuilder process(final CancelExchangeRequest cancel) throws InvalidTransferException, LowLevelPaymentException, TransferDeniedException, NeuClearException {
+    public final CancelExchangeReceiptBuilder process(final CancelExchangeOrder cancel) throws InvalidTransferException, LowLevelPaymentException, TransferDeniedException, NeuClearException {
         try {
             final PostedHeldTransaction heldTran = ledger.findHeldTransaction(cancel.getHoldId());
             if (!isRecipient(cancel.getSignatory(), heldTran))
