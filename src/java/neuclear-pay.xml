@@ -7,13 +7,11 @@
         <param type="java.lang.String">SuperBux</param>
         <param type="java.lang.String">neu://superbux/reserve</param>
     </component>
-    <component class="org.neuclear.pay.PaymentReceiver">
+    <component class="org.neuclear.pay.receiver.PaymentReceiver">
         <param type="java.lang.String">neu://superbux/reserve</param>
     </component>
-    <component type="org.neuclear.signer.Signer"
-        class="org.neuclear.signer.JCESigner"/>
-    <component type="org.neuclear.signer.PublicKeySource"
-        class="org.neuclear.signer.JCESigner"/>
+    <component type="org.neudist.crypto.Signer"
+        class="org.neuclear.signers.DefaultSigner"/>
     <component type="org.neuclear.passphraseagents.PassPhraseAgent"
         class="org.neuclear.passphraseagents.GuiDialogAgent"/>
 
