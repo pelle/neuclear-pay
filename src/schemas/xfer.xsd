@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-$Id: xfer.xsd,v 1.4 2004/01/07 23:11:06 pelle Exp $
+$Id: xfer.xsd,v 1.5 2004/01/08 17:15:28 pelle Exp $
 $Log: xfer.xsd,v $
+Revision 1.5  2004/01/08 17:15:28  pelle
+Further improving the model. Removing the need for transactions to be members of NamedObject
+
 Revision 1.4  2004/01/07 23:11:06  pelle
 XMLSig now has various added features:
 -  KeyInfo supports X509v3 (untested)
@@ -47,6 +50,7 @@ Updated the Exchange and transfer orders.
             <xs:list itemType="neuid:NamedObjectReference"/>
         </xs:simpleType>
     </xs:element>
+
     <xs:element name="TransferOrder" nillable="false">
         <xs:complexType>
             <xs:complexContent>
@@ -61,6 +65,7 @@ Updated the Exchange and transfer orders.
             </xs:complexContent>
         </xs:complexType>
     </xs:element>
+
     <xs:element name="TransferReceipt" nillable="false">
         <xs:complexType >
             <xs:complexContent>
